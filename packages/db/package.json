@@ -1,0 +1,26 @@
+{
+  "name": "db",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./index.ts"
+    }
+  },
+  "scripts": {
+    "push": "drizzle-kit push",
+    "studio": "drizzle-kit studio --port 5556",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.6",
+    "pg": "^8.16.3"
+  }
+}

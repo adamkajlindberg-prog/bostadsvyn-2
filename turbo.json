@@ -1,0 +1,49 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env*"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "FAL_KEY",
+    "GEMINI_API_KEY",
+    "RECAPTCHA_SECRET_KEY",
+    "SENDGRID_API_KEY"
+  ],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "npm_lifecycle_event"
+  ],
+  "tasks": {
+    "//#format": {
+      "cache": false
+    },
+    "//#lint": {},
+    "//#lint-fix": {
+      "cache": false
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "cache": false,
+      "persistent": true
+    },
+    "type-check": {
+      "cache": false,
+      "outputs": ["tsconfig.tsbuildinfo", ".tsbuildinfo"]
+    },
+    "ui-add": {
+      "cache": false,
+      "interactive": true
+    }
+  },
+  "ui": "tui"
+}
