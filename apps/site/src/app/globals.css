@@ -36,6 +36,17 @@
   --color-primary-light: var(--primary-light);
   --color-primary-deep: var(--primary-deep);
   --color-nordic-ice: var(--nordic-ice);
+  --color-nordic-glacier: var(--nordic-glacier);
+  --color-nordic-fjord: var(--nordic-fjord);
+  --color-nordic-fjord-deep: var(--nordic-fjord-deep);
+  --color-nordic-forest: var(--nordic-forest);
+  --color-nordic-forest-dark: var(--nordic-forest-dark);
+  --color-nordic-aurora: var(--nordic-aurora);
+  --color-nordic-aurora-light: var(--nordic-aurora-light);
+  --color-nordic-midnight: var(--nordic-midnight);
+  --color-nordic-snow: var(--nordic-snow);
+  --color-nordic-mist: var(--nordic-mist);
+  --color-nordic-sage: var(--nordic-sage);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -83,6 +94,17 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --nordic-ice: hsl(215 40% 96%);
+  --nordic-glacier: hsl(215 35% 90%);
+  --nordic-fjord: hsl(215 65% 55%);
+  --nordic-fjord-deep: hsl(215 70% 48%);
+  --nordic-forest: hsl(215 60% 58%);
+  --nordic-forest-dark: hsl(215 65% 50%);
+  --nordic-aurora: hsl(215 55% 65%);
+  --nordic-aurora-light: hsl(215 45% 80%);
+  --nordic-midnight: hsl(215 85% 20%);
+  --nordic-snow: hsl(215 35% 96%);
+  --nordic-mist: hsl(215 55% 65%);
+  --nordic-sage: hsl(215 60% 58%);
 }
 
 .dark {

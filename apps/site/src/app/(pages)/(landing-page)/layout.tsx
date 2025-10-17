@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../../globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatSidebar from "@/components/chat-sidebar";
 import Header from "@/components/common/header";
+import Footer from "@/components/common/footer";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,6 +28,7 @@ export default function RootLayout({
           <main className="w-full">
             <Header />
             {children}
+            <Footer />
           </main>
         </SidebarProvider>
       </body>

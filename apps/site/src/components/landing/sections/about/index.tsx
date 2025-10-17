@@ -1,6 +1,3 @@
-"use client"
-
-import Hero from "@/components/hero"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRightIcon, BrainIcon, CalculatorIcon, EyeIcon, FileTextIcon, SearchIcon, SparklesIcon, TrendingUpIcon } from "lucide-react"
 import Image from "next/image"
@@ -10,9 +7,9 @@ import villaBefore from "@/images/villa-before-edit.webp"
 import villaAfter from "@/images/villa-after-with-pool.webp"
 import Link from "next/link"
 
-const features = [
+const highlights = [
     {
-        badgeIcon: <BrainIcon size={16} className="text-white" /> ,
+        badgeIcon: <BrainIcon size={16} className="text-primary-foreground" /> ,
         badgeText: "AI-Homestyling",
         title: "Se potentialen i varje rum",
         description: "Vår AI-teknik kan transformera rum till den stil eller miljö som önskas så att du som köpare kan visualisera din framtida bostad.",
@@ -27,7 +24,7 @@ const features = [
         imageAfterAlt: "Vardagsrum efter"
     },
     {
-        badgeIcon: <SparklesIcon size={16} className="text-white" /> ,
+        badgeIcon: <SparklesIcon size={16} className="text-primary-foreground" /> ,
         badgeText: "AI Bildredigering",
         title: "Visualisera renoveringar, förändringar och tillbyggnader",
         description: "Vårt AI-verktyg låter dig enkelt lägga till eller ta bort element från fastighetbilder. Visa potentialen i utomhusutrymmen genom att lägga till pooler, terrasser, och andra förbättringar.",
@@ -43,7 +40,7 @@ const features = [
     }
 ]
 
-const cardItems = [
+const features = [
     {
         badgeIcon: <BrainIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         badgeText: "Populär",
@@ -110,11 +107,8 @@ const cardItems = [
     },
 ]
 
-const HomePage = () => {
+const About = () => {
     return (
-    <div className="@container">
-        <Hero />
-       
         <div className="bg-gradient-to-b from-nordic-ice to-background">
             <div className="container mx-auto max-w-7xl py-16 px-6 @lg:px-8 @8xl:px-0">
                 <h1 className="text-center text-4xl @4xl:text-6xl font-semibold tracking-tight mb-6">
@@ -145,8 +139,8 @@ const HomePage = () => {
 
                 <div className="flex justify-center mb-4">
                     <div className="flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full">
-                        <SparklesIcon size={16} className="text-white" /> 
-                        <div className="text-xs font-semibold text-white">
+                        <SparklesIcon size={16} className="text-primary-foreground" /> 
+                        <div className="text-xs font-semibold text-primary-foreground">
                             AI-Powered Features
                         </div>
                     </div>
@@ -162,23 +156,23 @@ const HomePage = () => {
                 </p>
                 
                 <div className="space-y-16 mb-16">
-                    {features.map((feature) => (
-                        <Card key={feature.badgeText} className="border-none p-0 bg-white overflow-hidden">
+                    {highlights.map((highlight) => (
+                        <Card key={highlight.badgeText} className="border-none p-0 bg-card overflow-hidden">
                             <CardContent className="p-0">
                                 <div className="pt-12 pb-16 px-8 @lg:px-10 @4xl:px-12">
                                     <div className="inline-flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full mb-4">
-                                        {feature.badgeIcon}
-                                        <div className="text-xs font-semibold text-white">
-                                            {feature.badgeText}
+                                        {highlight.badgeIcon}
+                                        <div className="text-xs font-semibold text-primary-foreground">
+                                            {highlight.badgeText}
                                         </div>
                                     </div>
 
-                                    <h3 className="text-xl @lg:text-3xl font-semibold tracking-tight mb-4">{feature.title}</h3>
-                                    <p className="text-muted-foreground text-base @lg:text-lg leading-relaxed mb-6">{feature.description}</p>
+                                    <h3 className="text-xl @lg:text-3xl font-semibold tracking-tight mb-4">{highlight.title}</h3>
+                                    <p className="text-muted-foreground text-base @lg:text-lg leading-relaxed mb-6">{highlight.description}</p>
 
                                     <ul className="list-disc list-inside marker:text-primary marker:text-xl space-y-1">
-                                        {feature.details.map((detail, index) => (
-                                            <li className="text-sm @lg:text-base" key={`${feature.badgeText}-detail-${index}`}>{detail}</li>
+                                        {highlight.details.map((detail, index) => (
+                                            <li className="text-sm @lg:text-base" key={`${highlight.badgeText}-detail-${index}`}>{detail}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -186,8 +180,8 @@ const HomePage = () => {
                                 <div className="grid grid-cols-1 @6xl:grid-cols-2">
                                     <div className="relative h-60 @lg:h-96 @2xl:h-96 @4xl:h-[500px] @6xl:h-[430px]">
                                         <Image
-                                            src={feature.imageBefore}
-                                            alt={feature.imageBeforeAlt}
+                                            src={highlight.imageBefore}
+                                            alt={highlight.imageBeforeAlt}
                                             fill
                                             className="object-cover"
                                         />
@@ -198,13 +192,13 @@ const HomePage = () => {
                                     </div>
                                     <div className="relative h-60 @lg:h-96 @4xl:h-[500px] @6xl:h-[430px]">
                                         <Image
-                                            src={feature.imageAfter}
-                                            alt={feature.imageAfterAlt}
+                                            src={highlight.imageAfter}
+                                            alt={highlight.imageAfterAlt}
                                             fill
                                             className="object-cover"
                                         />
 
-                                        <div className="absolute top-4 right-4 @lg:top-5 @lg:right-5 text-sm text-white bg-primary/90 px-4 py-1 rounded-full shadow-sm">
+                                        <div className="absolute top-4 right-4 @lg:top-5 @lg:right-5 text-sm text-primary-foreground bg-primary/90 px-4 py-1 rounded-full shadow-sm">
                                             Efter
                                         </div>
                                     </div>
@@ -214,43 +208,43 @@ const HomePage = () => {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 @2xl:grid-cols-2 @6xl:grid-cols-3 gap-6">
-                    {cardItems.map((item, index) => (
-                        <Card key={`card-${index}`} className="border-none p-0 bg-white overflow-hidden">
-                            <CardContent className="p-0">
-                                <div className="p-8">
-                                <div className="flex items-center gap-x-4 mb-4">
-                                    {item.badgeIcon}
-                                    {item.badgeText && (
-                                        <div className="text-xs text-primary-deep font-medium bg-primary/20 px-3 py-1 rounded-full">{item.badgeText}</div>
-                                    )}
-                                </div>
-                                
-                                <h4 className="text-xl font-semibold mb-3">{item.title}</h4>
-                                <p className="text-muted-foreground mb-4">{item.description}</p>
+                <div className="grid grid-cols-1 @2xl:grid-cols-2 @6xl:grid-cols-3 auto-rows-min gap-6">
+                    {features.map((feature, index) => (
+                        <Link key={`card-${index}`} href="#">
+                            <Card className="border-none p-0 bg-card overflow-hidden group hover:shadow-lg hover:scale-105 transition-all duration-300 h-full">
+                                <CardContent className="p-0 h-full flex flex-col">
+                                    <div className="p-8 flex flex-col flex-1">
+                                        <div className="flex items-center gap-x-4 mb-4">
+                                            {feature.badgeIcon}
+                                            {feature.badgeText && (
+                                                <div className="text-xs text-primary-deep font-medium bg-primary/20 px-3 py-1 rounded-full">{feature.badgeText}</div>
+                                            )}
+                                        </div>
+                                    
+                                        <h4 className="text-xl group-hover:text-primary font-semibold mb-3">{feature.title}</h4>
+                                        <p className="text-muted-foreground mb-4">{feature.description}</p>
 
-                                    <ul className="list-disc list-inside marker:text-primary marker:text-xl space-y-1 mb-6">
-                                        {item.details.map((detail, index) => (
-                                            <li key={`card-detail-${index}`} className="text-sm text-muted-foreground">{detail}</li>    
-                                        ))}
-                                    </ul>
+                                        <ul className="list-disc list-inside marker:text-primary marker:text-xl space-y-1 mb-6">
+                                            {feature.details.map((detail, index) => (
+                                                <li key={`card-detail-${index}`} className="text-sm text-muted-foreground">{detail}</li>    
+                                            ))}
+                                        </ul>
 
-                                    <div className="flex justify-center">
-                                        <Link className="text-primary flex items-center gap-x-1 hover:underline underline-offset-3" href="#">
-                                            Läs mer 
-                                            <ArrowRightIcon size={14} />
-                                        </Link>
+                                        <div className="flex justify-center mt-auto">
+                                            <div className="text-primary flex items-center gap-x-1 group-hover:underline underline-offset-3">
+                                                Läs mer 
+                                                <ArrowRightIcon size={14} />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     ))}
-                    
                 </div>
             </div>
         </div>
-    </div>
-    ) 
+    )
 }
 
-export default HomePage
+export default About

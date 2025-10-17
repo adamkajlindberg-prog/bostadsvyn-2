@@ -5,22 +5,22 @@ const features = [
     {
         title: "AI-Rekommendationer",
         description: "Personliga tips och rekommendationer baserade på din sökhistorik och önskemål",
-        icon: <BrainIcon className="text-white" size={32} />
+        icon: <BrainIcon className="text-primary-foreground" size={32} />
     },
     {
         title: "Marknadsanalys",
         description: "Värderingar och förväntningar baserade på marknadsdata och avancerad AI-teknologi",
-        icon: <TrendingUpIcon className="text-white" size={32} />
+        icon: <TrendingUpIcon className="text-primary-foreground" size={32} />
     },
     {
         title: "Digitala hyreskontrakt",
         description: "Efter vald hyresbostad hjälper vi med digitala hyreskontrakt och säker signering med BankID",
-        icon: <FilePenIcon className="text-white" size={32} />
+        icon: <FilePenIcon className="text-primary-foreground" size={32} />
     },
     {
         title: "Brett utbud av bostäder",
         description: "Första portalen i Sverige som erbjuder alla typer av bostäder på en och samma plattform",
-        icon: <HouseIcon className="text-white" size={32} />
+        icon: <HouseIcon className="text-primary-foreground" size={32} />
     },
 ]
 
@@ -30,7 +30,7 @@ const Hero = () => {
             <div className="absolute inset-0 bg-primary/40" />
 
             <div className="container mx-auto max-w-7xl px-6 @lg:px-8 @8xl:px-0 relative z-10">
-                <h1 className="text-center text-4xl @4xl:text-6xl font-semibold tracking-tight text-white mb-8">
+                <h1 className="text-center text-4xl @4xl:text-6xl font-semibold tracking-tight text-primary-foreground mb-8">
                     Välkommen till Bostadsvyn!
                 </h1>
 
@@ -39,7 +39,7 @@ const Hero = () => {
                         <Card key={`feature-${index}`} className="bg-white/5 border border-primary-foreground/10 backdrop-blur-sm">
                             <CardContent>
                                 <div className="flex justify-center mb-2">{feature.icon}</div>
-                                <h6 className="text-lg text-white text-center font-semibold mb-1">{feature.title}</h6>
+                                <h6 className="text-lg text-primary-foreground text-center font-semibold mb-1">{feature.title}</h6>
                                 <p className="text-sm text-neutral-200 text-center">{feature.description}</p>
                             </CardContent>
                         </Card>

@@ -41,18 +41,20 @@ const navMenu = [
 
 const Header = () => {
     return (
-        <div className="@container">
-            <div className="flex items-center justify-between container mx-auto py-4 px-6 @lg:px-8">
+        <header className="@container sticky top-0 bg-background w-full z-50 shadow-sm">
+            <div className="flex items-center justify-between container mx-auto py-3 @lg:py-4 px-6 @lg:px-8">
                 {/* Logo */}
-                <div className="flex items-center gap-x-3">
-                    <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
-                        <Logo className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
+                <Link href="#">
+                    <div className="flex items-center gap-x-3">
+                        <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
+                            <Logo className="h-6 w-6 @lg:h-7 @lg:w-7 text-primary-foreground" aria-hidden="true" />
+                        </div>
+                        
+                        <h2 className="font-semibold text-lg @lg:text-xl">
+                            Bostadsvyn.se
+                        </h2>
                     </div>
-                    
-                    <div className="font-semibold text-xl">
-                        Bostadsvyn.se
-                    </div>
-                </div>
+                </Link>
 
                 {/* Navigation menu for extra large screens */}
                 <div className="hidden @6xl:flex items-center gap-x-6 2xl:gap-x-8">
@@ -65,7 +67,9 @@ const Header = () => {
 
                 <div className="flex items-center gap-x-4">
                     <Button variant="outline" className="hidden @xl:flex"><Building2Icon /> Mäklare</Button>
-                    <Button className="hidden @xl:flex"><UserIcon /> Logga in</Button>
+                    <Link href="/login">
+                        <Button className="hidden @xl:flex"><UserIcon /> Logga in</Button>
+                    </Link>
 
                     {/* Navigation menu for small - large screens */}
                     <Sheet>
@@ -96,7 +100,7 @@ const Header = () => {
                     </Sheet>
                 </div> 
             </div>
-        </div>
+        </header>
     )
 }
 

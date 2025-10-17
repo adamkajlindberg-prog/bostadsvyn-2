@@ -9,13 +9,12 @@ import {
   SidebarGroupLabel,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "../ui/button"
 
 const ChatSidebar = () => {
   const { open, toggleSidebar } = useSidebar()
   
   return (
-    <div className="relative max-h-screen">
+    <div>
       <Sidebar collapsible="icon">
         <SidebarContent>
           <SidebarGroup>
@@ -34,7 +33,7 @@ const ChatSidebar = () => {
       <button
         aria-label="Toggle sidebar"
         onClick={toggleSidebar}
-        className="hidden sm:block absolute top-1/2 left-full -ml-4 z-40 bg-primary text-white rounded-full p-2 hover:bg-primary-light shadow-lg cursor-pointer"
+        className="hidden sm:block sticky top-1/2 left-full -mr-5 z-40 bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary-light shadow-lg cursor-pointer"
       >
         {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
@@ -43,7 +42,7 @@ const ChatSidebar = () => {
       <button
         aria-label="Toggle sidebar"
         onClick={toggleSidebar}
-        className="block sm:hidden fixed top-1/2 z-40 bg-primary -ml-2 text-white rounded-e-full py-2 pl-2 pr-1 hover:bg-primary-light shadow-lg cursor-pointer"
+        className="block sm:hidden fixed top-1/2 z-40 bg-primary -ml-2 text-primary-foreground rounded-e-full py-2 pl-2 pr-1 hover:bg-primary-light shadow-lg cursor-pointer"
       >
         {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
