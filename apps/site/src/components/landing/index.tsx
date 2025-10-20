@@ -7,7 +7,9 @@ const LandingContent = () => {
         <div className="@container">
             <Hero />
             <About />  
-            <Properties /> 
+            <div className="bg-nordic-ice py-14 @lg:py-16 px-6 @lg:px-8 @8xl:px-0">
+                <Properties /> 
+            </div>
         </div>
     )
 }

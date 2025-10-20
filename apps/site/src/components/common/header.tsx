@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 const navMenu = [
     {
         title: "Köp",
-        url: "#"
+        url: "/kop"
     },
     {
         title: "Sälj",
@@ -15,7 +15,7 @@ const navMenu = [
     },
     {
         title: "Hyra",
-        url: "#"
+        url: "/hyra"
     },
     {
         title: "Nyproduktion",
@@ -44,7 +44,7 @@ const Header = () => {
         <header className="@container sticky top-0 bg-background w-full z-50 shadow-sm">
             <div className="flex items-center justify-between container mx-auto py-3 @lg:py-4 px-6 @lg:px-8">
                 {/* Logo */}
-                <Link href="#">
+                <Link href="/">
                     <div className="flex items-center gap-x-3">
                         <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
                             <Logo className="h-6 w-6 @lg:h-7 @lg:w-7 text-primary-foreground" aria-hidden="true" />

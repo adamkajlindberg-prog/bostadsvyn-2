@@ -7,7 +7,7 @@ const Footer = () => {
             <div className="container mx-auto px-6 @lg:px-8">
                 <div className="flex w-full flex-col justify-between gap-10 @5xl:flex-row @5xl:items-start @5xl:text-left pb-2">
                     <div className="flex w-full @5xl:max-w-xs @8xl:max-w-lg flex-col justify-between gap-6 lg:items-start">
-                        <Link href="#">
+                        <Link href="/">
                             <h2 className="text-lg @lg:text-xl text-nordic-aurora font-semibold">Bostadsvyn.se</h2>
                         </Link>
                         <p className="text-sm text-nordic-mist max-w-[70%]">

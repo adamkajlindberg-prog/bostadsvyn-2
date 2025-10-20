@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { BrainIcon, FilePenIcon, HouseIcon, TrendingUpIcon } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { BrainIcon, FilePenIcon, HouseIcon, InfoIcon, SearchIcon, SlidersHorizontalIcon, TrendingUpIcon } from "lucide-react"
 
 const features = [
     {
@@ -24,9 +26,11 @@ const features = [
     },
 ]
 
+const popularSearches = ["3 rum Stockholm under 5M", "Lägenhet nära tunnelbana Göteborg", "Villa med trädgård Malmö"]
+
 const Hero = () => {
     return (
-        <div className="relative h-auto w-full py-10 @lg:py-12 @6xl:py-16 bg-[url('../images/bg-image.webp')] bg-cover bg-center bg-no-repeat">
+        <div className="relative min-h-screen h-auto w-full py-10 @lg:py-12 @6xl:py-16 bg-[url('../images/bg-image.webp')] bg-cover bg-center bg-no-repeat">
             <div className="absolute inset-0 bg-primary/40" />
 
             <div className="container mx-auto max-w-7xl px-6 @lg:px-8 @8xl:px-0 relative z-10">
@@ -47,8 +51,47 @@ const Hero = () => {
                 </div>
 
                 <div>
-                    <Card className="bg-white/30 border border-primary-foreground/10 backdrop-blur-lg h-[30rem]">
-                        <CardContent>
+                    <Card className="bg-card/40 border border-primary-foreground/20 backdrop-blur-lg py-4 @lg:py-8 shadow-2xl text-primary-foreground">
+                        <CardContent className="px-4 @lg:px-8">
+                            <div className="bg-accent/10 border border-accent/40 rounded-lg p-6">
+                                <div className="flex flex-wrap flex-row @lg:items-center gap-3 mb-4 justify-between @lg:justify-start">
+                                    <BrainIcon size={28} className="text-primary/90 order-1" />
+                                    <h4 className="text-lg font-semibold order-3 @lg:order-2 mx-auto @lg:mx-0">Smart bostadssökning</h4>
+                                    <div className="flex items-center gap-x-2 @lg:gap-x-3 order-2 @lg:order-3">
+                                    <InfoIcon className="bg-accent/30 h-5 w-5 rounded-full p-1"/>
+                                    <div className="bg-accent/20 text-xs font-semibold rounded-full border border-accent px-2.5 py-0.5">Beta</div>
+                                    </div>
+                                </div>
+                                
+                                <p className="text-sm text-center text-primary-foreground/90 max-w-5xl mx-auto mb-6">
+                                    Med hjälp av vår unika AI-sökning kan du enkelt skriva en liten text om vad du söker, vilka 
+                                    attribut som den nya bostaden ska ha och vilken gata, område eller kommun som önskas. Vår AI 
+                                    kommer sen att matcha de bostäderna i vårt system som bäst passar dina önskemål.
+                                </p>
+
+                                <div className="grid grid-cols-1 @lg:grid-cols-2 @lg:items-center gap-4 mb-6">
+                                    <Input className="bg-background/80 border border-accent/30 px-4 text-sm h-12 text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" placeholder="Sök område, stad eller beskriv din drömbostad..." />
+                                    <Button variant="secondary" className="h-12 bg-background/80 border border-accent/30">
+                                        <SlidersHorizontalIcon /> 
+                                        Önskar du söka via filter?
+                                    </Button>
+                                </div>
+                                
+                                <div className="flex justify-center mb-8">
+                                    <Button className="w-full @lg:w-auto h-12 has-[>svg]:px-10"><SearchIcon /> Sök bostäder</Button>
+                                </div>
+
+                                <div className="border-t border-accent/40 pt-6">
+                                    <div className="text-center text-sm text-primary-foreground/90 mb-4">Populära sökningar:</div>
+                                    <div className="flex flex-wrap gap-3">
+                                        {popularSearches.map((search, index) => (
+                                            <Button key={`popular-search-${index}`} size="sm" variant="ghost" className="text-xs text-primary-foreground bg-primary/30 hover:bg-primary/40 hover:text-primary-foreground">
+                                                {search}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

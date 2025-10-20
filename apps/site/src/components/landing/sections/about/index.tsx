@@ -159,7 +159,7 @@ const About = () => {
                     {highlights.map((highlight) => (
                         <Card key={highlight.badgeText} className="border-none p-0 bg-card overflow-hidden">
                             <CardContent className="p-0">
-                                <div className="pt-12 pb-16 px-8 @lg:px-10 @4xl:px-12">
+                                <div className="pt-8 @lg:pt-12 pb-12 @lg:pb-16 px-8 @lg:px-10 @4xl:px-12">
                                     <div className="inline-flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full mb-4">
                                         {highlight.badgeIcon}
                                         <div className="text-xs font-semibold text-primary-foreground">

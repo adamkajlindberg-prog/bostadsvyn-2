@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -7,16 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { HeartIcon, LockIcon, MailIcon } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import LoginTab from "./login-tab"
+import RegisterTab from "./register-tab"
 
 export function LoginForm({
   className,
@@ -24,7 +16,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="w-md">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Välkommen!</CardTitle>
           <CardDescription>
@@ -43,36 +35,12 @@ export function LoginForm({
                   </TabsTrigger>
               </TabsList>
               <TabsContent value="login">
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="email">E-postadress</FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput placeholder="din@email.se" />
-                      <InputGroupAddon>
-                        <MailIcon />
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="password">Lösenord</FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput placeholder="Ditt lösenord" />
-                      <InputGroupAddon>
-                        <LockIcon />
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </Field>
-                  <Field>
-                    <Button type="submit" className="mb-4">Logga in</Button>
-                    <Separator />
-                    <FieldDescription className="mt-1 flex justify-center items-center gap-x-2">
-                      <HeartIcon size={18} className="text-red-400" /> Hitta ditt drömhem bland tusentals annonser
-                    </FieldDescription>
-                  </Field>
-                </FieldGroup>
+                <LoginTab />
+              </TabsContent>
+              <TabsContent value="register">
+                <RegisterTab />
               </TabsContent>
             </Tabs>
-           
           </form>
         </CardContent>
       </Card>
