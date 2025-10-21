@@ -46,7 +46,7 @@ const ChatSidebar = () => {
   
   return (
     <div>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" className="border-r border-neutral-200">
         <SidebarContent className="flex flex-col h-full">
           <SidebarGroup className="px-0 pt-5 flex flex-col flex-1">
             <SidebarGroupLabel className="px-6 mb-6">
@@ -92,7 +92,7 @@ const ChatSidebar = () => {
               )}
               
 
-              <div className="flex-1 px-2 border-t">
+              <div className="flex-1 px-2 border-t border-neutral-200">
                  <Conversation className="relative w-full">
                     <ConversationContent className="py-2">
                       <Message from="assistant" className="items-start">
@@ -103,7 +103,7 @@ const ChatSidebar = () => {
                   </Conversation>
               </div>
               
-              <div className="px-6 pt-4 pb-1.5 border-t">
+              <div className="px-6 pt-4 pb-1.5 border-t border-neutral-200">
                 <PromptInput className="relative w-full mb-2.5" onSubmit={() => {}}>
                   <PromptInputTextarea className="pr-12 text-sm" placeholder="Skriv ditt meddelande här..." />
                   <PromptInputSubmit className="absolute bottom-1 right-1 cursor-pointer" />

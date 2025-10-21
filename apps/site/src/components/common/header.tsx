@@ -11,7 +11,7 @@ const navMenu = [
     },
     {
         title: "Sälj",
-        url: "#"
+        url: "/salj"
     },
     {
         title: "Hyra",
@@ -19,11 +19,11 @@ const navMenu = [
     },
     {
         title: "Nyproduktion",
-        url: "#"
+        url: "/nyproduktion"
     },
     {
         title: "Fritid & Tomter",
-        url: "#"
+        url: "/fritid-tomter"
     },
     {
         title: "Kommersiellt",

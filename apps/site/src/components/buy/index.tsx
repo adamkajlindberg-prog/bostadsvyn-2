@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import Properties from "@/components/landing/sections/properties"
+import ContainerWrapper from "@/components/common/container-wrapper"
 
 const houseTypes = [
   { value: "apartment", label: "Lägenhet" },
@@ -49,23 +50,23 @@ const features = [
 const Buy = () => {
     return (
         <div className="@container">
-            <div className="container mx-auto max-w-7xl px-6 @lg:px-8 @8xl:px-0 py-10">
-                <div className="flex items-center justify-center gap-x-4 mb-6">
+            <ContainerWrapper className="py-10">
+                <div className="flex items-center justify-center flex-wrap gap-4 mb-4">
                     <div className="bg-primary text-primary-foreground rounded-md p-3">
                         <ShoppingCartIcon className="h-6 w-6 @lg:h-8 @lg:w-8" />
                     </div>
                     <div className="bg-primary text-xs text-primary-foreground rounded-full px-3 py-1.5">Över 125,000 annonser</div>
                 </div>
 
-                <h1 className="text-4xl @lg:text-5xl text-primary text-center font-semibold tracking-tight mb-4">Köp din drömbostad</h1>
+                <h1 className="text-4xl @lg:text-5xl text-primary text-center font-semibold tracking-tight leading-tight mb-4">Köp din drömbostad</h1>
                 <p className="text-lg @lg:text-xl text-center text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-12">
                     Upptäck tusentals lägenheter, villor och bostadsrätter i hela Sverige. Våra AI-drivna verktyg 
                     hjälper dig att hitta perfekta bostaden och fatta smarta beslut.
                 </p>
 
-                <Card className="py-6 shadow-none mb-10">
+                <Card className="py-6 shadow-xs mb-8">
                     <CardContent className="px-6">
-                        <div className="flex items-center gap-x-2 mb-6">
+                        <div className="flex flex-wrap items-center gap-2 mb-6">
                             <FunnelIcon size={20} />
                             <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">Avancerad sökning</h3>
                         </div>
@@ -145,9 +146,9 @@ const Buy = () => {
                     </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-1 @lg:grid-cols-2 @4xl:grid-cols-3 gap-8 mb-14">
+                <div className="grid grid-cols-1 @lg:grid-cols-2 @4xl:grid-cols-3 gap-6 mb-14">
                     {features.map((feature) => (
-                        <Card key={feature.title} className="py-6 shadow-none">
+                        <Card key={feature.title} className="py-6 shadow-xs">
                             <CardContent className="px-6">
                                 <div className="flex justify-center mb-4">
                                     <div className="inline-flex bg-accent/10 rounded-full p-4 text-primary">
@@ -172,7 +173,7 @@ const Buy = () => {
                 <div className="@lg:bg-nordic-ice @lg:py-16 px-0 @lg:px-8">
                     <Properties />
                 </div>
-            </div>
+            </ContainerWrapper>
         </div>
     )
 }
