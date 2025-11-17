@@ -2,11 +2,12 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env*"],
   "globalEnv": [
+    "AI_CHAT_AGENT",
     "DATABASE_URL",
-    "FAL_KEY",
+    "EMBEDDING_DIMENSIONALITY",
     "GEMINI_API_KEY",
-    "RECAPTCHA_SECRET_KEY",
-    "SENDGRID_API_KEY"
+    "OPENAI_API_KEY",
+    "TRAFIKVERKET_API_KEY"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

@@ -1,7 +1,7 @@
-import Sell from "@/components/sell"
+import Sell from "@/components/sell";
 
 const SellPage = () => {
-    return <Sell />
-}
+  return <Sell />;
+};
 
-export default SellPage 
+export default SellPage;

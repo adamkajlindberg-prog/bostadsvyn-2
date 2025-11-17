@@ -1,7 +1,7 @@
 import Tools from "@/components/ai-tools";
 
 const ToolsPage = () => {
-    return <Tools />;
-}
+  return <Tools />;
+};
 
-export default ToolsPage
+export default ToolsPage;

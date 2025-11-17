@@ -1,7 +1,7 @@
-import PriceAnalysis from "@/components/price-analysis"
+import PriceAnalysis from "@/components/price-analysis";
 
 const PriceAnalysisPage = () => {
-    return <PriceAnalysis />
-}
+  return <PriceAnalysis />;
+};
 
-export default PriceAnalysisPage
+export default PriceAnalysisPage;

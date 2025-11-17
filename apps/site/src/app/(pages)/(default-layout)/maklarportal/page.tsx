@@ -1,7 +1,7 @@
-import BrokerPortal from "@/components/broker-portal"
+import BrokerPortal from "@/components/broker-portal";
 
 const BrokerPortalPage = () => {
-    return <BrokerPortal />
-}
+  return <BrokerPortal />;
+};
 
-export default BrokerPortalPage
+export default BrokerPortalPage;

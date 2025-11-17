@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from "react";
 
 interface LogoProps {
   className?: string;
@@ -6,8 +6,11 @@ interface LogoProps {
 }
 
 // Minimalist house + B logo as inline SVG using currentColor so it can be themed
-const Logo: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
-  const titleId = 'logoTitle';
+const Logo: React.FC<LogoProps> = ({
+  className = "h-10 w-10",
+  title = "Bostadsvyn logotyp",
+}) => {
+  const titleId = "logoTitle";
   return (
     <svg
       viewBox="0 0 64 64"
@@ -18,14 +21,29 @@ const Logo: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvy
     >
       <title id={titleId}>{title}</title>
       {/* House outline */}
-      <g fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M8 26 L32 10 L56 26" />
         <path d="M14 26 V52" />
         <path d="M50 26 V52" />
         <path d="M10 52 H54" />
       </g>
       {/* Letter B */}
-      <text x="32" y="44" textAnchor="middle" fontSize="30" fontWeight="700" fill="currentColor">B</text>
+      <text
+        x="32"
+        y="44"
+        textAnchor="middle"
+        fontSize="30"
+        fontWeight="700"
+        fill="currentColor"
+      >
+        B
+      </text>
       {/* Small window detail */}
       <g fill="currentColor">
         <rect x="28" y="18" width="4" height="4" rx="0.5" />

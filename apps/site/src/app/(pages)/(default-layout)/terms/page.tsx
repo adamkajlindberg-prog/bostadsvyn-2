@@ -1,7 +1,7 @@
-import Terms from "@/components/terms"
+import Terms from "@/components/terms";
 
 const TermsPage = () => {
-    return <Terms />
-}
+  return <Terms />;
+};
 
-export default TermsPage
+export default TermsPage;

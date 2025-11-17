@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 type T_Select_Image = {
   selectedImage: number;
@@ -6,6 +6,6 @@ type T_Select_Image = {
 };
 
 export const useSelectImageStore = create<T_Select_Image>((set) => ({
-    selectedImage: 1,
-    setSelectedImage: (value) => set({ selectedImage: value })
-}))
+  selectedImage: 1,
+  setSelectedImage: (value) => set({ selectedImage: value }),
+}));

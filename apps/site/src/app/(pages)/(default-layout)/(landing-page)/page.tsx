@@ -1,7 +1,7 @@
-import LandingContent from "@/components/landing"
+import LandingContent from "@/components/landing";
 
 const HomePage = () => {
-    return <LandingContent />
-}
+  return <LandingContent />;
+};
 
-export default HomePage
+export default HomePage;

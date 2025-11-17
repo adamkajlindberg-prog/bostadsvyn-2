@@ -1,0 +1,24 @@
+{
+  "name": "@bostadsvyn/images",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./image-client": {
+      "default": "./dist/output/image-client.pub.js",
+      "types": "./dist/types/image-client.pub.d.ts"
+    },
+    "./mime-types": {
+      "default": "./dist/output/mime-types.pub.js",
+      "types": "./dist/types/mime-types.pub.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && create-exports",
+    "test": "bun test",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "remeda": "2.32.0",
+    "zod": "4.1.12"
+  }
+}

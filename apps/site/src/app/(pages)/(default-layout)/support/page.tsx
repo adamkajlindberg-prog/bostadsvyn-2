@@ -1,7 +1,7 @@
-import Support from "@/components/support"
+import Support from "@/components/support";
 
 const SupportPage = () => {
-    return <Support />
-}
+  return <Support />;
+};
 
-export default SupportPage
+export default SupportPage;

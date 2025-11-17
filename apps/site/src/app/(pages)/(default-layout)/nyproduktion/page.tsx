@@ -1,7 +1,7 @@
-import NewProduction from "@/components/new-production"
+import NewProduction from "@/components/new-production";
 
 const NewProductionPage = () => {
-    return <NewProduction />
-}
+  return <NewProduction />;
+};
 
-export default NewProductionPage
+export default NewProductionPage;

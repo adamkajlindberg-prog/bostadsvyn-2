@@ -1,7 +1,7 @@
-import DigitalLeaseContract from "@/components/digital-lease-contract"
+import DigitalLeaseContract from "@/components/digital-lease-contract";
 
 const DigitalLeaseContractPage = () => {
-    return <DigitalLeaseContract />
-}
+  return <DigitalLeaseContract />;
+};
 
-export default DigitalLeaseContractPage
+export default DigitalLeaseContractPage;

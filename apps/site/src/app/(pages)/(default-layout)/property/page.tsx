@@ -1,7 +1,7 @@
-import Property from "@/components/property"
+import Property from "@/components/property";
 
 const PropertyPage = () => {
-    return <Property />
-}
+  return <Property />;
+};
 
-export default PropertyPage
+export default PropertyPage;

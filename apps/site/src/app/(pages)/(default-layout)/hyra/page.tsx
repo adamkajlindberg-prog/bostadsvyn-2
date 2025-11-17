@@ -1,7 +1,7 @@
-import Rent from "@/components/rent"
+import Rent from "@/components/rent";
 
 const RentPage = () => {
-    return <Rent />
-}
+  return <Rent />;
+};
 
-export default RentPage
+export default RentPage;

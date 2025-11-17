@@ -1,0 +1,36 @@
+{
+  "name": "@bostadsvyn/common",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./error": {
+      "default": "./dist/output/error.pub.js",
+      "types": "./dist/types/error.pub.d.ts"
+    },
+    "./id": {
+      "default": "./dist/output/id.pub.js",
+      "types": "./dist/types/id.pub.d.ts"
+    },
+    "./json": {
+      "default": "./dist/output/json.pub.js",
+      "types": "./dist/types/json.pub.d.ts"
+    },
+    "./sleep": {
+      "default": "./dist/output/sleep.pub.js",
+      "types": "./dist/types/sleep.pub.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && create-exports",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "nanoid": "5.1.6",
+    "remeda": "2.32.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@cjkihl/create-exports": "^1.0.9",
+    "@cjkihl/tsconfig": "^1.0.10"
+  }
+}

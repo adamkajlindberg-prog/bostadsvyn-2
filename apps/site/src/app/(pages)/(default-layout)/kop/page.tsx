@@ -1,7 +1,7 @@
-import Buy from "@/components/buy"
+import Buy from "@/components/buy";
 
 const BuyPage = () => {
-    return <Buy />
-}
+  return <Buy />;
+};
 
-export default BuyPage
+export default BuyPage;

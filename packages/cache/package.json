@@ -1,0 +1,34 @@
+{
+  "name": "@bostadsvyn/cache",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./dist/output/index.pub.js",
+      "types": "./dist/types/index.pub.d.ts"
+    },
+    "./env": {
+      "default": "./dist/output/env.pub.js",
+      "types": "./dist/types/env.pub.d.ts"
+    },
+    "./ioredis": {
+      "default": "./dist/output/ioredis.pub.js",
+      "types": "./dist/types/ioredis.pub.d.ts"
+    },
+    "./upstash": {
+      "default": "./dist/output/upstash.pub.js",
+      "types": "./dist/types/upstash.pub.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && create-exports",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bostadsvyn/common": "workspace:*",
+    "@t3-oss/env-nextjs": "0.13.8",
+    "@upstash/redis": "^1.35.6",
+    "ioredis": "5.8.2",
+    "zod": "4.1.12"
+  }
+}

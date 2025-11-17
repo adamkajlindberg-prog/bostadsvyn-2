@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
+// Import to validate env variables on build
+import "./src/env";
+
 const nextConfig: NextConfig = {
-  /* config options here */
-  env: {
-    WEB_URL: process.env.WEB_URL
-  }
 };
 
 export default nextConfig;

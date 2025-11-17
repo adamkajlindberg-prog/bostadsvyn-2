@@ -1,7 +1,7 @@
-import ImageEditor from "@/components/ai-image-editor"
+import ImageEditor from "@/components/ai-image-editor";
 
 const ImageEditorPage = () => {
-    return <ImageEditor />
-}
+  return <ImageEditor />;
+};
 
-export default ImageEditorPage
+export default ImageEditorPage;

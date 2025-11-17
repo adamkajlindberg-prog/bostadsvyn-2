@@ -1,7 +1,7 @@
-import Faq from "@/components/faq"
+import Faq from "@/components/faq";
 
 const FaqPage = () => {
-    return <Faq />
-}
+  return <Faq />;
+};
 
-export default FaqPage
+export default FaqPage;

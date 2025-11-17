@@ -1,7 +1,7 @@
-import SearchProperty from "@/components/search-property"
+import SearchProperty from "@/components/search-property";
 
 const SearchPropertyPage = () => {
-    return <SearchProperty />
-}
+  return <SearchProperty />;
+};
 
-export default SearchPropertyPage
+export default SearchPropertyPage;

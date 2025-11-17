@@ -1,7 +1,7 @@
-import CookiePolicy from "@/components/cookie-policy"
+import CookiePolicy from "@/components/cookie-policy";
 
 const CookiePolicyPage = () => {
-    return <CookiePolicy />
-}
+  return <CookiePolicy />;
+};
 
-export default CookiePolicyPage
+export default CookiePolicyPage;

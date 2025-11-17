@@ -1,7 +1,7 @@
-import Commercial from "@/components/commercial"
+import Commercial from "@/components/commercial";
 
 const CommercialPage = () => {
-    return <Commercial />
-}
+  return <Commercial />;
+};
 
-export default CommercialPage
+export default CommercialPage;

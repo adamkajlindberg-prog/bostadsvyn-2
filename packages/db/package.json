@@ -7,21 +7,23 @@
     }
   },
   "scripts": {
-    "push": "drizzle-kit push",
-    "studio": "drizzle-kit studio --port 5556",
+    "push": "with-env drizzle-kit push",
+    "studio": "with-envdrizzle-kit studio --port 5556",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@cjkihl/with-env": "^1.0.10",
     "@types/bun": "latest",
-    "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.5"
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.7",
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.44.6",
+    "drizzle-orm": "^0.44.7",
     "drizzle-zod": "^0.8.3",
     "pg": "^8.16.3"
   }

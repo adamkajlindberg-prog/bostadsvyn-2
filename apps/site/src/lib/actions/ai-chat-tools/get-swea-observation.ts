@@ -1,23 +1,31 @@
 import { generateText } from "ai";
-import { AI_CHAT_AGENT } from "../../../../env-server";
-import {google, openai, OPENAI_CHAT_MODEL, GEMINI_CHAT_MODEL } from "@/lib/ai/utils";
+import { env } from "@/env";
+import {
+  GEMINI_CHAT_MODEL,
+  google,
+  OPENAI_CHAT_MODEL,
+  openai,
+} from "@/lib/ai/utils";
 
 const getSweaObservation = async (question: string) => {
-    try {
-        const today = new Date().toISOString().slice(0, 10);
+  try {
+    const today = new Date().toISOString().slice(0, 10);
 
-        // Get series data
-        const series = await fetch(`https://api.riksbank.se/swea/v1/Series?language=sv`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
+    // Get series data
+    const series = await fetch(
+      `https://api.riksbank.se/swea/v1/Series?language=sv`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    );
 
-        const seriesData = await series.json()
-        
-        // Intialize prompt for AI to extract relevant series ID
-        const prompt = `Given the following list:
+    const seriesData = await series.json();
+
+    // Intialize prompt for AI to extract relevant series ID
+    const prompt = `Given the following list:
 
         **Series:**
         ${JSON.stringify(seriesData)}
@@ -35,40 +43,45 @@ const getSweaObservation = async (question: string) => {
             date: <desired date or today's date in YYYY-MM-DD format>
         }
 
-        Only output the JSON object as shown above.`
+        Only output the JSON object as shown above.`;
 
-        
-        const initialPrompt = await generateText({
-            prompt: prompt,
-            model: AI_CHAT_AGENT === "GEMINI" ? google(GEMINI_CHAT_MODEL) : openai(OPENAI_CHAT_MODEL),
-        })
+    const initialPrompt = await generateText({
+      prompt: prompt,
+      model:
+        env.AI_CHAT_AGENT === "GEMINI"
+          ? google(GEMINI_CHAT_MODEL)
+          : openai(OPENAI_CHAT_MODEL),
+    });
 
-        // Parse the JSON from the AI response
-        let extracted;
-        try {
-            const text = initialPrompt.text.replace(/```json|```/g, '').trim();
-            extracted = JSON.parse(text);
-        } catch (e) {
-            throw new Error('Failed to parse AI response');
-        }
-
-        const { seriesId, date } = extracted;
-
-        // Fetch observation data
-        const response = await fetch(`https://api.riksbank.se/swea/v1/Observations/${seriesId}/${date}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-
-        const data = await response.json();
-
-        return JSON.stringify(data)
-    } catch (error) {
-        console.error('Fetch failed (SWEA API). Error:', error);
-        return 'Could not retrieve information from the SWEA API at this time.';
+    // Parse the JSON from the AI response
+    let extracted: { seriesId: string; date: string };
+    try {
+      const text = initialPrompt.text.replace(/```json|```/g, "").trim();
+      extracted = JSON.parse(text) as { seriesId: string; date: string };
+    } catch (_e) {
+      throw new Error("Failed to parse AI response");
     }
-}
 
-export default getSweaObservation
+    const { seriesId, date } = extracted;
+
+    // Fetch observation data
+    const response = await fetch(
+      `https://api.riksbank.se/swea/v1/Observations/${seriesId}/${date}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    );
+
+    const data = await response.json();
+
+    return JSON.stringify(data);
+  } catch (error) {
+    console.error("Fetch failed (SWEA API). Error:", error);
+    return "Could not retrieve information from the SWEA API at this time.";
+  }
+};
+
+export default getSweaObservation;
