@@ -29,7 +29,7 @@ const ProjectCard = ({project}: {project: Project}) => {
         <Card className="py-0 shadow-xs overflow-hidden">
             <CardContent className="px-0">
                 <div className="relative h-48 bg-gray-100">
-                    <Image src={project.image} alt="New production image" layout="fill" objectFit="cover" />
+                    <Image src={project.image} alt="New production image" fill className="object-cover" />
                     <div className="bg-primary-deep absolute top-3.5 left-3.5 text-xs text-primary-foreground font-medium rounded-full px-3 py-1">{project.badgeOneText}</div>
                     <div className="bg-primary absolute top-3.5 right-3.5 text-xs text-primary-foreground font-medium rounded-full px-3 py-1">{project.badgeTwoText}</div>
                 </div>

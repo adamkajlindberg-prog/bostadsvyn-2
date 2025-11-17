@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 let _client: DbClient | undefined;
 
 import * as schema from "../schema";
+import { DATABASE_URL } from "../../env";
 
 export const getDbClient = () => {
 	if (!_client) {
@@ -12,7 +13,7 @@ export const getDbClient = () => {
 };
 
 const createDbClient = () => {
-	const url = process.env.DATABASE_URL!;
+	const url = DATABASE_URL!;
 	return drizzle({
 		connection: {
 			connectionString: url,

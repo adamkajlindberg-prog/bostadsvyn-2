@@ -1,6 +1,6 @@
 "use client"
 
-import { BotIcon, Building2Icon, Calculator, ChartColumnIcon, ChevronLeft, ChevronRight, HouseIcon, SparklesIcon, UserCheckIcon, XIcon } from "lucide-react"
+import { BotIcon, Building2Icon, Calculator, ChartColumnIcon, ChevronLeft, ChevronRight, HouseIcon, LoaderCircleIcon, SparklesIcon, UserCheckIcon, XIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,9 @@ import { Message, MessageAvatar, MessageContent } from "@/components/ai-elements
 import { PromptInput, PromptInputSubmit, PromptInputTextarea } from "@/components/ai-elements/prompt-input"
 import { useState } from "react"
 import Link from "next/link"
+import { useChat } from "@ai-sdk/react"
+import { DefaultChatTransport } from "ai"
+import { Response } from "@/components/ai-elements/response"
 
 const quickQuestions = [
   {
@@ -43,6 +46,18 @@ const ChatSidebar = () => {
   const { open, toggleSidebar } = useSidebar()
 
   const [hideQuickQuestions, setHideQuickQuestions] = useState<boolean>(false)
+  const [input, setInput] = useState<string>("");
+
+  const { messages, sendMessage, status, } = useChat({
+      transport: new DefaultChatTransport({
+          api: "/api/ai/chat"
+      })
+  })
+
+   const handleSubmit = () => {
+		sendMessage({ text: input });
+		setInput("");
+	};
   
   return (
     <div>
@@ -92,21 +107,72 @@ const ChatSidebar = () => {
               )}
               
 
-              <div className="flex-1 px-2 border-t border-neutral-200">
-                 <Conversation className="relative w-full">
+              <div className="flex-[1_1_0] px-2 border-t border-neutral-200 overflow-y-auto">
+                  <Conversation className="relative w-full">
                     <ConversationContent className="py-2">
                       <Message from="assistant" className="items-start">
                         <MessageContent className="group-[.is-assistant]:bg-muted">Hej! Jag är din AI-fastighetrådgivare. Vad kan jag hjälpa dig med?</MessageContent>
-                        <MessageAvatar name="AI Assistant" src={"https://github.com/openai.png"} />
+                        <MessageAvatar name="AI Assistant" src="/bot.svg" />
                       </Message>
+
+                      {messages.map((message) => (
+                        <Message from={message.role} key={message.id} className="items-start">
+                            <MessageContent className="group-[.is-assistant]:bg-muted">
+                                {message.parts.map((part, i) => {
+                                    switch (part.type) {
+                                        case "text":
+                                            return (
+                                              <div key={`response-${message.id}-${i}`}>
+                                                <Response>
+                                                    {part.text}
+                                                </Response>    
+                                              </div>
+                                            );
+                                        default:
+                                            return null
+                                    }
+                                })}
+                            </MessageContent>
+                            {message.role === "assistant" && (
+                                <MessageAvatar name="AI Assistant" src="/bot.svg" />
+                            )}
+                        </Message>
+                      ))}
+
+                      {(status === "submitted") && (
+                          <Message from="assistant" className="items-start">
+                              <MessageContent className="group-[.is-assistant]:bg-muted group-[.is-assistant]:text-muted-foreground flex flex-row items-center">
+                                  <LoaderCircleIcon className="animate-spin text-primary" /> AI tänker...
+                              </MessageContent>
+                              <MessageAvatar name="AI Assistant" src="/bot.svg" />
+                          </Message>
+                      )}
+
+                      {status === "error" && (
+                          <Message from="assistant" className="items-start">
+                              <MessageContent className="group-[.is-assistant]:bg-muted">
+                                  Oj, något gick fel när jag försökte bearbeta din begäran. Kan du försöka igen?
+                              </MessageContent>
+                              <MessageAvatar name="AI Assistant" src="/bot.svg" />
+                          </Message>
+                      )}
                     </ConversationContent>
                   </Conversation>
               </div>
               
               <div className="px-6 pt-4 pb-1.5 border-t border-neutral-200">
-                <PromptInput className="relative w-full mb-2.5" onSubmit={() => {}}>
-                  <PromptInputTextarea className="pr-12 text-sm" placeholder="Skriv ditt meddelande här..." />
-                  <PromptInputSubmit className="absolute bottom-1 right-1 cursor-pointer" />
+                <PromptInput className="relative w-full mb-2.5" onSubmit={handleSubmit}>
+                  <PromptInputTextarea 
+                    className="pr-12 text-sm" 
+                    placeholder="Skriv ditt meddelande här..." 
+                    onChange={(e) => setInput(e.currentTarget.value)}
+                    value={input}
+                  />
+                  <PromptInputSubmit 
+                    className="absolute bottom-1 right-1 cursor-pointer" 
+                    disabled={!input.trim() || status === "submitted" || status === "streaming"}
+						        status={status === "streaming" ? "streaming" : "ready"}
+                  />
                 </PromptInput>
 
                 <div className="text-xs text-center text-muted-foreground">
@@ -120,6 +186,9 @@ const ChatSidebar = () => {
       </Sidebar>
 
       <div className={`${open ? "hidden" : "hidden sm:inline-flex"} ml-1 sticky top-1/2 -translate-y-0.5 z-40 bg-muted bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full p-2.5 ring-2 ring-primary/20`}>
+        <span className="absolute inset-0 flex items-center justify-center -z-10">
+          <span className="inline-flex h-2/3 w-2/3 rounded-full bg-primary opacity-60 animate-ping"></span>
+        </span>
         <BotIcon size={20} />
       </div>
 

@@ -25,13 +25,13 @@ const Footer = () => {
                             <h5 className="mb-4 text-nordic-fjord font-semibold">Juridisk Information</h5>
                             <ul className="text-muted-foreground space-y-3 text-sm">
                                 <li className="text-neutral-300 hover:text-nordic-aurora font-medium">
-                                    <Link href="#">Integritetspolicy</Link>
+                                    <Link href="/privacy">Integritetspolicy</Link>
                                 </li>
                                 <li className="text-neutral-300 hover:text-nordic-aurora font-medium">
-                                    <Link href="#">Användarvillkor</Link>
+                                    <Link href="/terms">Användarvillkor</Link>
                                 </li>
                                 <li className="text-neutral-300 hover:text-nordic-aurora font-medium">
-                                    <Link href="#">Cookie-policy</Link>
+                                    <Link href="/cookies">Cookie-policy</Link>
                                 </li>
                             </ul>
                         </div>

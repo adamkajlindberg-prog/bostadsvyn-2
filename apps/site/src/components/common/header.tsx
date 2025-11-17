@@ -27,15 +27,15 @@ const navMenu = [
     },
     {
         title: "Kommersiellt",
-        url: "#"
+        url: "/kommersiellt"
     },
     {
         title: "AI-verktyg",
-        url: "#"
+        url: "/ai-tools"
     },
     {
         title: "Om oss",
-        url: "#"
+        url: "/om-oss"
     }
 ]
 
@@ -57,7 +57,7 @@ const Header = () => {
                 </Link>
 
                 {/* Navigation menu for extra large screens */}
-                <div className="hidden @6xl:flex items-center gap-x-6 2xl:gap-x-8">
+                <div className="hidden @7xl:flex items-center gap-x-6 2xl:gap-x-8">
                     {navMenu.map((item) => (
                         <Link key={item.title} href={item.url} className="text-sm font-medium hover:underline underline-offset-2 hover:opacity-80">
                             {item.title}
@@ -66,7 +66,9 @@ const Header = () => {
                 </div>
 
                 <div className="flex items-center gap-x-4">
+                    <Link href="/maklare-login">
                     <Button variant="outline" className="hidden @xl:flex"><Building2Icon /> Mäklare</Button>
+                    </Link>
                     <Link href="/login">
                         <Button className="hidden @xl:flex"><UserIcon /> Logga in</Button>
                     </Link>
@@ -74,7 +76,7 @@ const Header = () => {
                     {/* Navigation menu for small - large screens */}
                     <Sheet>
                         <SheetTrigger asChild>
-                            <button className="@6xl:hidden">
+                            <button className="@7xl:hidden">
                                 <MenuIcon />
                             </button>
                         </SheetTrigger>
@@ -93,8 +95,8 @@ const Header = () => {
                                     </div>
                                 ))}
 
-                                <Button variant="outline" className="flex @lg:hidden w-full mt-4"><Building2Icon /> Mäklare</Button>
-                                <Button className="flex @lg:hidden w-full mt-3"><UserIcon /> Logga in</Button>
+                                <Button variant="outline" className="flex lg:hidden w-full mt-4"><Building2Icon /> Mäklare</Button>
+                                <Button className="flex lg:hidden w-full mt-3"><UserIcon /> Logga in</Button>
                             </div>
                         </SheetContent>
                     </Sheet>

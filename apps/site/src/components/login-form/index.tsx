@@ -16,9 +16,9 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-xs">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Välkommen!</CardTitle>
+          <CardTitle className="text-xl @sm:text-2xl">Välkommen!</CardTitle>
           <CardDescription>
             Logga in eller skapa ett konto för att komma igång
           </CardDescription>

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { BrainIcon, FilePenIcon, HouseIcon, InfoIcon, SearchIcon, SlidersHorizontalIcon, TrendingUpIcon } from "lucide-react"
+import Link from "next/link"
 
 const features = [
     {
@@ -30,9 +31,8 @@ const popularSearches = ["3 rum Stockholm under 5M", "Lägenhet nära tunnelbana
 
 const Hero = () => {
     return (
-        <div className="relative min-h-screen h-auto w-full py-10 @lg:py-12 @6xl:py-16 bg-[url('../images/bg-image.webp')] bg-cover bg-center bg-no-repeat">
+        <div id="11-9-14-14-5-20-8" className="relative min-h-screen h-auto w-full py-10 @lg:py-12 @6xl:py-16 bg-[url('../images/bg-image.webp')] bg-cover bg-center bg-no-repeat">
             <div className="absolute inset-0 bg-primary/40" />
-
             <div className="container mx-auto max-w-7xl px-6 @lg:px-8 @8xl:px-0 relative z-10">
                 <h1 className="text-center text-4xl @4xl:text-6xl font-semibold tracking-tight text-primary-foreground mb-8">
                     Välkommen till Bostadsvyn!
@@ -69,16 +69,18 @@ const Hero = () => {
                                     kommer sen att matcha de bostäderna i vårt system som bäst passar dina önskemål.
                                 </p>
 
-                                <div className="grid grid-cols-1 @lg:grid-cols-2 @lg:items-center gap-4 mb-6">
-                                    <Input className="bg-background/80 border border-accent/30 px-4 text-sm h-12 text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" placeholder="Sök område, stad eller beskriv din drömbostad..." />
-                                    <Button variant="secondary" className="h-12 bg-background/80 border border-accent/30">
+                                <div className="grid grid-cols-1 @lg:grid-cols-12 @lg:items-center gap-4 mb-6">
+                                    <Input className="@lg:col-span-8 @4xl:col-span-10 bg-background/80 border border-accent/30 px-4 text-sm h-12 text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" placeholder="Beskriv din önskade bostad eller sök på gata, område, kommun eller stad..." />
+                                    <Button variant="secondary" className="@lg:col-span-4 @4xl:col-span-2 h-12 bg-background/80 border border-accent/30">
                                         <SlidersHorizontalIcon /> 
-                                        Önskar du söka via filter?
+                                        Filter?
                                     </Button>
                                 </div>
                                 
                                 <div className="flex justify-center mb-8">
-                                    <Button className="w-full @lg:w-auto h-12 has-[>svg]:px-10"><SearchIcon /> Sök bostäder</Button>
+                                    <Link href="/search">
+                                        <Button className="w-full @lg:w-auto h-12 has-[>svg]:px-10"><SearchIcon /> Sök bostäder</Button>
+                                    </Link>
                                 </div>
 
                                 <div className="border-t border-accent/40 pt-6">

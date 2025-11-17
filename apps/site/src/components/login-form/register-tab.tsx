@@ -40,7 +40,7 @@ const RegisterTab = () => {
             </InputGroup>
             </Field>
             <Field>
-            <Button type="submit" className="mb-3">Skapa konto</Button>
+            <Button type="submit" className="mb-3 bg-green-600 hover:bg-green-700">Skapa konto</Button>
             <FieldDescription className="text-sm text-center">
                Som privatperson kan du:
             </FieldDescription>

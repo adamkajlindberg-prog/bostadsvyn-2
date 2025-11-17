@@ -26,7 +26,7 @@ const advantages = [
 
 const Advantages = () => {
     return (
-        <Card className="py-6 mb-12 shadow-xs bg-gradient-to-br from-accent/5 to-success/5">
+        <Card className="py-6 mb-12 shadow-xs bg-gradient-to-br from-primary/5 to-success/5">
             <CardContent className="px-6">
                 <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight mb-6">Fördelar med nyproduktion</h3>
 

@@ -1,0 +1,49 @@
+import { cn } from "@/lib/utils"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import LoginTab from "./login-tab"
+import RegisterTab from "./register-tab"
+
+export function BrokerLoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="w-full max-w-md shadow-xs">
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl @sm:text-2xl">Välkommen!</CardTitle>
+          <CardDescription>
+            Logga in på din mäklarportal eller registrera dig som ny mäklare
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form>
+            <Tabs defaultValue="login">
+              <TabsList className="w-full mb-4">
+                  <TabsTrigger value="login">
+                      Logga in
+                  </TabsTrigger>
+                  <TabsTrigger value="register">
+                      Ny mäklare
+                  </TabsTrigger>
+              </TabsList>
+              <TabsContent value="login">
+                <LoginTab />
+              </TabsContent>
+              <TabsContent value="register">
+                <RegisterTab />
+              </TabsContent>
+            </Tabs>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

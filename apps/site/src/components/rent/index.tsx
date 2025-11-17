@@ -21,11 +21,8 @@ const Rent = () => {
     return (
         <div className="@container">
             <ContainerWrapper className="py-10">
-                <div className="flex justify-center mb-4">
-                    <div className="inline-flex items-center bg-primary/10 text-sm text-primary rounded-full px-3 py-1.5 gap-x-2">
-                        <HouseIcon size={18} />
-                        Hyresbostäder
-                    </div>
+                <div className="flex items-center justify-center mb-4">
+                    <div className="bg-primary text-xs text-primary-foreground rounded-full px-3 py-1.5">Hyresbostäder</div>
                 </div>
 
                 <h1 className="text-4xl @lg:text-5xl text-center font-semibold tracking-tight leading-tight mb-4">Hitta din perfekta <span className="text-primary">hyresbostad</span></h1>

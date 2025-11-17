@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRightIcon, BrainIcon, CalculatorIcon, EyeIcon, FileTextIcon, SearchIcon, SparklesIcon, TrendingUpIcon } from "lucide-react"
+import { ArrowRightIcon, BrainIcon, CalculatorIcon, FileTextIcon, SearchIcon, SparklesIcon, TrendingUpIcon, UsersIcon } from "lucide-react"
 import Image from "next/image"
 import livingRoomBefore from "@/images/living-room-before.webp"
 import livingRoomAfter from "@/images/living-room-after.webp"
@@ -42,6 +42,7 @@ const highlights = [
 
 const features = [
     {
+        href: "/ai-homestyling",
         badgeIcon: <BrainIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         badgeText: "Populär",
         title: "AI-Homestyling",
@@ -53,6 +54,7 @@ const features = [
         ]
     },
     {
+        href: "/prisanalys",
         badgeIcon: <TrendingUpIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         badgeText: "AI-driven",
         title: "Prisanalys & Prognoser",
@@ -64,16 +66,19 @@ const features = [
         ]
     },
     {
-        badgeIcon: <EyeIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
-        title: "Virtuella Visningar",
-        description: "360° visningar och 3D-modeller för immersiva bostadsupplevelser",
+        href: "/maklarportal",
+        badgeIcon: <UsersIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
+        badgeText: "Professionell",
+        title: "Mäklarportal",
+        description: "Professionella verktyg för mäklare att hantera kunder, visningar och annonser",
         details: [
-            "360° tours",
-            "3D-modeller",
-            "AR-visning"
+            "Kundhantering",
+            "Statistik & rapporter",
+            "Automatisering"
         ]
     },
     {
+        href: "/digitala-hyreskontrakt",
         badgeIcon: <FileTextIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         badgeText: "Säker",
         title: "Digitala Hyreskontrakt",
@@ -85,6 +90,7 @@ const features = [
         ]
     },
     {
+        href: "#",
         badgeIcon: <CalculatorIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         title: "Kostnadskalkylator",
         description: "Beräkna totala kostnader inklusive skatter, avgifter och låneinformation",
@@ -95,6 +101,7 @@ const features = [
         ]
     },
     {
+        href: "#",
         badgeIcon: <SearchIcon size={44} className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md" />,
         badgeText: "Smart",
         title: "AI Sökassistent",
@@ -210,7 +217,7 @@ const About = () => {
 
                 <div className="grid grid-cols-1 @2xl:grid-cols-2 @6xl:grid-cols-3 auto-rows-min gap-6">
                     {features.map((feature, index) => (
-                        <Link key={`card-${index}`} href="#">
+                        <Link key={`card-${index}`} href={feature.href}>
                             <Card className="border-none p-0 bg-card overflow-hidden group hover:shadow-lg hover:scale-105 transition-all duration-300 h-full">
                                 <CardContent className="p-0 h-full flex flex-col">
                                     <div className="p-8 flex flex-col flex-1">

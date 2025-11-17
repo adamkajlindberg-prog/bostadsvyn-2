@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} antialiased bg-primary-deep`}
+        className={`${inter.className} antialiased bg-neutral-200/30`}
       >
         <SidebarProvider defaultOpen={false}>
           <ChatSidebar />

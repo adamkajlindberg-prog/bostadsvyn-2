@@ -31,7 +31,7 @@ const tools = [
 
 const Tools = () => {
     return (
-        <Card className="py-6 bg-gradient-to-br from-accent/5 to-success/5 mt-8 shadow-xs">
+        <Card className="py-6 bg-gradient-to-br from-primary/5 to-success/5 mt-8 shadow-xs">
             <CardContent className="px-6">
                 <div className="flex @lg:items-center flex-wrap mb-4 gap-4 @lg:gap-2">
                     <BrainIcon className="text-primary" />

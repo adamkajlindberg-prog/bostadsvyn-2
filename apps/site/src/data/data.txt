@@ -1,0 +1,102 @@
+[HOME_PAGE]
+
+{HERO_SECTION}
+
+Välkommen till Bostadsvyn!
+
+AI-Rekommendationer  
+Personliga tips och rekommendationer baserade på din sökhistorik och önskemål.
+
+Marknadsanalys  
+Värderingar och förväntningar baserade på marknadsdata och avancerad AI-teknologi.
+
+Digitala hyreskontrakt  
+Efter vald hyresbostad hjälper vi med digitala hyreskontrakt och säker signering med BankID.
+
+Brett utbud av bostäder  
+Första portalen i Sverige som erbjuder alla typer av bostäder på en och samma plattform.
+
+Smart bostadssökning (Beta)  
+Med hjälp av vår unika AI-sökning kan du enkelt skriva en liten text om vad du söker, vilka attribut som den nya bostaden ska ha och vilken gata, område eller kommun som önskas. Vår AI kommer sen att matcha de bostäderna i vårt system som bäst passar dina önskemål.
+
+Sökfält:  
+Beskriv din önskade bostad eller sök på gata, område, kommun eller stad...
+
+Sök bostäder-knapp
+
+Filter-knapp
+
+Populära sökningar:  
+- 3 rum Stockholm under 5M  
+- Lägenhet nära tunnelbana Göteborg  
+- Villa med trädgård Malmö
+
+{ABOUT_SECTION}
+
+Bostadsvyn
+
+Välkommen till framtidens bostadsportal med det bredaste utbudet av bostäder i Sverige. Hos oss hittar du allt från villor, gårdar, lägenheter, tomter och fritidshus till radhus, kedjehus, parhus, hyresbostäder, nyproduktion och kommersiella fastigheter – allt på samma plattform.
+
+Vår vision är att revolutionera bostadsmarknaden genom att kombinera cutting-edge AI-teknologi med personlig service och rådgivning. Vi är här för att hjälpa dig genom hela processen och göra din största affär till en trygg och smidig upplevelse – oavsett om du köper, säljer eller hyr.
+
+Smarta verktyg för modern fastighetshantering
+
+AI-drivna lösningar som gör bostadsprocessen enklare och mer transparent.
+
+1. AI-Homestyling
+
+Se potentialen i varje rum
+
+AI-teknik som transformerar rum till den stil du önskar – visualisera din framtida bostad.
+
+- Fotorealistiska resultat på sekunder
+- Olika inredningsstilar
+- Automatisk anpassning
+
+2. AI Bildredigering
+
+Visualisera renoveringar, förändringar och tillbyggnader
+
+Vårt AI-verktyg låter dig enkelt lägga till eller ta bort element från fastighetbilder. Visa potentialen i utomhusutrymmen genom att lägga till pooler, terrasser, och andra förbättringar.
+
+- Lägg till pooler, terrasser och uteplatser
+- Ta bort eller ändra befintliga element
+- Visa renoveringspotential i olika stilar
+
+{FEATURES_SECTION}
+
+AI-Homestyling  
+Transformera tomma rum till inredda drömhem med vår avancerade AI-teknik.  
+- Fotorealistiska resultat  
+- Olika stilar  
+- Snabb rendering
+
+Prisanalys & Prognoser  
+Få exakta värderingar och framtida prisförutsägelser baserat på marknadsdata.  
+- Realtidsdata  
+- Konfidensintervall  
+- Områdesanalys
+
+Virtuella Visningar  
+360° visningar och 3D-modeller för immersiva bostadsupplevelser.  
+- 360° tours  
+- 3D-modeller  
+- AR-visning
+
+Digitala Hyreskontrakt  
+Säkra signeringar med BankID och automatiserade juridiska dokument.  
+- BankID-integration  
+- Automatisering  
+- Juridisk säkerhet
+
+Kostnadskalkylator  
+Beräkna totala kostnader inklusive skatter, avgifter och låneinformation.  
+- Lånekalkyler  
+- Skatteinfo  
+- Månadsbudget
+
+AI Sökassistent  
+Personliga tips och lärandealgoritm för bostadssökning. Endast för medlemmar.  
+- Personliga tips  
+- Lärandealgoritm  
+- Endast för medlemmar

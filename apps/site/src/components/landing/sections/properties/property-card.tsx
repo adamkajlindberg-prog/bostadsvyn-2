@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { BedSingleIcon, CrownIcon, EyeIcon, HeartIcon, MapPinIcon, SquareIcon } from "lucide-react"
 import Image, { StaticImageData } from "next/image"
-import propertyImageOne from "@/images/property-image-1.webp"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 type T_Props = {
     image: string | StaticImageData
@@ -23,10 +23,10 @@ const PropertyCard = ({image, name, location, price, areaSize, rooms}: T_Props) 
                 <div className="flex flex-col @4xl:flex-row">
                     <div className="bg-primary-light/10 @4xl:w-[70%] overflow-hidden">
                         <div className="relative h-40 @lg:h-72 @4xl:h-[450px] @6xl:h-[440px] @8xl:h-[460px]">
-                            <Image src={image} alt="Egendom" fill className="object-cover group-hover:scale-105 transition-all duration-300" />
+                            <Image src={image} alt="Egendom" fill  className="object-cover group-hover:scale-105 transition-all duration-300" />
                             
-                            <div className="absolute top-3 left-3 @lg:top-5 @lg:left-5 py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 backdrop-blur-sm border-2 border-white/30 text-xs sm:text-sm text-primary-foreground font-semibold inline-flex items-center gap-x-1.5">
-                                <CrownIcon className="h-3.5 w-3.5 sm:h-[18px] sm:w-[18px]" />
+                            <div className="absolute top-3 left-3 @lg:top-5 @lg:left-5 py-1.5 px-3 @lg:py-2 @lg:px-4 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 backdrop-blur-sm border-2 border-white/30 text-xs @lg:text-sm text-primary-foreground font-semibold inline-flex items-center gap-x-1.5">
+                                <CrownIcon className="h-3.5 w-3.5 @lg:h-[18px] @lg:w-[18px]" />
                                 Exklusiv
                             </div>
 
@@ -41,12 +41,12 @@ const PropertyCard = ({image, name, location, price, areaSize, rooms}: T_Props) 
                         <div className="flex items-start gap-1.5 mb-5">
                             <MapPinIcon size={20} className="text-primary mt-0.5" />
                             <div className="text-sm text-muted-foreground">
-                                <div className="text-sm sm:text-base font-medium">{ location.street }</div>
-                                <div className="text-sm sm:text-base">{ location.city }</div>
+                                <div className="text-sm @lg:text-base font-medium">{ location.street }</div>
+                                <div className="text-sm @lg:text-base">{ location.city }</div>
                             </div>
                         </div>
 
-                        <div className="text-2xl sm:text-3xl text-primary font-bold mb-7">{ price.toLocaleString("sv-SE") } kr</div>
+                        <div className="text-2xl @lg:text-3xl text-primary font-bold mb-7">{ price.toLocaleString("sv-SE") } kr</div>
                         
                         <div className="py-2 border-y flex @8xl:items-center gap-10 @4xl:gap-6 @6xl:gap-10 px-1">
                             <div className="flex items-center gap-2">
@@ -67,7 +67,9 @@ const PropertyCard = ({image, name, location, price, areaSize, rooms}: T_Props) 
                         </div>
 
                         <div className="mt-10 @lg:mt-12 @4xl:mt-auto">
-                            <Button size="lg" className="w-full text-base font-semibold py-6"><EyeIcon /> Se hela annonsen</Button>
+                            <Link href="/property">
+                                <Button size="lg" className="w-full text-base font-semibold py-6"><EyeIcon /> Se hela annonsen</Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

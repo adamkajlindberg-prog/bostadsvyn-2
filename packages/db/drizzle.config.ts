@@ -1,8 +1,9 @@
 import type { Config } from "drizzle-kit";
+import { DATABASE_URL } from "./env";
 
 export default {
 	dbCredentials: {
-		url: process.env.DATABASE_URL!,
+		url: DATABASE_URL!,
 	},
 	dialect: "postgresql",
 	out: "pg/.drizzle",
