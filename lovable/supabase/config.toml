@@ -1,0 +1,70 @@
+project_id = "evgzebvzrihsqfqhmwxo"
+
+[functions.ai-natural-search]
+verify_jwt = false
+
+[functions.ai-category-search]
+verify_jwt = false
+
+[functions.ai-support-chat]
+verify_jwt = false
+
+[functions.analyze-property-description]
+verify_jwt = false
+
+[functions.batch-analyze-properties]
+verify_jwt = true
+
+[functions.ai-document-generator]
+verify_jwt = false
+
+[functions.ai-image-editor]
+verify_jwt = false
+
+[functions.ai-property-valuation]
+verify_jwt = false
+
+[functions.ai-market-analysis]
+verify_jwt = false
+
+[functions.ai-property-advisor]
+verify_jwt = false
+
+[functions.verify-rental-content]
+verify_jwt = true
+
+[functions.mapbox-token]
+verify_jwt = false
+
+[functions.osm-boundary]
+verify_jwt = false
+
+[functions.verify-marketing-content]
+verify_jwt = true
+
+[functions.publish-social-media]
+verify_jwt = true
+
+[functions.generate-dac7-report]
+verify_jwt = true
+
+[functions.verify-bankid]
+verify_jwt = true
+
+[functions.send-property-inquiry]
+verify_jwt = false
+
+[functions.create-ad-payment]
+verify_jwt = true
+
+[functions.verify-ad-payment]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
+
+[functions.create-subscription-checkout]
+verify_jwt = true
+
+[functions.customer-portal]
+verify_jwt = true

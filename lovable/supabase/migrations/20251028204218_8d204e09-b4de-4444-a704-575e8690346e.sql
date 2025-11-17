@@ -1,0 +1,108 @@
+-- Add rental_info column to properties table
+ALTER TABLE properties ADD COLUMN IF NOT EXISTS rental_info JSONB;
+
+-- Insert two sample rental properties
+INSERT INTO properties (
+  user_id,
+  title,
+  description,
+  property_type,
+  status,
+  price,
+  address_street,
+  address_postal_code,
+  address_city,
+  address_country,
+  living_area,
+  rooms,
+  bedrooms,
+  bathrooms,
+  images,
+  features,
+  ad_tier,
+  moderation_status,
+  rental_info
+) VALUES
+(
+  'f6f059c6-de9a-4ac9-a8ce-5a98f661da96',
+  'Modern 3:a i Vasastan',
+  'Ljus och trivsam 3:a i hjärtat av Vasastan. Nyrenoverad med öppet kök och balkong. Perfekt för par eller liten familj. Nära till kommunikationer, parker och shoppingmöjligheter.',
+  'APARTMENT',
+  'FOR_RENT',
+  18000,
+  'Odenplan 5',
+  '113 22',
+  'Stockholm',
+  'Sverige',
+  75,
+  3,
+  2,
+  1,
+  ARRAY['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800'],
+  ARRAY['Balkong', 'Hiss', 'Tvättstuga', 'Fiber', 'Parkering'],
+  'plus',
+  'approved',
+  '{
+    "contract_type": "first_hand",
+    "lease_duration": "unlimited",
+    "move_in_date": "2025-02-01",
+    "deposit_amount": 36000,
+    "utilities_included": true,
+    "furnished": false,
+    "pets_allowed": false,
+    "smoking_allowed": false,
+    "parking_included": true,
+    "parking_type": "garage",
+    "kitchen_amenities": ["Spis", "Ugn", "Kyl/frys", "Diskmaskin", "Mikrovågsugn"],
+    "bathroom_amenities": ["Dusch", "Tvättmaskin"],
+    "tech_amenities": ["Fiber 1000/1000", "TV-utag"],
+    "other_amenities": ["Förråd", "Cykelrum"],
+    "tenant_requirements": {
+      "min_income": 54000,
+      "employment_required": true,
+      "credit_check": true,
+      "references_required": true
+    }
+  }'::jsonb
+),
+(
+  'f6f059c6-de9a-4ac9-a8ce-5a98f661da96',
+  'Rymlig 2:a på Södermalm',
+  'Charmig 2:a med högt i tak och vacker stuckatur. Renoverat badrum och modernt kök. Lugnt läge nära Nytorget. Perfekt för singel eller par som söker boende i Stockholms hippaste område.',
+  'APARTMENT',
+  'FOR_RENT',
+  15000,
+  'Bondegatan 15',
+  '116 33',
+  'Stockholm',
+  'Sverige',
+  58,
+  2,
+  1,
+  1,
+  ARRAY['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800', 'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800'],
+  ARRAY['Högt i tak', 'Stuckatur', 'Fiber', 'Parkering möjlig'],
+  'free',
+  'approved',
+  '{
+    "contract_type": "second_hand",
+    "lease_duration": "12",
+    "move_in_date": "2025-03-01",
+    "deposit_amount": 30000,
+    "utilities_included": false,
+    "furnished": false,
+    "pets_allowed": true,
+    "smoking_allowed": false,
+    "parking_included": false,
+    "kitchen_amenities": ["Spis", "Ugn", "Kyl/frys"],
+    "bathroom_amenities": ["Dusch/badkar-kombination"],
+    "tech_amenities": ["Fiber 100/100"],
+    "other_amenities": ["Gemensam tvättstuga"],
+    "tenant_requirements": {
+      "min_income": 45000,
+      "employment_required": true,
+      "credit_check": true,
+      "references_required": false
+    }
+  }'::jsonb
+);

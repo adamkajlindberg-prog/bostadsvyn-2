@@ -1,0 +1,33 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import PrivateAuthForm from "@/components/PrivateAuthForm";
+import { useAuth } from "@/hooks/useAuth";
+
+export default function PrivateLogin() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect authenticated users to home page
+    if (user && !loading) {
+      navigate("/");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-background mx-auto mb-4"></div>
+          <p className="text-background">Laddar...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return null; // Will redirect via useEffect
+  }
+
+  return <PrivateAuthForm />;
+}

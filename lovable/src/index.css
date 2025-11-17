@@ -1,0 +1,344 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Nordic Real Estate Design System - All colors MUST be HSL */
+
+@layer base {
+  :root {
+    /* Core Nordic palette - Enhanced contrast */
+    --background: 0 0% 100%;
+    --foreground: 216 30% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 216 30% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 30% 8%;
+
+    /* Clean Blue Design System - Stronger colors and contrast */
+    --primary: 215 95% 42%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 215 90% 55%;
+    --primary-deep: 215 100% 28%;
+
+    /* Secondary - Light navy */
+    --secondary: 215 45% 92%;
+    --secondary-foreground: 215 75% 35%;
+
+    /* Muted tones - Better contrast */
+    --muted: 215 40% 94%;
+    --muted-foreground: 215 30% 28%;
+
+    /* Success - Navy blue - Stronger */
+    --success: 215 85% 48%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 215 80% 58%;
+
+    /* Rental - Green - Stronger */
+    --rental: 142 85% 34%;
+    --rental-foreground: 0 0% 100%;
+    --rental-light: 142 80% 42%;
+
+    /* Premium - Deep navy - Stronger */
+    --premium: 215 90% 38%;
+    --premium-foreground: 0 0% 100%;
+    --premium-dark: 215 95% 28%;
+
+    /* Accent colors - Navy variations - Stronger */
+    --accent: 215 80% 52%;
+    --accent-foreground: 0 0% 100%;
+    --accent-warm: 215 85% 48%;
+    --accent-warm-foreground: 0 0% 100%;
+    --accent-sage: 215 80% 52%;
+    --accent-sage-foreground: 0 0% 100%;
+    --accent-gold: 215 90% 45%;
+    --accent-gold-foreground: 0 0% 100%;
+
+    /* Critical - Navy blue - Stronger */
+    --critical: 215 85% 42%;
+    --critical-foreground: 0 0% 100%;
+
+    --destructive: 215 85% 42%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 35% 85%;
+    --input: 215 40% 94%;
+    --ring: 215 75% 45%;
+
+    /* Extended Navy design tokens */
+    --nordic-ice: 215 40% 96%;
+    --nordic-glacier: 215 35% 90%;
+    --nordic-fjord: 215 65% 55%;
+    --nordic-fjord-deep: 215 70% 48%;
+    --nordic-forest: 215 60% 58%;
+    --nordic-forest-dark: 215 65% 50%;
+    --nordic-aurora: 215 55% 65%;
+    --nordic-aurora-light: 215 45% 80%;
+    --nordic-midnight: 215 85% 20%;
+    --nordic-snow: 215 35% 96%;
+    --nordic-mist: 215 55% 65%;
+    --nordic-sage: 215 60% 58%;
+
+    /* Enhanced neutral gradients */
+    --gradient-nordic: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--accent))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(var(--primary-deep)) 0%,
+      hsl(var(--accent-warm)) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--background)),
+      hsl(var(--nordic-ice))
+    );
+    --gradient-premium: linear-gradient(
+      135deg,
+      hsl(var(--premium)),
+      hsl(var(--premium-dark))
+    );
+    --gradient-success: linear-gradient(
+      135deg,
+      hsl(var(--success)),
+      hsl(var(--success-light))
+    );
+    --gradient-gold: linear-gradient(
+      135deg,
+      hsl(var(--accent-gold)),
+      hsl(var(--premium))
+    );
+    --gradient-warm: linear-gradient(
+      135deg,
+      hsl(var(--accent-warm)),
+      hsl(var(--primary-light))
+    );
+    --gradient-ocean: linear-gradient(
+      135deg,
+      hsl(var(--accent)),
+      hsl(var(--nordic-aurora))
+    );
+
+    /* Enhanced shadows with color variations */
+    --shadow-nordic: 0 8px 32px -8px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
+    --shadow-elevated: 0 16px 64px -12px hsl(var(--primary) / 0.15);
+    --shadow-premium: 0 8px 32px -8px hsl(var(--premium) / 0.2);
+    --shadow-success: 0 8px 32px -8px hsl(var(--success) / 0.15);
+    --shadow-gold: 0 8px 32px -8px hsl(var(--accent-gold) / 0.25);
+
+    /* Animations */
+    --transition-nordic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --bounce-nordic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    /* Additional design elements */
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
+    --shadow-glow-premium: 0 0 40px hsl(var(--premium) / 0.3);
+
+    /* Sidebar variables (keeping existing) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode Nordic palette - Enhanced contrast */
+    --background: 216 30% 10%;
+    --foreground: 210 25% 98%;
+
+    --card: 216 25% 12%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 216 25% 12%;
+    --popover-foreground: 210 20% 98%;
+
+    /* Dark mode navy variations */
+    --primary: 215 50% 65%;
+    --primary-foreground: 215 85% 15%;
+    --primary-light: 215 45% 75%;
+    --primary-deep: 215 55% 55%;
+
+    --secondary: 215 35% 20%;
+    --secondary-foreground: 215 40% 90%;
+
+    --muted: 215 35% 20%;
+    --muted-foreground: 215 25% 65%;
+
+    /* Dark mode navy tones */
+    --success: 215 50% 60%;
+    --success-foreground: 215 85% 15%;
+    --success-light: 215 45% 70%;
+
+    /* Dark mode rental - Green */
+    --rental: 142 70% 45%;
+    --rental-foreground: 0 0% 100%;
+    --rental-light: 142 65% 55%;
+
+    --premium: 215 55% 70%;
+    --premium-foreground: 215 85% 15%;
+    --premium-dark: 215 50% 60%;
+
+    /* Dark mode navy accents */
+    --accent: 215 45% 58%;
+    --accent-foreground: 215 85% 15%;
+    --accent-warm: 215 50% 62%;
+    --accent-warm-foreground: 215 85% 15%;
+    --accent-sage: 215 45% 58%;
+    --accent-sage-foreground: 215 85% 15%;
+    --accent-gold: 215 55% 65%;
+    --accent-gold-foreground: 215 85% 15%;
+
+    --critical: 215 50% 58%;
+    --critical-foreground: 215 85% 15%;
+
+    --destructive: 215 50% 58%;
+    --destructive-foreground: 215 85% 15%;
+
+    --border: 215 30% 22%;
+    --input: 215 35% 20%;
+    --ring: 215 50% 65%;
+
+    /* Dark navy tokens */
+    --nordic-ice: 215 30% 18%;
+    --nordic-glacier: 215 28% 24%;
+    --nordic-fjord: 215 45% 52%;
+    --nordic-fjord-deep: 215 50% 42%;
+    --nordic-forest: 215 40% 56%;
+    --nordic-forest-dark: 215 45% 48%;
+    --nordic-aurora: 215 38% 65%;
+    --nordic-aurora-light: 215 32% 75%;
+    --nordic-midnight: 215 75% 12%;
+    --nordic-snow: 215 30% 78%;
+    --nordic-mist: 215 45% 52%;
+    --nordic-sage: 215 40% 60%;
+
+    /* Dark mode neutral gradients */
+    --gradient-nordic: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--accent))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(var(--primary-deep)) 0%,
+      hsl(var(--accent-warm)) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(var(--nordic-ice))
+    );
+    --gradient-premium: linear-gradient(
+      135deg,
+      hsl(var(--premium)),
+      hsl(var(--premium-dark))
+    );
+    --gradient-success: linear-gradient(
+      135deg,
+      hsl(var(--success)),
+      hsl(var(--success-light))
+    );
+    --gradient-gold: linear-gradient(
+      135deg,
+      hsl(var(--accent-gold)),
+      hsl(var(--premium))
+    );
+    --gradient-warm: linear-gradient(
+      135deg,
+      hsl(var(--accent-warm)),
+      hsl(var(--primary-light))
+    );
+    --gradient-ocean: linear-gradient(
+      135deg,
+      hsl(var(--accent)),
+      hsl(var(--nordic-aurora))
+    );
+
+    /* Keep existing sidebar dark mode variables */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 450;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  p,
+  span,
+  div {
+    font-weight: 400;
+  }
+}
+
+/* Google Maps InfoWindow tweaks: remove default inner padding */
+.gm-style .gm-style-iw,
+.gm-style .gm-style-iw-c,
+.gm-style .gm-style-iw-d {
+  padding: 0;
+}
+.gm-style .gm-style-iw-d {
+  overflow: hidden;
+}
+/* Remove top cap space completely so content can touch top edge */
+.gm-style .gm-style-iw-t,
+.gm-style .gm-style-iw-tc {
+  height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.gm-style .gm-style-iw-t::after,
+.gm-style .gm-style-iw-tc::after {
+  display: none;
+}
+/* Sharper corners and transparent chrome so only our content shows */
+.gm-style .gm-style-iw-c {
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  padding-top: 0;
+}
+/* Keep close button visible */
+.gm-style .gm-style-iw-chr,
+.gm-ui-hover-effect {
+  top: 6px;
+  right: 6px;
+}
