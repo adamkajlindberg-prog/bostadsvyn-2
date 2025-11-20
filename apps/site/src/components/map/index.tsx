@@ -4,7 +4,7 @@ import ContainerWrapper from "@/components/common/container-wrapper";
 import PropertyMap from "@/components/property-map";
 import PropertySearch from "@/components/property-search";
 
-const Map = () => {
+const MapComponent = () => {
   return (
     <ContainerWrapper className="py-8">
       <div className="mb-8">
@@ -21,4 +21,4 @@ const Map = () => {
   );
 };
 
-export default Map;
+export default MapComponent;

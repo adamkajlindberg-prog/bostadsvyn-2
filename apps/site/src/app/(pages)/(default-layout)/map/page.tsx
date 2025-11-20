@@ -1,5 +1,5 @@
-import Map from "@/components/map";
+import MapComponent from "@/components/map";
 
 export default function MapPage() {
-  return <Map />;
+  return <MapComponent />;
 }

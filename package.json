@@ -8,17 +8,17 @@
     "packages/*"
   ],
   "scripts": {
+    "auth:generate": "with-env 'bunx @better-auth/cli@latest generate --config apps/site/src/auth/config.ts --output packages/db/pg/schema/user.ts'",
     "build": "turbo build",
     "clean": "git clean -fxd -e .env.local",
+    "db:push": "bun -F db push",
     "dev": "turbo dev",
     "knip": "with-env knip --config knip.config.ts",
     "lint": "biome check . && manypkg check ",
     "lint-fix": "biome check --write --unsafe . && manypkg fix && sort-package-json",
     "test": "turbo test",
     "type-check": "turbo type-check",
-    "up": "bunx npm-check-updates -ws --root --format group -u",
-    "auth:generate": "with-env 'bunx @better-auth/cli@latest generate --config apps/site/src/auth/config.ts --output packages/db/pg/schema/user.ts'",
-    "db:push": "bun -F db push"
+    "up": "bunx npm-check-updates -ws --root --format group -u"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.6",

@@ -1,10 +1,8 @@
 import { Suspense } from "react";
-import type { Session } from "@/auth/config";
 import { getServerSession } from "@/auth/server-session";
-import { DashboardOverview } from "@/components/dashboard-overview";
-import { getDashboardStats } from "@/lib/dashboard";
+import Tools from "@/components/tools";
 
-export default async function DashboardPage() {
+export default async function VerktygPage() {
   const session = await getServerSession();
   if (!session?.user) {
     return null; // Layout handles redirect
@@ -16,17 +14,16 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Laddar dashboard...</p>
+            <p>Laddar verktyg...</p>
           </div>
         </div>
       }
     >
-      <DashboardSuspense session={session} />
+      <VerktygContent />
     </Suspense>
   );
 }
 
-const DashboardSuspense = async ({ session }: { session: Session }) => {
-  const stats = await getDashboardStats(session.user.id);
-  return <DashboardOverview user={session.user} stats={stats} />;
+const VerktygContent = () => {
+  return <Tools />;
 };
