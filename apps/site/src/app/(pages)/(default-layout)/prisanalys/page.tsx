@@ -1,7 +1,5 @@
 import PriceAnalysis from "@/components/price-analysis";
 
-const PriceAnalysisPage = () => {
+export default function PrisanalysPage() {
   return <PriceAnalysis />;
-};
-
-export default PriceAnalysisPage;
+}

@@ -1,7 +1,5 @@
 import CookiePolicy from "@/components/cookie-policy";
 
-const CookiePolicyPage = () => {
+export default function CookiesPage() {
   return <CookiePolicy />;
-};
-
-export default CookiePolicyPage;
+}

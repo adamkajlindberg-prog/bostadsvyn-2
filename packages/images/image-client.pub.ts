@@ -1,4 +1,3 @@
-
 interface ImageClientConfig {
   endpoint: string;
   region: string;

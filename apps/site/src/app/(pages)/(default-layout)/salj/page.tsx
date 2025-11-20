@@ -1,7 +1,5 @@
 import Sell from "@/components/sell";
 
-const SellPage = () => {
+export default function SaljPage() {
   return <Sell />;
-};
-
-export default SellPage;
+}

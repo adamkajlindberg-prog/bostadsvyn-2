@@ -1,6 +1,6 @@
+import { embeddings, getDbClient, resources } from "db";
 import { generateEmbeddings } from "../apps/site/src/lib/ai/embedding";
 import { generateChunks } from "../apps/site/src/lib/ai/generate-chunk";
-import { embeddings, getDbClient, resources } from "../packages/db";
 
 const generateChunkEmbeddings = async (chunks: string[]) => {
   const db = getDbClient();

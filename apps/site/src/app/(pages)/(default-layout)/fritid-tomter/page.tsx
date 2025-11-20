@@ -1,7 +1,5 @@
 import LeisurePlots from "@/components/leisure-plots";
 
-const LeisurePlotsPage = () => {
+export default function FritidTomterPage() {
   return <LeisurePlots />;
-};
-
-export default LeisurePlotsPage;
+}

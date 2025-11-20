@@ -1,7 +1,5 @@
 import Terms from "@/components/terms";
 
-const TermsPage = () => {
+export default function TermsPage() {
   return <Terms />;
-};
-
-export default TermsPage;
+}

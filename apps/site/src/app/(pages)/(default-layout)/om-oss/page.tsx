@@ -1,7 +1,5 @@
 import AboutUs from "@/components/about-us";
 
-const AboutUsPage = () => {
+export default function OmOssPage() {
   return <AboutUs />;
-};
-
-export default AboutUsPage;
+}

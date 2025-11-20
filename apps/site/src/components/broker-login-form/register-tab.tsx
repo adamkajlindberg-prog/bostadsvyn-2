@@ -143,7 +143,7 @@ const RegisterTab = () => {
       </div>
 
       <Field>
-        <Button type="submit" className="mb-2 bg-green-600 hover:bg-green-700">
+        <Button type="submit" className="mb-2">
           Registrera mäklarkonto
         </Button>
         <FieldDescription className="text-xs text-center">

@@ -1,7 +1,5 @@
 import DigitalLeaseContract from "@/components/digital-lease-contract";
 
-const DigitalLeaseContractPage = () => {
+export default function DigitalaHyreskontraktPage() {
   return <DigitalLeaseContract />;
-};
-
-export default DigitalLeaseContractPage;
+}

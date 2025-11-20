@@ -1,83 +1,72 @@
 import {
   boolean,
+  integer,
   pgTable,
   text,
   timestamp,
-  unique,
-  varchar,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
-  banExpires: timestamp(),
-  banned: boolean().notNull().default(false),
-  banReason: text(),
-  createdAt: timestamp().notNull().defaultNow(),
-  email: text().notNull().unique(),
-  emailVerified: boolean().notNull().default(false),
-  id: varchar({ length: 255 }).notNull().primaryKey(),
-  image: text(),
-  name: text(),
-
-  // Admin See roles in permissions.ts
-  role: varchar({ length: 255 }).notNull().default("buyer"),
-
-  // Payments
-  stripeCustomerId: varchar({ length: 255 }).unique(),
-  updatedAt: timestamp().notNull().defaultNow(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  role: text("role"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
+  stripeCustomerId: text("stripe_customer_id"),
 });
 
-export type User = typeof user.$inferSelect;
-export type NewUser = typeof user.$inferInsert;
-
-export const account = pgTable(
-  "account",
-  {
-    accessToken: text(),
-    accessTokenExpiresAt: timestamp(),
-    accountId: varchar({ length: 255 }).notNull(),
-    createdAt: timestamp().notNull().defaultNow(),
-    id: varchar({ length: 255 }).primaryKey(),
-    idToken: text(),
-    providerId: varchar({ length: 255 }).notNull(),
-    refreshToken: text(),
-    refreshTokenExpiresAt: timestamp(),
-    scope: text(),
-    updatedAt: timestamp().notNull().defaultNow(),
-    userId: varchar({ length: 255 })
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-  },
-  (tbl) => [unique().on(tbl.providerId, tbl.accountId)],
-);
-
-export type DbAccount = typeof account.$inferSelect;
-export type DbNewAccount = typeof account.$inferInsert;
-
-export const verification = pgTable("verification", {
-  createdAt: timestamp().notNull().defaultNow(),
-  expiresAt: timestamp().notNull(),
-  id: varchar({ length: 255 }).primaryKey(),
-  identifier: text().notNull(),
-  updatedAt: timestamp().notNull().defaultNow(),
-  value: text().notNull(),
-});
-
-export type DbVerificationToken = typeof verification.$inferSelect;
-export type DbNewVerificationToken = typeof verification.$inferInsert;
-
-export const session = pgTable("session", {
-  createdAt: timestamp().notNull().defaultNow(),
-  expiresAt: timestamp().notNull(),
-  id: varchar({ length: 255 }).primaryKey(),
-  impersonatedById: varchar({ length: 255 }).references(() => user.id),
-  ipAddress: varchar({ length: 255 }),
-  token: text().notNull(),
-  updatedAt: timestamp().notNull().defaultNow(),
-  userAgent: text(),
-  userId: varchar({ length: 255 })
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
-export type DbSession = typeof session.$inferSelect;
-export type DbNewSession = typeof session.$inferInsert;
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const subscription = pgTable("subscription", {
+  id: text("id").primaryKey(),
+  plan: text("plan").notNull(),
+  referenceId: text("reference_id").notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  status: text("status").default("incomplete"),
+  periodStart: timestamp("period_start"),
+  periodEnd: timestamp("period_end"),
+  trialStart: timestamp("trial_start"),
+  trialEnd: timestamp("trial_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  seats: integer("seats"),
+});

@@ -1,7 +1,5 @@
 import Commercial from "@/components/commercial";
 
-const CommercialPage = () => {
+export default function KommersielltPage() {
   return <Commercial />;
-};
-
-export default CommercialPage;
+}

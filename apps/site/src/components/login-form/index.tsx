@@ -24,20 +24,18 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <Tabs defaultValue="login">
-              <TabsList className="w-full mb-4">
-                <TabsTrigger value="login">Logga in</TabsTrigger>
-                <TabsTrigger value="register">Skapa konto</TabsTrigger>
-              </TabsList>
-              <TabsContent value="login">
-                <LoginTab />
-              </TabsContent>
-              <TabsContent value="register">
-                <RegisterTab />
-              </TabsContent>
-            </Tabs>
-          </form>
+          <Tabs defaultValue="login">
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="login">Logga in</TabsTrigger>
+              <TabsTrigger value="register">Skapa konto</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <LoginTab />
+            </TabsContent>
+            <TabsContent value="register">
+              <RegisterTab />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

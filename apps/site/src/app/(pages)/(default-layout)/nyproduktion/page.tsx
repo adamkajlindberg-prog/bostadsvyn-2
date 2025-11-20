@@ -1,7 +1,5 @@
 import NewProduction from "@/components/new-production";
 
-const NewProductionPage = () => {
+export default function NyproduktionPage() {
   return <NewProduction />;
-};
-
-export default NewProductionPage;
+}

@@ -1,4 +1,4 @@
-import { type StripePlan, stripe } from "@better-auth/stripe";
+import { stripe } from "@better-auth/stripe";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -7,7 +7,6 @@ import { getDbClient } from "db";
 import Stripe from "stripe";
 import { sendEmail } from "@/email";
 import { env } from "@/env";
-import { prices } from "@/payments/pricing-plans";
 import { cacheAdapter } from "./cache-adapter";
 import { ac, roles } from "./permissions";
 
@@ -55,14 +54,15 @@ const authConfig = {
       subscription: {
         enabled: true,
         plans: async () => {
-          const plans: StripePlan[] = [];
-          for (const p of Object.values(prices)) {
-            plans.push({
-              lookupKey: p.id,
-              name: p.id,
-            });
-          }
-          return plans;
+          return [];
+          // const plans: StripePlan[] = [];
+          // for (const p of Object.values(prices)) {
+          //   plans.push({
+          //     lookupKey: p.id,
+          //     name: p.id,
+          //   });
+          // }
+          // return plans;
         },
       },
     }),

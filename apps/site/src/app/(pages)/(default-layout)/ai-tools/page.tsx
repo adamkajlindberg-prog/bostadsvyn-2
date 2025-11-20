@@ -1,7 +1,5 @@
-import Tools from "@/components/ai-tools";
+import AITools from "@/components/ai-tools";
 
-const ToolsPage = () => {
-  return <Tools />;
-};
-
-export default ToolsPage;
+export default function AIToolsPage() {
+  return <AITools />;
+}

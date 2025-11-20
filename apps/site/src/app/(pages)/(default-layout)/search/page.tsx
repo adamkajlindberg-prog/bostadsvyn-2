@@ -1,7 +1,7 @@
-import SearchProperty from "@/components/search-property";
+import PropertySearch from "@/components/property-search";
 
-const SearchPropertyPage = () => {
-  return <SearchProperty />;
-};
+export const dynamic = "force-dynamic";
 
-export default SearchPropertyPage;
+export default function SearchPage() {
+  return <PropertySearch />;
+}

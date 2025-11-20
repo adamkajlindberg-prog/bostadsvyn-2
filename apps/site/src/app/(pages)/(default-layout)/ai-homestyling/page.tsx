@@ -1,7 +1,5 @@
-import Homestyling from "@/components/ai-homestyling";
+import AIHomestyling from "@/components/ai-homestyling";
 
-const HomestylingPage = () => {
-  return <Homestyling />;
-};
-
-export default HomestylingPage;
+export default function AIHomestylingPage() {
+  return <AIHomestyling />;
+}

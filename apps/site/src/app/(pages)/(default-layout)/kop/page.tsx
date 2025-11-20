@@ -1,7 +1,5 @@
 import Buy from "@/components/buy";
 
-const BuyPage = () => {
+export default function KopPage() {
   return <Buy />;
-};
-
-export default BuyPage;
+}
