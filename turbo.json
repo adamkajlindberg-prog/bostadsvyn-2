@@ -1,12 +1,29 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env*"],
+  "globalDependencies": [
+    "**/.env*"
+  ],
   "globalEnv": [
     "AI_CHAT_AGENT",
+    "AUTH_FROM_EMAIL",
+    "AUTH_SECRET",
     "DATABASE_URL",
     "EMBEDDING_DIMENSIONALITY",
     "GEMINI_API_KEY",
+    "NEXT_PUBLIC_CUSTOMER_SERVICE_EMAIL",
+    "NEXT_PUBLIC_WEB_URL",
     "OPENAI_API_KEY",
+    "R2_ACCESS_KEY_ID",
+    "R2_ACCESS_SECRET",
+    "R2_BUCKET",
+    "R2_ENDPOINT",
+    "R2_REGION",
+    "REDIS_PREFIX",
+    "REDIS_TOKEN",
+    "REDIS_URL",
+    "RESEND_API_KEY",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
     "TRAFIKVERKET_API_KEY"
   ],
   "globalPassThroughEnv": [
@@ -26,8 +43,12 @@
       "cache": false
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist"
+      ]
     },
     "dev": {
       "cache": false,
@@ -39,7 +60,10 @@
     },
     "type-check": {
       "cache": false,
-      "outputs": ["tsconfig.tsbuildinfo", ".tsbuildinfo"]
+      "outputs": [
+        "tsconfig.tsbuildinfo",
+        ".tsbuildinfo"
+      ]
     },
     "ui-add": {
       "cache": false,

@@ -60,7 +60,7 @@ export class ImageClient {
 
     // Convert headers to regular object
     const fetchHeaders: Record<string, string> = {};
-    for (const [key, value] of headers) {
+    for (const [key, value] of headers.entries()) {
       fetchHeaders[key] = value;
     }
 
@@ -100,13 +100,18 @@ export class ImageClient {
     const algorithm = "AWS4-HMAC-SHA256";
 
     // Sort headers and create canonical headers
-    const sortedHeaders = new Map([...headers.entries()].sort());
+    const sortedHeaders = new Map<string, string>(
+      [...headers.entries()].sort(),
+    );
     const canonicalHeaders = `${Array.from(sortedHeaders.entries())
-      .map(([key, value]) => `${key.toLowerCase()}:${value.trim()}`)
+      .map(
+        ([key, value]: [string, string]) =>
+          `${key.toLowerCase()}:${value.trim()}`,
+      )
       .join("\n")}\n`;
 
     const signedHeaders = Array.from(sortedHeaders.keys())
-      .map((key) => key.toLowerCase())
+      .map((key: string) => key.toLowerCase())
       .join(";");
 
     // Create canonical request
@@ -227,7 +232,7 @@ export class ImageClient {
 
     // Convert headers to regular object
     const fetchHeaders: Record<string, string> = {};
-    for (const [key, value] of headers) {
+    for (const [key, value] of headers.entries()) {
       fetchHeaders[key] = value;
     }
 
