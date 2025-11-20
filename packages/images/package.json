@@ -20,5 +20,9 @@
   "dependencies": {
     "remeda": "2.32.0",
     "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@cjkihl/create-exports": "^1.0.9",
+    "@cjkihl/tsconfig": "^1.0.10"
   }
 }
