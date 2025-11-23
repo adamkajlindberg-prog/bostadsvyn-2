@@ -4,16 +4,16 @@
   "type": "module",
   "exports": {
     "./image-client": {
-      "default": "./dist/output/image-client.pub.js",
-      "types": "./dist/types/image-client.pub.d.ts"
+      "default": "./image-client.pub.ts",
+      "types": "./image-client.pub.ts"
     },
     "./mime-types": {
-      "default": "./dist/output/mime-types.pub.js",
-      "types": "./dist/types/mime-types.pub.d.ts"
+      "default": "./mime-types.pub.ts",
+      "types": "./mime-types.pub.ts"
     }
   },
   "scripts": {
-    "build": "tsc && create-exports",
+    "create-exports": "create-exports -s",
     "test": "bun test",
     "type-check": "tsc --noEmit"
   },

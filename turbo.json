@@ -1,8 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env*"
-  ],
+  "globalDependencies": ["**/.env*"],
   "globalEnv": [
     "AI_CHAT_AGENT",
     "AUTH_FROM_EMAIL",
@@ -43,12 +41,8 @@
       "cache": false
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["dist", ".next"]
     },
     "dev": {
       "cache": false,
@@ -60,10 +54,7 @@
     },
     "type-check": {
       "cache": false,
-      "outputs": [
-        "tsconfig.tsbuildinfo",
-        ".tsbuildinfo"
-      ]
+      "outputs": ["tsconfig.tsbuildinfo", ".tsbuildinfo"]
     },
     "ui-add": {
       "cache": false,

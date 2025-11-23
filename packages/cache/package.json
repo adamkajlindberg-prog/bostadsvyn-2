@@ -4,24 +4,24 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./dist/output/index.pub.js",
-      "types": "./dist/types/index.pub.d.ts"
+      "default": "./index.pub.ts",
+      "types": "./index.pub.ts"
     },
     "./env": {
-      "default": "./dist/output/env.pub.js",
-      "types": "./dist/types/env.pub.d.ts"
+      "default": "./env.pub.ts",
+      "types": "./env.pub.ts"
     },
     "./ioredis": {
-      "default": "./dist/output/ioredis.pub.js",
-      "types": "./dist/types/ioredis.pub.d.ts"
+      "default": "./ioredis.pub.ts",
+      "types": "./ioredis.pub.ts"
     },
     "./upstash": {
-      "default": "./dist/output/upstash.pub.js",
-      "types": "./dist/types/upstash.pub.d.ts"
+      "default": "./upstash.pub.ts",
+      "types": "./upstash.pub.ts"
     }
   },
   "scripts": {
-    "build": "tsc && create-exports",
+    "create-exports": "create-exports -s",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

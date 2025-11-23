@@ -4,24 +4,24 @@
   "type": "module",
   "exports": {
     "./error": {
-      "default": "./dist/output/error.pub.js",
-      "types": "./dist/types/error.pub.d.ts"
+      "default": "./error.pub.ts",
+      "types": "./error.pub.ts"
     },
     "./id": {
-      "default": "./dist/output/id.pub.js",
-      "types": "./dist/types/id.pub.d.ts"
+      "default": "./id.pub.ts",
+      "types": "./id.pub.ts"
     },
     "./json": {
-      "default": "./dist/output/json.pub.js",
-      "types": "./dist/types/json.pub.d.ts"
+      "default": "./json.pub.ts",
+      "types": "./json.pub.ts"
     },
     "./sleep": {
-      "default": "./dist/output/sleep.pub.js",
-      "types": "./dist/types/sleep.pub.d.ts"
+      "default": "./sleep.pub.ts",
+      "types": "./sleep.pub.ts"
     }
   },
   "scripts": {
-    "build": "tsc && create-exports",
+    "create-exports": "create-exports -s",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
