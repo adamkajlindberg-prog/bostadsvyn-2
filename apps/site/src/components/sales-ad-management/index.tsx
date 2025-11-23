@@ -20,3 +20,4 @@ const SalesAdManagement = ({ id }: SalesAdManagementProps) => {
 };
 
 export default SalesAdManagement;
+

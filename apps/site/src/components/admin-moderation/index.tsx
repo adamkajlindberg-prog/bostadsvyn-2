@@ -16,3 +16,4 @@ const AdminModeration = () => {
 };
 
 export default AdminModeration;
+

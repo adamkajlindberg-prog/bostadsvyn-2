@@ -20,3 +20,4 @@ const NyproduktionDetail = ({ projectId }: NyproduktionDetailProps) => {
 };
 
 export default NyproduktionDetail;
+

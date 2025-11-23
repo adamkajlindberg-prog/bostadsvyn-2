@@ -263,3 +263,4 @@ const BankIdInfo = () => {
 };
 
 export default BankIdInfo;
+

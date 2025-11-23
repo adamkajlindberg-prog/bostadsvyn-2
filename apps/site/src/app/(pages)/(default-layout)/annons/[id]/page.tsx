@@ -34,3 +34,4 @@ export default async function PropertyAdPage({ params }: Props) {
   // Default to property details
   redirect(`/property/${cleanId}`);
 }
+

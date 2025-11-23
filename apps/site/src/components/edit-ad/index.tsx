@@ -20,3 +20,4 @@ const EditAd = ({ adId }: EditAdProps) => {
 };
 
 export default EditAd;
+

@@ -20,3 +20,4 @@ const RentalDetails = ({ id }: RentalDetailsProps) => {
 };
 
 export default RentalDetails;
+

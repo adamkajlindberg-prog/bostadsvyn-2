@@ -18,3 +18,4 @@ const SnartTillSalu = () => {
 };
 
 export default SnartTillSalu;
+

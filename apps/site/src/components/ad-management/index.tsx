@@ -20,3 +20,4 @@ const AdManagement = ({ id }: AdManagementProps) => {
 };
 
 export default AdManagement;
+

@@ -18,3 +18,4 @@ const EnhancedSearch = () => {
 };
 
 export default EnhancedSearch;
+
