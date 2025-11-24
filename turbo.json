@@ -25,7 +25,8 @@
     "RESEND_API_KEY",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
-    "TRAFIKVERKET_API_KEY"
+    "TRAFIKVERKET_API_KEY",
+    "DISABLE_INDEXING"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
