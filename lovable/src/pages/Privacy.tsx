@@ -145,7 +145,7 @@ const Privacy = () => {
                   <li>Tillhandahålla marknadsplatstjänster</li>
                   <li>Möjliggöra kontakt mellan köpare, säljare och mäklare</li>
                   <li>
-                    Skapa och administrera digitala hyreskontrakt via Criipto
+                    Skapa och administrera digitala hyreskontrakt via Idura
                     och BankID
                   </li>
                   <li>Hantera användarkonten och prenumerationer</li>
@@ -249,7 +249,7 @@ const Privacy = () => {
                 genom plattformen
               </li>
               <li>
-                <strong>BankID/Criipto:</strong> För autentisering och digital
+                <strong>BankID/IDURA:</strong> För autentisering och digital
                 signering av hyreskontrakt
               </li>
               <li>
@@ -366,7 +366,7 @@ const Privacy = () => {
             <ul className="list-disc pl-6 space-y-2 text-foreground/90">
               <li>SSL/TLS-kryptering för all datatrafik</li>
               <li>
-                BankID-integration via Criipto för säker autentisering och
+                BankID-integration via Idura för säker autentisering och
                 digital signering
               </li>
               <li>Stripe för PCI DSS-kompatibel betalningshantering</li>

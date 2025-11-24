@@ -1,0 +1,4 @@
+{
+  "installCommand": "bun install",
+  "rootDirectory": "apps/site"
+}

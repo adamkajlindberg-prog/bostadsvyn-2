@@ -1,12 +1,14 @@
 import { stripe } from "@better-auth/stripe";
-import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { admin, magicLink } from "better-auth/plugins";
+
+import { admin, genericOAuth, magicLink } from "better-auth/plugins";
 import { getDbClient } from "db";
 import Stripe from "stripe";
 import { sendEmail } from "@/email";
 import { env } from "@/env";
+import { bankIdOauthConfig } from "./bank-id";
 import { cacheAdapter } from "./cache-adapter";
 import { ac, roles } from "./permissions";
 
@@ -30,6 +32,12 @@ const authConfig = {
       });
     },
   },
+  account: {
+    accountLinking: {
+      // Needed for BankID since no email is provided
+      allowDifferentEmails: true,
+    },
+  },
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
@@ -40,6 +48,9 @@ const authConfig = {
           to: email,
         });
       },
+    }),
+    genericOAuth({
+      config: [bankIdOauthConfig],
     }),
     admin({
       ac,

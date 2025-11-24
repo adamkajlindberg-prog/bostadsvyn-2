@@ -136,7 +136,7 @@ const FragorSvar = () => {
         },
         {
           q: "Vad är digitala hyreskontrakt?",
-          a: "Våra digitala hyreskontrakt används via Criipto för säker digital hantering. Kontrakten genereras automatiskt baserat på din information och gällande svensk hyreslagstiftning. Både hyresvärd och hyresgäst signerar med BankID-autentisering vilket är juridiskt bindande. Efter signering får båda parter digitala kopior via e-mail, och kontrakten arkiveras automatiskt och säkert i varje parts användarprofil för framtida referens.",
+          a: "Våra digitala hyreskontrakt används via Idura för säker digital hantering. Kontrakten genereras automatiskt baserat på din information och gällande svensk hyreslagstiftning. Både hyresvärd och hyresgäst signerar med BankID-autentisering vilket är juridiskt bindande. Efter signering får båda parter digitala kopior via e-mail, och kontrakten arkiveras automatiskt och säkert i varje parts användarprofil för framtida referens.",
         },
         {
           q: "Behöver jag själv skriva hyreskontrakt?",

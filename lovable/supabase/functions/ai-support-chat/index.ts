@@ -183,7 +183,7 @@ Mäklaren ser i mäklarportalen:
 
 **Hyra ut:**
 - Privatpersoner och företag kan lägga upp hyresannonser direkt (gratis)
-- Digitala hyreskontrakt via Criipto med BankID-signering
+- Digitala hyreskontrakt via Idura med BankID-signering
 - Automatisk kontraktsgenerering enligt svensk hyreslagstiftning
 - Säker lagring i molnet
 - Efter signering: Båda parter får digitala kopior via e-mail och kontrakt arkiveras i användarprofilerna
@@ -214,7 +214,7 @@ Mäklaren ser i mäklarportalen:
 - Alla betalningar via säkra **PCI DSS-certifierade** tjänster (Stripe)
 - Användare har full kontroll över sina uppgifter
 - Tvåfaktorsautentisering tillgänglig
-- Hyreskontrakt signeras med BankID via Criipto för juridisk säkerhet
+- Hyreskontrakt signeras med BankID via Idura för juridisk säkerhet
 
 **PRISER:**
 **Annonspaket (Säljaren betalar efter godkännande via Stripe Checkout):**
@@ -304,7 +304,7 @@ FÖRETAG (Ex. moms, 200 kr/mån mer än privatpersoner):
 
 **För uthyrare:**
 "Kan jag hyra ut min bostad?" → Ja, privatpersoner kan, förklara processen
-"Hur fungerar digitala kontrakt?" → Criipto + BankID-signering, automatisk generering, arkivering i profiler
+"Hur fungerar digitala kontrakt?" → Idura + BankID-signering, automatisk generering, arkivering i profiler
 "Är hyresavtalen juridiskt bindande?" → Ja, följer svensk lag
 
 **DITT BETEENDE:**

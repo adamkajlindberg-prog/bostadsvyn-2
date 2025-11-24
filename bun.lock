@@ -26,6 +26,7 @@
         "@ai-sdk/openai": "^2.0.71",
         "@ai-sdk/react": "^2.0.100",
         "@better-auth/stripe": "^1.4.1",
+        "@better-fetch/fetch": "^1.1.18",
         "@bostadsvyn/cache": "workspace:*",
         "@bostadsvyn/images": "workspace:*",
         "@hookform/resolvers": "^5.2.2",

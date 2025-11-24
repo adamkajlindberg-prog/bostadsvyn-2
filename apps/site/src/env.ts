@@ -78,5 +78,10 @@ export const env = createEnv({
       .min(1)
       .optional()
       .describe("The region where the bucket is located"),
+
+    // IDURA
+    IDURA_CLIENT_ID: z.string().min(1),
+    IDURA_CLIENT_SECRET: z.string().min(1),
+    IDURA_CLIENT_URL: z.url(),
   },
 });

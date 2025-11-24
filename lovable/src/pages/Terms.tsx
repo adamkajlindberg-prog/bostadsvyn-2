@@ -301,7 +301,7 @@ const Terms = () => {
               <ul className="list-disc pl-6 space-y-2">
                 <li>Identitetsverifiering vid registrering</li>
                 <li>Säker inloggning på kontot</li>
-                <li>Digital signering av hyreskontrakt via Criipto</li>
+                <li>Digital signering av hyreskontrakt via Idura</li>
                 <li>Verifiering vid publicering av annonser</li>
               </ul>
 
