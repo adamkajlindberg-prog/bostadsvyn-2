@@ -6,7 +6,7 @@ import {
   text,
   vector,
 } from "drizzle-orm/pg-core";
-import { EMBEDDING_DIMENSIONALITY } from "../../env";
+import { env } from "../../env";
 import { resources } from "./resources";
 
 export const embeddings = pgTable(
@@ -14,7 +14,7 @@ export const embeddings = pgTable(
   {
     content: text("content").notNull(),
     embedding: vector("embedding", {
-      dimensions: EMBEDDING_DIMENSIONALITY,
+      dimensions: env.EMBEDDING_DIMENSIONALITY,
     }).notNull(),
     id: serial("id").primaryKey(),
     resourceId: integer("resource_id").references(() => resources.id, {

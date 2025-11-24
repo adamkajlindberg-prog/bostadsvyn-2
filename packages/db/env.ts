@@ -1,10 +1,22 @@
-import dotenv from "dotenv";
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
 
-dotenv.config({ path: "../../.env" });
-
-export const DATABASE_URL = process.env.DATABASE_URL;
-
-export const EMBEDDING_DIMENSIONALITY = process.env.EMBEDDING_DIMENSIONALITY
-  ? parseInt(process.env.EMBEDDING_DIMENSIONALITY, 10)
-  : 1536;
-export const AI_CHAT_AGENT = process.env.AI_CHAT_AGENT || "OPENAI";
+export const env = createEnv({
+  emptyStringAsUndefined: true,
+  experimental__runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    EMBEDDING_DIMENSIONALITY: process.env.EMBEDDING_DIMENSIONALITY,
+    AI_CHAT_AGENT: process.env.AI_CHAT_AGENT,
+  },
+  server: {
+    DATABASE_URL: z
+      .string()
+      .min(1)
+      .describe("PostgreSQL database connection URL"),
+    EMBEDDING_DIMENSIONALITY: z
+      .string()
+      .default("1536")
+      .transform((s) => parseInt(s, 10)),
+    AI_CHAT_AGENT: z.string().default("OPENAI"),
+  },
+});

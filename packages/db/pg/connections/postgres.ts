@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 
 let _client: DbClient | undefined;
 
-import { DATABASE_URL } from "../../env";
+import { env } from "../../env";
 import * as schema from "../schema";
 
 export const getDbClient = () => {
@@ -13,10 +13,7 @@ export const getDbClient = () => {
 };
 
 const createDbClient = () => {
-  if (!DATABASE_URL) {
-    throw new Error("DATABASE_URL is not set");
-  }
-  const url = DATABASE_URL;
+  const url = env.DATABASE_URL;
   return drizzle({
     connection: {
       connectionString: url,

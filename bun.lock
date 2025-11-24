@@ -55,7 +55,6 @@
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
         "db": "workspace:*",
-        "dotenv": "^17.2.3",
         "embla-carousel-react": "^8.6.0",
         "lucide-react": "^0.554.0",
         "nanoid": "^5.1.6",
@@ -118,7 +117,7 @@
     "packages/db": {
       "name": "db",
       "dependencies": {
-        "dotenv": "^17.2.3",
+        "@t3-oss/env-nextjs": "^0.13.8",
         "drizzle-orm": "^0.44.7",
         "drizzle-zod": "^0.8.3",
         "pg": "^8.16.3",
