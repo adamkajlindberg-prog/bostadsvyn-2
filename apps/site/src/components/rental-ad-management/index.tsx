@@ -20,4 +20,3 @@ const RentalAdManagement = ({ id }: RentalAdManagementProps) => {
 };
 
 export default RentalAdManagement;
-

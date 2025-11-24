@@ -16,4 +16,3 @@ const PropertyManagement = () => {
 };
 
 export default PropertyManagement;
-

@@ -20,4 +20,3 @@ const BrokerProfile = ({ brokerId }: BrokerProfileProps) => {
 };
 
 export default BrokerProfile;
-

@@ -338,4 +338,3 @@ const GdprInfo = () => {
 };
 
 export default GdprInfo;
-

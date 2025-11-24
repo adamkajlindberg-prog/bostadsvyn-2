@@ -20,4 +20,3 @@ const OfficeProfile = ({ officeId }: OfficeProfileProps) => {
 };
 
 export default OfficeProfile;
-

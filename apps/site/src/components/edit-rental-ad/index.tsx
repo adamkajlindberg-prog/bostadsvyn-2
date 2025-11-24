@@ -22,4 +22,3 @@ const EditRentalAd = ({ adId }: EditRentalAdProps) => {
 };
 
 export default EditRentalAd;
-

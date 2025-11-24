@@ -18,4 +18,3 @@ const TillSalu = () => {
 };
 
 export default TillSalu;
-

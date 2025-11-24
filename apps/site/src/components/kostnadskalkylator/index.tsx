@@ -16,4 +16,3 @@ const Kostnadskalkylator = () => {
 };
 
 export default Kostnadskalkylator;
-

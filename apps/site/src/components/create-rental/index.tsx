@@ -16,4 +16,3 @@ const CreateRental = () => {
 };
 
 export default CreateRental;
-

@@ -16,4 +16,3 @@ const Advertising = () => {
 };
 
 export default Advertising;
-

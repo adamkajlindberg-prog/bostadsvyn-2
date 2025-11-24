@@ -16,4 +16,3 @@ const LogoVariantsPreview = () => {
 };
 
 export default LogoVariantsPreview;
-
