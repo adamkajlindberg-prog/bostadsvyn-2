@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import PrivateAuthForm from "@/components/PrivateAuthForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import PrivateAuthForm from '@/components/PrivateAuthForm';
 
 export default function PrivateLogin() {
   const { user, loading } = useAuth();
@@ -10,7 +10,7 @@ export default function PrivateLogin() {
   useEffect(() => {
     // Redirect authenticated users to home page
     if (user && !loading) {
-      navigate("/");
+      navigate('/');
     }
   }, [user, loading, navigate]);
 

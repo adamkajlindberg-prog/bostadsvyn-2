@@ -1,24 +1,15 @@
-import {
-  Building2,
-  Globe,
-  Home,
-  Mail,
-  MapPin,
-  Phone,
-  TrendingUp,
-  Users,
-} from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import PropertyCard, { type Property } from "@/components/PropertyCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, Mail, Phone, Globe, MapPin, TrendingUp, Home, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import Navigation from "@/components/Navigation";
+import LegalFooter from "@/components/LegalFooter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PropertyCard, { Property } from "@/components/PropertyCard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface OfficeInfo {
   id: string;
@@ -72,7 +63,7 @@ export default function OfficeProfile() {
     if (officeId) {
       loadOfficeData();
     }
-  }, [officeId, loadOfficeData]);
+  }, [officeId]);
 
   const loadOfficeData = async () => {
     try {
@@ -98,7 +89,7 @@ export default function OfficeProfile() {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-
+      
       setOffice(office);
 
       // Fetch brokers at this office
@@ -108,41 +99,38 @@ export default function OfficeProfile() {
         .eq("office_id", officeId);
 
       // Fallback to demo brokers if not found or empty
-      const brokers =
-        brokersData && brokersData.length > 0
-          ? brokersData
-          : [
-              {
-                id: "demo-broker-1",
-                user_id: "demo-user-1",
-                broker_name: "Anna Andersson",
-                broker_email: "anna@hemmamäkleri.se",
-                broker_phone: "070-123 45 67",
-                office_id: officeId || "demo-office",
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-              {
-                id: "demo-broker-2",
-                user_id: "demo-user-2",
-                broker_name: "Erik Eriksson",
-                broker_email: "erik@hemmamäkleri.se",
-                broker_phone: "070-234 56 78",
-                office_id: officeId || "demo-office",
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-              {
-                id: "demo-broker-3",
-                user_id: "demo-user-3",
-                broker_name: "Maria Svensson",
-                broker_email: "maria@hemmamäkleri.se",
-                broker_phone: "070-345 67 89",
-                office_id: officeId || "demo-office",
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-            ];
+      const brokers = (brokersData && brokersData.length > 0) ? brokersData : [
+        {
+          id: "demo-broker-1",
+          user_id: "demo-user-1",
+          broker_name: "Anna Andersson",
+          broker_email: "anna@hemmamäkleri.se",
+          broker_phone: "070-123 45 67",
+          office_id: officeId || "demo-office",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: "demo-broker-2",
+          user_id: "demo-user-2",
+          broker_name: "Erik Eriksson",
+          broker_email: "erik@hemmamäkleri.se",
+          broker_phone: "070-234 56 78",
+          office_id: officeId || "demo-office",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: "demo-broker-3",
+          user_id: "demo-user-3",
+          broker_name: "Maria Svensson",
+          broker_email: "maria@hemmamäkleri.se",
+          broker_phone: "070-345 67 89",
+          office_id: officeId || "demo-office",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ];
 
       // Get property stats for each broker
       const brokersWithStats = await Promise.all(
@@ -153,13 +141,10 @@ export default function OfficeProfile() {
             .eq("user_id", broker.user_id);
 
           const propertyCount = propData?.length || 0;
-          const totalArea =
-            propData?.reduce((sum, p) => sum + (p.living_area || 0), 0) || 0;
-          const avgPrice =
-            propertyCount > 0
-              ? propData.reduce((sum, p) => sum + (p.price || 0), 0) /
-                propertyCount
-              : 0;
+          const totalArea = propData?.reduce((sum, p) => sum + (p.living_area || 0), 0) || 0;
+          const avgPrice = propertyCount > 0
+            ? propData.reduce((sum, p) => sum + (p.price || 0), 0) / propertyCount
+            : 0;
 
           return {
             id: broker.id,
@@ -171,13 +156,13 @@ export default function OfficeProfile() {
             total_area: totalArea,
             avg_price: avgPrice,
           };
-        }),
+        })
       );
 
       setBrokers(brokersWithStats);
 
       // Fetch all properties from all brokers at this office
-      const userIds = brokers.map((b) => b.user_id);
+      const userIds = brokers.map(b => b.user_id);
       if (userIds.length > 0) {
         const { data: propertiesData } = await supabase
           .from("properties")
@@ -189,18 +174,12 @@ export default function OfficeProfile() {
 
         // Calculate office-wide stats
         const totalProperties = propertiesData?.length || 0;
-        const forSale =
-          propertiesData?.filter((p) => p.status === "for_sale").length || 0;
-        const comingSoon =
-          propertiesData?.filter((p) => p.status === "coming_soon").length || 0;
-        const avgPrice =
-          totalProperties > 0
-            ? propertiesData.reduce((sum, p) => sum + (p.price || 0), 0) /
-              totalProperties
-            : 0;
-        const totalArea =
-          propertiesData?.reduce((sum, p) => sum + (p.living_area || 0), 0) ||
-          0;
+        const forSale = propertiesData?.filter(p => p.status === "for_sale").length || 0;
+        const comingSoon = propertiesData?.filter(p => p.status === "coming_soon").length || 0;
+        const avgPrice = totalProperties > 0
+          ? propertiesData.reduce((sum, p) => sum + (p.price || 0), 0) / totalProperties
+          : 0;
+        const totalArea = propertiesData?.reduce((sum, p) => sum + (p.living_area || 0), 0) || 0;
 
         setStats({
           total_properties: totalProperties,
@@ -266,10 +245,8 @@ export default function OfficeProfile() {
     );
   }
 
-  const forSaleProperties = properties.filter((p) => p.status === "FOR_SALE");
-  const comingSoonProperties = properties.filter(
-    (p) => p.status === "COMING_SOON",
-  );
+  const forSaleProperties = properties.filter(p => p.status === "FOR_SALE");
+  const comingSoonProperties = properties.filter(p => p.status === "COMING_SOON");
 
   return (
     <>
@@ -285,17 +262,12 @@ export default function OfficeProfile() {
                 </div>
               </div>
               <div className="flex-grow">
-                <h1 className="text-3xl font-bold mb-2">
-                  {office.office_name}
-                </h1>
+                <h1 className="text-3xl font-bold mb-2">{office.office_name}</h1>
                 <div className="flex flex-wrap gap-4 text-muted-foreground mt-4">
                   {office.office_address && (
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      <span>
-                        {office.office_address}, {office.office_postal_code}{" "}
-                        {office.office_city}
-                      </span>
+                      <span>{office.office_address}, {office.office_postal_code} {office.office_city}</span>
                     </div>
                   )}
                   {office.office_phone && (
@@ -313,12 +285,7 @@ export default function OfficeProfile() {
                   {office.office_website && (
                     <div className="flex items-center gap-2">
                       <Globe className="w-4 h-4" />
-                      <a
-                        href={office.office_website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-primary"
-                      >
+                      <a href={office.office_website} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                         {office.office_website}
                       </a>
                     </div>
@@ -347,9 +314,7 @@ export default function OfficeProfile() {
                   <Home className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Totalt antal objekt
-                  </p>
+                  <p className="text-sm text-muted-foreground">Totalt antal objekt</p>
                   <p className="text-2xl font-bold">{stats.total_properties}</p>
                 </div>
               </div>
@@ -361,9 +326,7 @@ export default function OfficeProfile() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Medelpris</p>
-                  <p className="text-2xl font-bold">
-                    {stats.average_price.toLocaleString("sv-SE")} kr
-                  </p>
+                  <p className="text-2xl font-bold">{stats.average_price.toLocaleString('sv-SE')} kr</p>
                 </div>
               </div>
             </Card>
@@ -374,9 +337,7 @@ export default function OfficeProfile() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total yta</p>
-                  <p className="text-2xl font-bold">
-                    {stats.total_area.toLocaleString("sv-SE")} m²
-                  </p>
+                  <p className="text-2xl font-bold">{stats.total_area.toLocaleString('sv-SE')} m²</p>
                 </div>
               </div>
             </Card>
@@ -387,8 +348,8 @@ export default function OfficeProfile() {
             <h2 className="text-2xl font-bold mb-6">Våra mäklare</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {brokers.map((broker) => (
-                <Card
-                  key={broker.id}
+                <Card 
+                  key={broker.id} 
                   className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate(`/maklare/${broker.user_id}`)}
                 >
@@ -396,19 +357,12 @@ export default function OfficeProfile() {
                     <Avatar className="w-16 h-16">
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                        {broker.broker_name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        {broker.broker_name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-grow">
-                      <h3 className="font-semibold text-lg">
-                        {broker.broker_name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Fastighetsmäklare
-                      </p>
+                      <h3 className="font-semibold text-lg">{broker.broker_name}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">Fastighetsmäklare</p>
                       <div className="space-y-1 text-sm">
                         <div className="flex items-center gap-2">
                           <Phone className="w-3 h-3" />
@@ -420,18 +374,8 @@ export default function OfficeProfile() {
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t space-y-1 text-sm">
-                        <p>
-                          <span className="font-medium">
-                            {broker.property_count}
-                          </span>{" "}
-                          objekt
-                        </p>
-                        <p>
-                          <span className="font-medium">
-                            {broker.avg_price.toLocaleString("sv-SE")} kr
-                          </span>{" "}
-                          snitt
-                        </p>
+                        <p><span className="font-medium">{broker.property_count}</span> objekt</p>
+                        <p><span className="font-medium">{broker.avg_price.toLocaleString('sv-SE')} kr</span> snitt</p>
                       </div>
                     </div>
                   </div>
@@ -454,9 +398,7 @@ export default function OfficeProfile() {
             <TabsContent value="for-sale" className="mt-6">
               {forSaleProperties.length === 0 ? (
                 <Card className="p-12 text-center">
-                  <p className="text-muted-foreground">
-                    Inga objekt till salu just nu
-                  </p>
+                  <p className="text-muted-foreground">Inga objekt till salu just nu</p>
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

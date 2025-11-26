@@ -1,30 +1,29 @@
-import {
-  ArrowLeft,
-  Eye,
-  Heart,
-  Image as ImageIcon,
-  MessageSquare,
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Eye, 
+  Heart, 
+  MessageSquare, 
+  Calendar, 
+  Clock,
   Settings,
-  Share2,
   Sparkles,
-  TrendingUp,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import DirectMarketing from "@/components/ads/DirectMarketing";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Image as ImageIcon,
+  ArrowLeft,
+  Users,
+  Target,
+  Share2
+} from 'lucide-react';
+import DirectMarketing from '@/components/ads/DirectMarketing';
 
 interface AdStats {
   views: number;
@@ -41,7 +40,7 @@ export default function AdManagement() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-
+  
   const [ad, setAd] = useState<any>(null);
   const [stats, setStats] = useState<AdStats>({
     views: 0,
@@ -49,7 +48,7 @@ export default function AdManagement() {
     inquiries: 0,
     conversions: 0,
     aiImagesGenerated: 0,
-    aiEditsUsed: 0,
+    aiEditsUsed: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -58,12 +57,12 @@ export default function AdManagement() {
       loadAdData();
       loadStats();
     }
-  }, [user, id, loadAdData, loadStats]);
+  }, [user, id]);
 
   const loadAdData = async () => {
     try {
       const { data, error } = await supabase
-        .from("ads")
+        .from('ads')
         .select(`
           *,
           properties (
@@ -79,18 +78,18 @@ export default function AdManagement() {
             images
           )
         `)
-        .eq("id", id)
-        .eq("user_id", user?.id)
+        .eq('id', id)
+        .eq('user_id', user?.id)
         .single();
 
       if (error) throw error;
       setAd(data);
     } catch (error) {
-      console.error("Error loading ad:", error);
+      console.error('Error loading ad:', error);
       toast({
         title: "Fel",
         description: "Kunde inte ladda annonsdata",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -107,10 +106,10 @@ export default function AdManagement() {
         conversions: Math.floor(Math.random() * 5),
         aiImagesGenerated: Math.floor(Math.random() * 10),
         aiEditsUsed: Math.floor(Math.random() * 15),
-        lastViewed: new Date().toISOString(),
+        lastViewed: new Date().toISOString()
       });
     } catch (error) {
-      console.error("Error loading stats:", error);
+      console.error('Error loading stats:', error);
     }
   };
 
@@ -129,10 +128,8 @@ export default function AdManagement() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardContent className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">
-              Annonsen hittades inte
-            </h3>
-            <Button onClick={() => navigate("/dashboard")} className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Annonsen hittades inte</h3>
+            <Button onClick={() => navigate('/dashboard')} className="mt-4">
               Tillbaka till Dashboard
             </Button>
           </CardContent>
@@ -141,8 +138,8 @@ export default function AdManagement() {
     );
   }
 
-  const isPremium = ad.ad_tier === "premium";
-  const isRental = ad.properties?.status === "FOR_RENT";
+  const isPremium = ad.ad_tier === 'premium';
+  const isRental = ad.properties?.status === 'FOR_RENT';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -151,13 +148,13 @@ export default function AdManagement() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate('/dashboard')}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Tillbaka till Dashboard
         </Button>
-
+        
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">{ad.title}</h1>
@@ -166,24 +163,14 @@ export default function AdManagement() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Badge
-              variant={
-                ad.moderation_status === "approved" ? "default" : "secondary"
-              }
-            >
-              {ad.moderation_status === "approved" ? "Godkänd" : "Granskas"}
+            <Badge variant={ad.moderation_status === 'approved' ? 'default' : 'secondary'}>
+              {ad.moderation_status === 'approved' ? 'Godkänd' : 'Granskas'}
             </Badge>
             <Badge variant="outline">
-              {ad.ad_tier === "free"
-                ? "Grund"
-                : ad.ad_tier === "plus"
-                  ? "Plus"
-                  : "Premium"}
+              {ad.ad_tier === 'free' ? 'Grund' : ad.ad_tier === 'plus' ? 'Plus' : 'Premium'}
             </Badge>
             {isRental ? (
-              <Badge className="bg-rental text-rental-foreground">
-                Uthyrning
-              </Badge>
+              <Badge className="bg-rental text-rental-foreground">Uthyrning</Badge>
             ) : (
               <Badge className="bg-blue-500 text-white">Försäljning</Badge>
             )}
@@ -267,9 +254,7 @@ export default function AdManagement() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Visningar per dag</span>
-                    <span className="font-semibold">
-                      ~{Math.floor(stats.views / 30)}
-                    </span>
+                    <span className="font-semibold">~{Math.floor(stats.views / 30)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Konverteringsgrad</span>
@@ -298,18 +283,14 @@ export default function AdManagement() {
                     <Eye className="h-4 w-4 text-muted-foreground mt-1" />
                     <div>
                       <p className="text-sm font-medium">Ny visning</p>
-                      <p className="text-xs text-muted-foreground">
-                        För 2 timmar sedan
-                      </p>
+                      <p className="text-xs text-muted-foreground">För 2 timmar sedan</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Heart className="h-4 w-4 text-muted-foreground mt-1" />
                     <div>
                       <p className="text-sm font-medium">Sparad som favorit</p>
-                      <p className="text-xs text-muted-foreground">
-                        För 5 timmar sedan
-                      </p>
+                      <p className="text-xs text-muted-foreground">För 5 timmar sedan</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -330,16 +311,16 @@ export default function AdManagement() {
               <CardTitle>Snabbåtgärder</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 className="w-full justify-start"
                 onClick={() => navigate(`/annons/${ad.property_id}`)}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Förhandsgranska annons
               </Button>
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 className="w-full justify-start"
                 onClick={() => navigate(`/redigera-annons/${ad.id}`)}
               >
@@ -365,34 +346,22 @@ export default function AdManagement() {
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">
-                    Visningsstatistik
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-4">Visningsstatistik</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Totala visningar
-                      </p>
+                      <p className="text-sm text-muted-foreground">Totala visningar</p>
                       <p className="text-2xl font-bold">{stats.views}</p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Unika besökare
-                      </p>
-                      <p className="text-2xl font-bold">
-                        {Math.floor(stats.views * 0.7)}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Unika besökare</p>
+                      <p className="text-2xl font-bold">{Math.floor(stats.views * 0.7)}</p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Genomsnittlig visningstid
-                      </p>
+                      <p className="text-sm text-muted-foreground">Genomsnittlig visningstid</p>
                       <p className="text-2xl font-bold">2:34</p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        Avvisningsfrekvens
-                      </p>
+                      <p className="text-sm text-muted-foreground">Avvisningsfrekvens</p>
                       <p className="text-2xl font-bold">32%</p>
                     </div>
                   </div>
@@ -458,9 +427,7 @@ export default function AdManagement() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-3xl font-bold mb-2">
-                      {stats.aiImagesGenerated}
-                    </p>
+                    <p className="text-3xl font-bold mb-2">{stats.aiImagesGenerated}</p>
                     <p className="text-sm text-muted-foreground">
                       Bilder genererade för denna annons
                     </p>
@@ -476,9 +443,7 @@ export default function AdManagement() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-3xl font-bold mb-2">
-                      {stats.aiEditsUsed}
-                    </p>
+                    <p className="text-3xl font-bold mb-2">{stats.aiEditsUsed}</p>
                     <p className="text-sm text-muted-foreground">
                       Redigeringar utförda på bilder
                     </p>
@@ -486,9 +451,7 @@ export default function AdManagement() {
                 </div>
 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold mb-2">
-                    Populära AI-redigeringar
-                  </h4>
+                  <h4 className="font-semibold mb-2">Populära AI-redigeringar</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Möbleringsvisualisering</span>
@@ -497,9 +460,7 @@ export default function AdManagement() {
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">
-                        Renovering förhandsvisning
-                      </span>
+                      <span className="text-sm">Renovering förhandsvisning</span>
                       <Badge variant="secondary">
                         {Math.floor(stats.aiEditsUsed * 0.35)}
                       </Badge>

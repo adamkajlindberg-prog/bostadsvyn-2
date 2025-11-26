@@ -1,4 +1,4 @@
-import type React from "react";
+import React from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,11 +6,8 @@ interface LogoProps {
 }
 
 // Detailed modern - mer detaljerad med flera element
-const LogoVariant9: React.FC<LogoProps> = ({
-  className = "h-10 w-10",
-  title = "Bostadsvyn logotyp",
-}) => {
-  const titleId = "logoTitle9";
+const LogoVariant9: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
+  const titleId = 'logoTitle9';
   return (
     <svg
       viewBox="0 0 64 64"
@@ -20,13 +17,7 @@ const LogoVariant9: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <title id={titleId}>{title}</title>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <g fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
         <path d="M8 28 L32 12 L56 28" />
         <path d="M14 28 V52" />
         <path d="M50 28 V52" />
@@ -34,17 +25,7 @@ const LogoVariant9: React.FC<LogoProps> = ({
         <line x1="32" y1="12" x2="32" y2="20" strokeWidth="2" />
         <circle cx="32" cy="20" r="1.5" fill="currentColor" />
       </g>
-      <text
-        x="32"
-        y="42"
-        textAnchor="middle"
-        fontSize="27"
-        fontWeight="700"
-        fill="currentColor"
-        fontFamily="system-ui, sans-serif"
-      >
-        B
-      </text>
+      <text x="32" y="42" textAnchor="middle" fontSize="27" fontWeight="700" fill="currentColor" fontFamily="system-ui, sans-serif">B</text>
       <g fill="currentColor">
         <rect x="20" y="32" width="3.5" height="3.5" rx="0.5" />
         <rect x="26" y="32" width="3.5" height="3.5" rx="0.5" />

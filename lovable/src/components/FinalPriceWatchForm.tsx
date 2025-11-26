@@ -1,20 +1,13 @@
-import { Bell } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Bell } from 'lucide-react';
 
 interface FinalPriceWatchFormProps {
   propertyId: string;
@@ -32,28 +25,27 @@ export default function FinalPriceWatchForm({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
     notify_via_email: true,
     notify_via_sms: false,
-    reasonForInterest: "",
+    reasonForInterest: '',
     planningToSell: false,
-    estimatedSaleTimeframe: "",
-    currentLivingSituation: "",
-    budgetRange: "",
+    estimatedSaleTimeframe: '',
+    currentLivingSituation: '',
+    budgetRange: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!formData.name || !formData.email || !formData.reasonForInterest) {
       toast({
-        title: "Fyll i alla obligatoriska fält",
-        description:
-          "Namn, e-post och anledning till intresse är obligatoriska",
-        variant: "destructive",
+        title: 'Fyll i alla obligatoriska fält',
+        description: 'Namn, e-post och anledning till intresse är obligatoriska',
+        variant: 'destructive',
       });
       return;
     }
@@ -62,7 +54,7 @@ export default function FinalPriceWatchForm({
 
     try {
       const { error } = await supabase
-        .from("property_final_price_watchers")
+        .from('property_final_price_watchers')
         .insert({
           property_id: propertyId,
           name: formData.name,
@@ -81,31 +73,31 @@ export default function FinalPriceWatchForm({
       if (error) throw error;
 
       toast({
-        title: "Tack för din anmälan!",
-        description: "Du kommer att få ett meddelande när slutpriset är klart.",
+        title: 'Tack för din anmälan!',
+        description: 'Du kommer att få ett meddelande när slutpriset är klart.',
       });
 
       // Reset form and close dialog
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
+        name: '',
+        email: '',
+        phone: '',
+        message: '',
         notify_via_email: true,
         notify_via_sms: false,
-        reasonForInterest: "",
+        reasonForInterest: '',
         planningToSell: false,
-        estimatedSaleTimeframe: "",
-        currentLivingSituation: "",
-        budgetRange: "",
+        estimatedSaleTimeframe: '',
+        currentLivingSituation: '',
+        budgetRange: '',
       });
       onOpenChange(false);
     } catch (error: any) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
       toast({
-        title: "Fel",
-        description: "Kunde inte registrera din bevakning. Försök igen.",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte registrera din bevakning. Försök igen.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -121,8 +113,7 @@ export default function FinalPriceWatchForm({
             Bevaka slutpriset
           </DialogTitle>
           <DialogDescription>
-            Få ett meddelande när slutpriset för{" "}
-            <strong>{propertyTitle}</strong> är klart
+            Få ett meddelande när slutpriset för <strong>{propertyTitle}</strong> är klart
           </DialogDescription>
         </DialogHeader>
 
@@ -135,9 +126,7 @@ export default function FinalPriceWatchForm({
               id="name"
               placeholder="Ditt för- och efternamn"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
           </div>
@@ -151,9 +140,7 @@ export default function FinalPriceWatchForm({
               type="email"
               placeholder="din@email.se"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
           </div>
@@ -165,9 +152,7 @@ export default function FinalPriceWatchForm({
               type="tel"
               placeholder="070-123 45 67"
               value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
           </div>
 
@@ -177,25 +162,20 @@ export default function FinalPriceWatchForm({
               id="message"
               placeholder="T.ex. Jag är intresserad av liknande objekt i området..."
               value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="reasonForInterest">
-              Varför vill du veta slutpriset?{" "}
-              <span className="text-destructive">*</span>
+              Varför vill du veta slutpriset? <span className="text-destructive">*</span>
             </Label>
             <Textarea
               id="reasonForInterest"
               placeholder="T.ex. Jag funderar på att köpa i området, vill värdera min egen bostad, etc."
               value={formData.reasonForInterest}
-              onChange={(e) =>
-                setFormData({ ...formData, reasonForInterest: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, reasonForInterest: e.target.value })}
               rows={3}
               required
             />
@@ -207,12 +187,7 @@ export default function FinalPriceWatchForm({
               <Checkbox
                 id="planningToSell"
                 checked={formData.planningToSell}
-                onCheckedChange={(checked) =>
-                  setFormData({
-                    ...formData,
-                    planningToSell: checked as boolean,
-                  })
-                }
+                onCheckedChange={(checked) => setFormData({ ...formData, planningToSell: checked as boolean })}
               />
               <label
                 htmlFor="planningToSell"
@@ -225,18 +200,11 @@ export default function FinalPriceWatchForm({
 
           {formData.planningToSell && (
             <div className="space-y-2">
-              <Label htmlFor="estimatedSaleTimeframe">
-                När planerar du att sälja?
-              </Label>
+              <Label htmlFor="estimatedSaleTimeframe">När planerar du att sälja?</Label>
               <select
                 id="estimatedSaleTimeframe"
                 value={formData.estimatedSaleTimeframe}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    estimatedSaleTimeframe: e.target.value,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, estimatedSaleTimeframe: e.target.value })}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <option value="">Välj tidsram</option>
@@ -250,18 +218,11 @@ export default function FinalPriceWatchForm({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="currentLivingSituation">
-              Nuvarande boendesituation
-            </Label>
+            <Label htmlFor="currentLivingSituation">Nuvarande boendesituation</Label>
             <select
               id="currentLivingSituation"
               value={formData.currentLivingSituation}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  currentLivingSituation: e.target.value,
-                })
-              }
+              onChange={(e) => setFormData({ ...formData, currentLivingSituation: e.target.value })}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Välj alternativ</option>
@@ -277,9 +238,7 @@ export default function FinalPriceWatchForm({
             <select
               id="budgetRange"
               value={formData.budgetRange}
-              onChange={(e) =>
-                setFormData({ ...formData, budgetRange: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Välj budgetram</option>
@@ -294,16 +253,13 @@ export default function FinalPriceWatchForm({
 
           <div className="space-y-3">
             <Label>Hur vill du bli notifierad?</Label>
-
+            
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="notify_email"
                 checked={formData.notify_via_email}
                 onCheckedChange={(checked) =>
-                  setFormData({
-                    ...formData,
-                    notify_via_email: checked as boolean,
-                  })
+                  setFormData({ ...formData, notify_via_email: checked as boolean })
                 }
               />
               <label
@@ -319,10 +275,7 @@ export default function FinalPriceWatchForm({
                 id="notify_sms"
                 checked={formData.notify_via_sms}
                 onCheckedChange={(checked) =>
-                  setFormData({
-                    ...formData,
-                    notify_via_sms: checked as boolean,
-                  })
+                  setFormData({ ...formData, notify_via_sms: checked as boolean })
                 }
               />
               <label
@@ -344,7 +297,7 @@ export default function FinalPriceWatchForm({
               Avbryt
             </Button>
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? "Skickar..." : "Bevaka slutpris"}
+              {loading ? 'Skickar...' : 'Bevaka slutpris'}
             </Button>
           </div>
         </form>

@@ -1,17 +1,9 @@
-import { Loader2 } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import PropertyCard, { type Property } from "./PropertyCard";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import PropertyCard, { Property } from './PropertyCard';
+import { Loader2 } from 'lucide-react';
 
-type SortOption =
-  | "latest"
-  | "price_asc"
-  | "price_desc"
-  | "area_asc"
-  | "area_desc"
-  | "rooms_asc"
-  | "rooms_desc";
+type SortOption = 'latest' | 'price_asc' | 'price_desc' | 'area_asc' | 'area_desc' | 'rooms_asc' | 'rooms_desc';
 
 interface RentalFilters {
   search?: string;
@@ -27,7 +19,7 @@ const RentalProperties: React.FC<RentalFilters> = ({
   minRent,
   maxRent,
   type,
-  sort = "latest",
+  sort = 'latest',
   onCountChange,
 }) => {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -36,54 +28,54 @@ const RentalProperties: React.FC<RentalFilters> = ({
   useEffect(() => {
     loadRentalProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadRentalProperties]);
+  }, [search, minRent, maxRent, type, sort]);
 
   const loadRentalProperties = async () => {
     try {
       setIsLoading(true);
       let query = supabase
-        .from("properties")
-        .select("*")
-        .eq("status", "FOR_RENT");
+        .from('properties')
+        .select('*')
+        .eq('status', 'FOR_RENT');
 
-      if (type && type !== "ALL") {
-        query = query.eq("property_type", type);
+      if (type && type !== 'ALL') {
+        query = query.eq('property_type', type);
       }
-      if (typeof minRent === "number") {
-        query = query.gte("price", minRent);
+      if (typeof minRent === 'number') {
+        query = query.gte('price', minRent);
       }
-      if (typeof maxRent === "number") {
-        query = query.lte("price", maxRent);
+      if (typeof maxRent === 'number') {
+        query = query.lte('price', maxRent);
       }
       if (search && search.trim().length > 0) {
         const s = search.trim();
         // Match title, city or street
         query = query.or(
-          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`,
+          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`
         );
       }
 
       switch (sort) {
-        case "price_asc":
-          query = query.order("price", { ascending: true });
+        case 'price_asc':
+          query = query.order('price', { ascending: true });
           break;
-        case "price_desc":
-          query = query.order("price", { ascending: false });
+        case 'price_desc':
+          query = query.order('price', { ascending: false });
           break;
-        case "area_asc":
-          query = query.order("area", { ascending: true });
+        case 'area_asc':
+          query = query.order('area', { ascending: true });
           break;
-        case "area_desc":
-          query = query.order("area", { ascending: false });
+        case 'area_desc':
+          query = query.order('area', { ascending: false });
           break;
-        case "rooms_asc":
-          query = query.order("rooms", { ascending: true });
+        case 'rooms_asc':
+          query = query.order('rooms', { ascending: true });
           break;
-        case "rooms_desc":
-          query = query.order("rooms", { ascending: false });
+        case 'rooms_desc':
+          query = query.order('rooms', { ascending: false });
           break;
         default:
-          query = query.order("created_at", { ascending: false });
+          query = query.order('created_at', { ascending: false });
       }
 
       const { data, error } = await query;
@@ -100,11 +92,11 @@ const RentalProperties: React.FC<RentalFilters> = ({
       const tierPriority = {
         premium: 3,
         plus: 2,
-        free: 1,
+        free: 1
       };
       transformedData.sort((a: any, b: any) => {
-        const aTierPriority = tierPriority[a.ad_tier || "free"];
-        const bTierPriority = tierPriority[b.ad_tier || "free"];
+        const aTierPriority = tierPriority[a.ad_tier || 'free'];
+        const bTierPriority = tierPriority[b.ad_tier || 'free'];
         if (aTierPriority !== bTierPriority) {
           return bTierPriority - aTierPriority; // Higher priority first
         }
@@ -115,7 +107,7 @@ const RentalProperties: React.FC<RentalFilters> = ({
       setProperties(transformedData as any);
       onCountChange?.(transformedData.length);
     } catch (error) {
-      console.error("Error loading rental properties:", error);
+      console.error('Error loading rental properties:', error);
       onCountChange?.(0);
     } finally {
       setIsLoading(false);
@@ -133,9 +125,7 @@ const RentalProperties: React.FC<RentalFilters> = ({
   if (properties.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          Inga hyresobjekt tillgängliga just nu.
-        </p>
+        <p className="text-muted-foreground">Inga hyresobjekt tillgängliga just nu.</p>
       </div>
     );
   }

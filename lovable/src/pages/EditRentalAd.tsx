@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import Navigation from "@/components/Navigation";
-import { RentalForm } from "@/components/RentalForm";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
+import { RentalForm } from '@/components/RentalForm';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import Navigation from '@/components/Navigation';
 
 const EditRentalAd = () => {
   const { adId } = useParams();
@@ -18,43 +18,43 @@ const EditRentalAd = () => {
     if (user && adId) {
       loadAdData();
     }
-  }, [user, adId, loadAdData]);
+  }, [user, adId]);
 
   const loadAdData = async () => {
     try {
       const { data, error } = await supabase
-        .from("ads")
+        .from('ads')
         .select(`
           *,
           properties (
             *
           )
         `)
-        .eq("id", adId)
-        .eq("user_id", user?.id)
+        .eq('id', adId)
+        .eq('user_id', user?.id)
         .maybeSingle();
 
       if (error) throw error;
-
+      
       if (!data) {
         toast({
           title: "Fel",
           description: "Annonsen hittades inte",
-          variant: "destructive",
+          variant: "destructive"
         });
-        navigate("/dashboard");
+        navigate('/dashboard');
         return;
       }
 
       setAdData(data);
     } catch (error) {
-      console.error("Error loading ad:", error);
+      console.error('Error loading ad:', error);
       toast({
         title: "Fel",
         description: "Kunde inte ladda annonsdata",
-        variant: "destructive",
+        variant: "destructive"
       });
-      navigate("/dashboard");
+      navigate('/dashboard');
     } finally {
       setLoading(false);
     }
@@ -106,9 +106,9 @@ const EditRentalAd = () => {
               Uppdatera din hyresannons med nya bilder, text eller villkor
             </p>
           </div>
-
-          <RentalForm
-            onSuccess={handleSuccess}
+          
+          <RentalForm 
+            onSuccess={handleSuccess} 
             onCancel={handleCancel}
             initialData={adData}
             adId={adId}

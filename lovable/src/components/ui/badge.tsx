@@ -1,5 +1,5 @@
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -8,23 +8,16 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-
+        
         // Enhanced Nordic variants per color specification
-        accent:
-          "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
-        success:
-          "border-transparent bg-success text-success-foreground hover:bg-success/80",
-        premium:
-          "border-transparent bg-premium text-premium-foreground hover:bg-premium/80",
-        critical:
-          "border-transparent bg-critical text-critical-foreground hover:bg-critical/80",
+        accent: "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
+        success: "border-transparent bg-success text-success-foreground hover:bg-success/80",
+        premium: "border-transparent bg-premium text-premium-foreground hover:bg-premium/80",
+        critical: "border-transparent bg-critical text-critical-foreground hover:bg-critical/80",
         gold: "border-transparent bg-accent-gold text-accent-gold-foreground hover:bg-accent-gold/80",
       },
     },
@@ -34,14 +27,10 @@ const badgeVariants = cva(
   },
 );
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  );
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
 
 export { Badge, badgeVariants };

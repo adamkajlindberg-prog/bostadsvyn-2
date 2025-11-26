@@ -1,15 +1,14 @@
-import { Loader2, Send, Sparkles, X } from "lucide-react";
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useRef, useEffect } from 'react';
+import { X, Send, Loader2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 }
 
@@ -20,12 +19,11 @@ interface AISupportChatProps {
 const AISupportChat: React.FC<AISupportChatProps> = ({ onClose }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      role: "assistant",
-      content:
-        "Hej! 👋 Jag är din AI-supportassistent för Bostadsvyn - Sveriges modernaste fastighetsplattform skapad av en tidigare mäklare med 5 års erfarenhet.\n\nJag kan hjälpa dig med:\n• Vår avancerade AI-sökning (naturligt språk!)\n• Köpa, sälja eller hyra bostäder\n• Pro & Pro+ prenumerationer med AI-verktyg\n• Mäklarportalen och annonspaket\n• Annonsprocessen och Stripe-betalningar\n• AI-verktyg (homestyling, bildredigering)\n• Nyproduktion och projektsidor\n• Priser, säkerhet och tekniska frågor\n\nVad kan jag hjälpa dig med idag?",
-    },
+      role: 'assistant',
+      content: 'Hej! 👋 Jag är din AI-supportassistent för Bostadsvyn - Sveriges modernaste fastighetsplattform skapad av en tidigare mäklare med 5 års erfarenhet.\n\nJag kan hjälpa dig med:\n• Vår avancerade AI-sökning (naturligt språk!)\n• Köpa, sälja eller hyra bostäder\n• Pro & Pro+ prenumerationer med AI-verktyg\n• Mäklarportalen och annonspaket\n• Annonsprocessen och Stripe-betalningar\n• AI-verktyg (homestyling, bildredigering)\n• Nyproduktion och projektsidor\n• Priser, säkerhet och tekniska frågor\n\nVad kan jag hjälpa dig med idag?'
+    }
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -34,51 +32,48 @@ const AISupportChat: React.FC<AISupportChatProps> = ({ onClose }) => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, []);
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    const userMessage: Message = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "ai-support-chat",
-        {
-          body: {
-            messages: [...messages, userMessage],
-          },
-        },
-      );
+      const { data, error } = await supabase.functions.invoke('ai-support-chat', {
+        body: {
+          messages: [...messages, userMessage]
+        }
+      });
 
       if (error) throw error;
 
       const assistantMessage: Message = {
-        role: "assistant",
-        content: data.reply,
+        role: 'assistant',
+        content: data.reply
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error calling AI:", error);
+      console.error('Error calling AI:', error);
       toast({
-        title: "Något gick fel",
-        description: "Kunde inte kontakta AI-supporten. Försök igen.",
-        variant: "destructive",
+        title: 'Något gick fel',
+        description: 'Kunde inte kontakta AI-supporten. Försök igen.',
+        variant: 'destructive'
       });
-
+      
       // Remove user message if failed
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -114,13 +109,13 @@ const AISupportChat: React.FC<AISupportChatProps> = ({ onClose }) => {
             {messages.map((message, idx) => (
               <div
                 key={idx}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground'
                   }`}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">

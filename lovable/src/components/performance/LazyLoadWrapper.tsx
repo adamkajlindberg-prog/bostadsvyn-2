@@ -1,6 +1,5 @@
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import React, { useState, useRef, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LazyLoadWrapperProps {
   children: React.ReactNode;
@@ -14,10 +13,10 @@ interface LazyLoadWrapperProps {
 export default function LazyLoadWrapper({
   children,
   fallback,
-  rootMargin = "50px",
+  rootMargin = '50px',
   threshold = 0.1,
   minHeight = 200,
-  className = "",
+  className = '',
 }: LazyLoadWrapperProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -35,7 +34,7 @@ export default function LazyLoadWrapper({
       {
         rootMargin,
         threshold,
-      },
+      }
     );
 
     if (ref.current) {
@@ -61,9 +60,9 @@ export default function LazyLoadWrapper({
     <div
       ref={ref}
       className={className}
-      style={{ minHeight: isVisible ? "auto" : `${minHeight}px` }}
+      style={{ minHeight: isVisible ? 'auto' : `${minHeight}px` }}
     >
-      {isVisible ? children : fallback || defaultFallback}
+      {isVisible ? children : (fallback || defaultFallback)}
     </div>
   );
 }
@@ -71,7 +70,7 @@ export default function LazyLoadWrapper({
 // Higher-order component for lazy loading
 export function withLazyLoading<P extends object>(
   Component: React.ComponentType<P>,
-  options?: Omit<LazyLoadWrapperProps, "children">,
+  options?: Omit<LazyLoadWrapperProps, 'children'>
 ) {
   return function LazyLoadedComponent(props: P) {
     return (
@@ -85,7 +84,7 @@ export function withLazyLoading<P extends object>(
 // Hook for intersection observer
 export function useIntersectionObserver(
   ref: React.RefObject<Element>,
-  options: IntersectionObserverInit = {},
+  options: IntersectionObserverInit = {}
 ) {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
@@ -102,9 +101,9 @@ export function useIntersectionObserver(
       },
       {
         threshold: 0.1,
-        rootMargin: "50px",
+        rootMargin: '50px',
         ...options,
-      },
+      }
     );
 
     observer.observe(ref.current);

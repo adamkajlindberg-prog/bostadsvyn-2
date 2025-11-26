@@ -1,16 +1,15 @@
-import { format } from "date-fns";
-import { sv } from "date-fns/locale";
-import { Loader2, MessageCircle, Send } from "lucide-react";
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Send, MessageCircle, Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 
 interface Message {
   id: string;
@@ -40,7 +39,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
   const { toast } = useToast();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,18 +51,18 @@ export const RentalChat: React.FC<RentalChatProps> = ({
     } else {
       setLoading(false);
     }
-  }, [user, propertyOwnerId, loadOrCreateConversation]);
+  }, [user, propertyOwnerId, propertyId]);
 
   useEffect(() => {
     if (conversationId) {
       loadMessages();
       subscribeToMessages();
     }
-  }, [conversationId, loadMessages, subscribeToMessages]);
+  }, [conversationId]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [scrollToBottom]);
+  }, [messages]);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -77,10 +76,10 @@ export const RentalChat: React.FC<RentalChatProps> = ({
     try {
       // Check if conversation already exists
       const { data: existingConv } = await supabase
-        .from("conversations")
-        .select("id")
-        .eq("property_id", propertyId)
-        .eq("buyer_id", user.id)
+        .from('conversations')
+        .select('id')
+        .eq('property_id', propertyId)
+        .eq('buyer_id', user.id)
         .maybeSingle();
 
       if (existingConv) {
@@ -88,16 +87,14 @@ export const RentalChat: React.FC<RentalChatProps> = ({
       } else {
         // Create new conversation
         const { data: newConv, error } = await supabase
-          .from("conversations")
-          .insert([
-            {
-              property_id: propertyId,
-              buyer_id: user.id,
-              seller_id: propertyOwnerId,
-              subject: "Förfrågan om hyresbostad",
-              status: "active",
-            },
-          ])
+          .from('conversations')
+          .insert([{
+            property_id: propertyId,
+            buyer_id: user.id,
+            seller_id: propertyOwnerId,
+            subject: 'Förfrågan om hyresbostad',
+            status: 'active'
+          }])
           .select()
           .single();
 
@@ -105,7 +102,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
         setConversationId(newConv.id);
       }
     } catch (error) {
-      console.error("Error loading conversation:", error);
+      console.error('Error loading conversation:', error);
     } finally {
       setLoading(false);
     }
@@ -116,15 +113,15 @@ export const RentalChat: React.FC<RentalChatProps> = ({
 
     try {
       const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       setMessages(data || []);
     } catch (error) {
-      console.error("Error loading messages:", error);
+      console.error('Error loading messages:', error);
     }
   };
 
@@ -134,16 +131,16 @@ export const RentalChat: React.FC<RentalChatProps> = ({
     const channel = supabase
       .channel(`messages:${conversationId}`)
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
-        },
+          setMessages(prev => [...prev, payload.new as Message]);
+        }
       )
       .subscribe();
 
@@ -157,29 +154,29 @@ export const RentalChat: React.FC<RentalChatProps> = ({
 
     setSending(true);
     try {
-      const { error } = await supabase.from("messages").insert([
-        {
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
           conversation_id: conversationId,
           sender_id: user.id,
           content: newMessage.trim(),
-          message_type: "text",
-        },
-      ]);
+          message_type: 'text'
+        }]);
 
       if (error) throw error;
 
       // Update conversation last_message_at
       await supabase
-        .from("conversations")
+        .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
-        .eq("id", conversationId);
+        .eq('id', conversationId);
 
-      setNewMessage("");
-    } catch (_error: any) {
+      setNewMessage('');
+    } catch (error: any) {
       toast({
-        title: "Fel",
-        description: "Kunde inte skicka meddelande",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte skicka meddelande',
+        variant: 'destructive'
       });
     } finally {
       setSending(false);
@@ -187,7 +184,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -201,7 +198,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
           <p className="text-muted-foreground mb-4">
             Logga in för att chatta med uthyraren
           </p>
-          <Button onClick={() => (window.location.href = "/login")}>
+          <Button onClick={() => window.location.href = '/login'}>
             Logga in
           </Button>
         </CardContent>
@@ -224,8 +221,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Har du frågor om bostaden? Starta en konversation med uthyraren
-            direkt här.
+            Har du frågor om bostaden? Starta en konversation med uthyraren direkt här.
           </p>
           <Button className="w-full" onClick={() => setShowChat(true)}>
             <MessageCircle className="h-4 w-4 mr-2" />
@@ -268,8 +264,7 @@ export const RentalChat: React.FC<RentalChatProps> = ({
               <div className="text-center py-8">
                 <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Inga meddelanden ännu. Skriv något för att starta
-                  konversationen!
+                  Inga meddelanden ännu. Skriv något för att starta konversationen!
                 </p>
               </div>
             ) : (
@@ -278,39 +273,26 @@ export const RentalChat: React.FC<RentalChatProps> = ({
                 return (
                   <div
                     key={message.id}
-                    className={`flex gap-3 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
+                    className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}
                   >
                     <Avatar className="h-8 w-8 flex-shrink-0">
-                      <AvatarFallback
-                        className={
-                          isOwn
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                      <AvatarFallback className={isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'}>
+                        {isOwn 
+                          ? (profile?.full_name || 'Du').charAt(0).toUpperCase()
+                          : (propertyOwner?.full_name || 'U').charAt(0).toUpperCase()
                         }
-                      >
-                        {isOwn
-                          ? (profile?.full_name || "Du").charAt(0).toUpperCase()
-                          : (propertyOwner?.full_name || "U")
-                              .charAt(0)
-                              .toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div
-                      className={`flex-1 ${isOwn ? "text-right" : "text-left"}`}
-                    >
-                      <div
-                        className={`inline-block max-w-[80%] rounded-lg p-3 ${
-                          isOwn
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
+                    <div className={`flex-1 ${isOwn ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block max-w-[80%] rounded-lg p-3 ${
+                        isOwn 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'bg-muted'
+                      }`}>
                         <p className="text-sm">{message.content}</p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 px-1">
-                        {format(new Date(message.created_at), "HH:mm", {
-                          locale: sv,
-                        })}
+                        {format(new Date(message.created_at), 'HH:mm', { locale: sv })}
                       </p>
                     </div>
                   </div>
@@ -329,8 +311,8 @@ export const RentalChat: React.FC<RentalChatProps> = ({
             onKeyPress={handleKeyPress}
             disabled={sending}
           />
-          <Button
-            onClick={sendMessage}
+          <Button 
+            onClick={sendMessage} 
             disabled={!newMessage.trim() || sending}
             size="icon"
           >

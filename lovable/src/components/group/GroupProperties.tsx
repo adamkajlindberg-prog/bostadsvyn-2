@@ -1,12 +1,12 @@
-import { Heart, Minus, ThumbsDown, ThumbsUp, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { PropertyVoting } from "./PropertyVoting";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Badge } from '@/components/ui/badge';
+import { ThumbsUp, ThumbsDown, Minus, Users, Eye, Heart, MessageSquare } from 'lucide-react';
+import { PropertyVoting } from './PropertyVoting';
 
 interface Property {
   id: string;
@@ -26,7 +26,7 @@ interface GroupProperty {
   group_id: string;
   property_id: string;
   added_by: string;
-  status: "voting" | "approved" | "rejected" | "maybe";
+  status: 'voting' | 'approved' | 'rejected' | 'maybe';
   created_at: string;
   properties?: Property;
   profiles?: {
@@ -37,7 +37,7 @@ interface GroupProperty {
 interface GroupVote {
   id: string;
   user_id: string;
-  vote: "yes" | "no" | "maybe";
+  vote: 'yes' | 'no' | 'maybe';
   profiles?: {
     full_name: string;
   };
@@ -47,20 +47,20 @@ export function GroupProperties({ groupId }: { groupId: string }) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [groupProperties, setGroupProperties] = useState<GroupProperty[]>([]);
-  const [_userGroup, setUserGroup] = useState<any>({ id: groupId });
+  const [userGroup, setUserGroup] = useState<any>({ id: groupId });
   const [isLoading, setIsLoading] = useState(true);
-  const [_votingProperty, _setVotingProperty] = useState<string | null>(null);
-  const [viewFilter, setViewFilter] = useState<"active" | "rejected">("active");
+  const [votingProperty, setVotingProperty] = useState<string | null>(null);
+  const [viewFilter, setViewFilter] = useState<'active' | 'rejected'>('active');
 
   useEffect(() => {
     if (groupId) {
       setUserGroup({ id: groupId });
       loadGroupProperties();
     }
-  }, [groupId, loadGroupProperties]);
+  }, [groupId]);
 
   // Remove unused function
-  const _loadUserGroup = async () => {
+  const loadUserGroup = async () => {
     // Not needed anymore since we get groupId as prop
   };
 
@@ -70,40 +70,42 @@ export function GroupProperties({ groupId }: { groupId: string }) {
     setIsLoading(true);
     try {
       const { data: properties, error } = await supabase
-        .from("group_properties")
+        .from('group_properties')
         .select(`
           *,
           properties!group_properties_property_id_fkey(*),
           profiles!group_properties_added_by_fkey(full_name)
         `)
-        .eq("group_id", groupId)
-        .order("created_at", { ascending: false });
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error loading group properties:", error);
+        console.error('Error loading group properties:', error);
         return;
       }
 
-      setGroupProperties(properties || ([] as any));
+      setGroupProperties(properties || [] as any);
     } catch (error) {
-      console.error("Error loading group properties:", error);
+      console.error('Error loading group properties:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const _addPropertyToGroup = async (propertyId: string) => {
+  const addPropertyToGroup = async (propertyId: string) => {
     if (!groupId || !user) return;
 
     try {
-      const { error } = await supabase.from("group_properties").insert({
-        group_id: groupId,
-        property_id: propertyId,
-        added_by: user.id,
-      });
+      const { error } = await supabase
+        .from('group_properties')
+        .insert({
+          group_id: groupId,
+          property_id: propertyId,
+          added_by: user.id
+        });
 
       if (error) {
-        if (error.code === "23505") {
+        if (error.code === '23505') {
           toast({
             title: "Objektet finns redan",
             description: "Detta objekt är redan tillagt till gruppen",
@@ -123,10 +125,10 @@ export function GroupProperties({ groupId }: { groupId: string }) {
         title: "Objekt tillagt!",
         description: "Objektet har lagts till för gruppröstning",
       });
-
+      
       loadGroupProperties();
     } catch (error) {
-      console.error("Error adding property to group:", error);
+      console.error('Error adding property to group:', error);
       toast({
         title: "Fel",
         description: "Kunde inte lägga till objekt",
@@ -136,40 +138,28 @@ export function GroupProperties({ groupId }: { groupId: string }) {
   };
 
   const formatPrice = (price: number, status: string) => {
-    if (status === "FOR_RENT") {
-      return `${new Intl.NumberFormat("sv-SE", {
-        style: "currency",
-        currency: "SEK",
+    if (status === 'FOR_RENT') {
+      return new Intl.NumberFormat('sv-SE', {
+        style: 'currency',
+        currency: 'SEK',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(price)}/mån`;
+      }).format(price) + '/mån';
     }
-    return new Intl.NumberFormat("sv-SE", {
-      style: "currency",
-      currency: "SEK",
+    return new Intl.NumberFormat('sv-SE', {
+      style: 'currency',
+      currency: 'SEK',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
   };
 
-  const getStatusBadge = (status: string, _votes?: GroupVote[]) => {
+  const getStatusBadge = (status: string, votes?: GroupVote[]) => {
     const statusConfig = {
-      voting: {
-        label: "Röstning pågår",
-        variant: "secondary" as const,
-        icon: Users,
-      },
-      approved: {
-        label: "Godkänt",
-        variant: "default" as const,
-        icon: ThumbsUp,
-      },
-      rejected: {
-        label: "Avvisat",
-        variant: "destructive" as const,
-        icon: ThumbsDown,
-      },
-      maybe: { label: "Kanske", variant: "outline" as const, icon: Minus },
+      voting: { label: 'Röstning pågår', variant: 'secondary' as const, icon: Users },
+      approved: { label: 'Godkänt', variant: 'default' as const, icon: ThumbsUp },
+      rejected: { label: 'Avvisat', variant: 'destructive' as const, icon: ThumbsDown },
+      maybe: { label: 'Kanske', variant: 'outline' as const, icon: Minus },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -190,18 +180,16 @@ export function GroupProperties({ groupId }: { groupId: string }) {
       <Card>
         <CardContent className="p-8 text-center">
           <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">
-            Du behöver vara medlem i en grupp för att se gemensamma objekt
-          </p>
+          <p className="text-muted-foreground">Du behöver vara medlem i en grupp för att se gemensamma objekt</p>
         </CardContent>
       </Card>
     );
   }
 
-  const filteredProperties = groupProperties.filter((gp) =>
-    viewFilter === "active"
-      ? gp.status !== "rejected"
-      : gp.status === "rejected",
+  const filteredProperties = groupProperties.filter(gp => 
+    viewFilter === 'active' 
+      ? gp.status !== 'rejected'
+      : gp.status === 'rejected'
   );
 
   return (
@@ -213,22 +201,21 @@ export function GroupProperties({ groupId }: { groupId: string }) {
             Gruppens sparade objekt
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Objekt som gruppmedlemmar har lagt till för gemensam röstning.
-            Fungerar för både köp- och hyresobjekt.
+            Objekt som gruppmedlemmar har lagt till för gemensam röstning. Fungerar för både köp- och hyresobjekt.
           </p>
           <div className="flex gap-2 mt-4">
             <Button
-              variant={viewFilter === "active" ? "default" : "outline"}
+              variant={viewFilter === 'active' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setViewFilter("active")}
+              onClick={() => setViewFilter('active')}
             >
               <Heart className="h-4 w-4 mr-1" />
               Aktiva favoriter
             </Button>
             <Button
-              variant={viewFilter === "rejected" ? "default" : "outline"}
+              variant={viewFilter === 'rejected' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setViewFilter("rejected")}
+              onClick={() => setViewFilter('rejected')}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Avvisade
@@ -246,13 +233,12 @@ export function GroupProperties({ groupId }: { groupId: string }) {
       ) : filteredProperties.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center">
-            {viewFilter === "active" ? (
+            {viewFilter === 'active' ? (
               <>
                 <Heart className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-muted-foreground">Inga aktiva objekt</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Lägg till objekt från sökresultat eller favoriter för att
-                  börja rösta tillsammans
+                  Lägg till objekt från sökresultat eller favoriter för att börja rösta tillsammans
                 </p>
               </>
             ) : (
@@ -273,19 +259,16 @@ export function GroupProperties({ groupId }: { groupId: string }) {
             if (!property) return null;
 
             return (
-              <Card
-                key={groupProperty.id}
-                className={`
+              <Card key={groupProperty.id} className={`
                 transition-all duration-200 hover:shadow-lg
-                ${groupProperty.status === "approved" ? "ring-2 ring-green-200 bg-green-50/50" : ""}
-                ${groupProperty.status === "rejected" ? "ring-2 ring-red-200 bg-red-50/50 opacity-75" : ""}
-                ${groupProperty.status === "maybe" ? "ring-2 ring-yellow-200 bg-yellow-50/50" : ""}
-              `}
-              >
+                ${groupProperty.status === 'approved' ? 'ring-2 ring-green-200 bg-green-50/50' : ''}
+                ${groupProperty.status === 'rejected' ? 'ring-2 ring-red-200 bg-red-50/50 opacity-75' : ''}
+                ${groupProperty.status === 'maybe' ? 'ring-2 ring-yellow-200 bg-yellow-50/50' : ''}
+              `}>
                 <div className="relative">
                   {property.images && property.images.length > 0 && (
-                    <img
-                      src={property.images[0]}
+                    <img 
+                      src={property.images[0]} 
                       alt={property.title}
                       className="w-full h-48 object-cover"
                     />
@@ -295,17 +278,15 @@ export function GroupProperties({ groupId }: { groupId: string }) {
                   </div>
                   <div className="absolute top-2 left-2">
                     <Badge variant="secondary" className="bg-background/90">
-                      {property.status === "FOR_RENT" ? "Hyra" : "Köp"}
+                      {property.status === 'FOR_RENT' ? 'Hyra' : 'Köp'}
                     </Badge>
                   </div>
                 </div>
-
+                
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     <div>
-                      <h3 className="font-semibold text-lg">
-                        {property.title}
-                      </h3>
+                      <h3 className="font-semibold text-lg">{property.title}</h3>
                       <p className="text-sm text-muted-foreground">
                         {property.address_street}, {property.address_city}
                       </p>
@@ -322,15 +303,12 @@ export function GroupProperties({ groupId }: { groupId: string }) {
                     </div>
 
                     <div className="text-xs text-muted-foreground">
-                      Tillagt av {groupProperty.profiles?.full_name || "Okänd"}{" "}
-                      •{" "}
-                      {new Date(groupProperty.created_at).toLocaleDateString(
-                        "sv-SE",
-                      )}
+                      Tillagt av {groupProperty.profiles?.full_name || 'Okänd'} •{' '}
+                      {new Date(groupProperty.created_at).toLocaleDateString('sv-SE')}
                     </div>
 
                     <div className="space-y-2">
-                      <PropertyVoting
+                      <PropertyVoting 
                         groupId={groupId}
                         propertyId={property.id}
                         currentStatus={groupProperty.status}

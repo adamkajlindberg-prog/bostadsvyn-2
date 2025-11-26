@@ -1,17 +1,10 @@
-import { AlertTriangle, CheckCircle, Loader2, Shield } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Shield, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface BankIDVerificationProps {
   userId: string;
@@ -29,39 +22,38 @@ const BankIDVerification: React.FC<BankIDVerificationProps> = ({
 
   const handleVerification = async () => {
     setLoading(true);
-
+    
     try {
       // In production, this would integrate with BankID API
       // For now, we'll simulate the verification process
-
+      
       toast({
-        title: "BankID-verifiering",
-        description: "Öppnar BankID-appen...",
+        title: 'BankID-verifiering',
+        description: 'Öppnar BankID-appen...',
       });
 
       // Simulate BankID verification
       // In production: Call edge function that initiates BankID auth
-      const { data, error } = await supabase.functions.invoke("verify-bankid", {
+      const { data, error } = await supabase.functions.invoke('verify-bankid', {
         body: { userId },
       });
 
       if (error) throw error;
 
       toast({
-        title: "Verifierad!",
-        description: "Din identitet har verifierats med BankID.",
+        title: 'Verifierad!',
+        description: 'Din identitet har verifierats med BankID.',
       });
 
       if (onVerificationComplete) {
         onVerificationComplete();
       }
     } catch (error: any) {
-      console.error("BankID verification error:", error);
+      console.error('BankID verification error:', error);
       toast({
-        title: "Verifieringen misslyckades",
-        description:
-          error.message || "Kunde inte verifiera med BankID. Försök igen.",
-        variant: "destructive",
+        title: 'Verifieringen misslyckades',
+        description: error.message || 'Kunde inte verifiera med BankID. Försök igen.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -100,8 +92,8 @@ const BankIDVerification: React.FC<BankIDVerificationProps> = ({
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>BankID krävs</AlertTitle>
           <AlertDescription>
-            För att skydda mot bedrägerier och säkerställa äkta användare kräver
-            vi BankID-verifiering för både hyresvärdar och hyresgäster.
+            För att skydda mot bedrägerier och säkerställa äkta användare kräver vi BankID-verifiering
+            för både hyresvärdar och hyresgäster.
           </AlertDescription>
         </Alert>
 
@@ -135,8 +127,7 @@ const BankIDVerification: React.FC<BankIDVerificationProps> = ({
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          Genom att verifiera godkänner du att vi lagrar ditt personnummer
-          krypterat enligt GDPR.
+          Genom att verifiera godkänner du att vi lagrar ditt personnummer krypterat enligt GDPR.
         </p>
       </CardContent>
     </Card>

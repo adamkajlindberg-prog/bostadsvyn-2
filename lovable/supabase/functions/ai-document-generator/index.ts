@@ -2,15 +2,14 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface DocumentRequest {
   content: string;
   title: string;
-  format: "word" | "pdf";
+  format: 'word' | 'pdf';
   includeHeaders?: boolean;
   metadata?: {
     author?: string;
@@ -20,90 +19,59 @@ interface DocumentRequest {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const {
-      content,
-      title,
-      format,
-      includeHeaders = true,
-      metadata,
-    }: DocumentRequest = await req.json();
-    const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
+    const { content, title, format, includeHeaders = true, metadata }: DocumentRequest = await req.json();
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
-      throw new Error("OpenAI API key not configured");
+      throw new Error('OpenAI API key not configured');
     }
 
-    console.log("Generating document:", {
-      title,
-      format,
-      contentLength: content.length,
-    });
+    console.log('Generating document:', { title, format, contentLength: content.length });
 
     // Clean and structure the content for document generation
-    const structuredContent = await structureContentForDocument(
-      content,
-      title,
-      includeHeaders,
-      openAIApiKey,
-    );
+    const structuredContent = await structureContentForDocument(content, title, includeHeaders, openAIApiKey);
 
-    if (format === "pdf") {
-      const htmlContent = await generateHTML(
-        structuredContent,
-        title,
-        metadata,
-      );
+    if (format === 'pdf') {
+      const htmlContent = await generateHTML(structuredContent, title, metadata);
       return new Response(htmlContent, {
         headers: {
           ...corsHeaders,
-          "Content-Type": "text/html",
-          "Content-Disposition": `attachment; filename="${sanitizeFilename(title)}.html"`,
+          'Content-Type': 'text/html',
+          'Content-Disposition': `attachment; filename="${sanitizeFilename(title)}.html"`,
         },
       });
-    } else if (format === "word") {
-      const docContent = await generateWordContent(
-        structuredContent,
-        title,
-        metadata,
-      );
+    } else if (format === 'word') {
+      const docContent = await generateWordContent(structuredContent, title, metadata);
       return new Response(docContent, {
         headers: {
           ...corsHeaders,
-          "Content-Type": "text/plain",
-          "Content-Disposition": `attachment; filename="${sanitizeFilename(title)}.txt"`,
+          'Content-Type': 'text/plain',
+          'Content-Disposition': `attachment; filename="${sanitizeFilename(title)}.txt"`,
         },
       });
     }
 
-    throw new Error("Unsupported format");
+    throw new Error('Unsupported format');
+
   } catch (error) {
-    console.error("Document generation error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    return new Response(
-      JSON.stringify({
-        error: errorMessage,
-        details: "Failed to generate document",
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    console.error('Document generation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      details: 'Failed to generate document'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 
-async function structureContentForDocument(
-  content: string,
-  title: string,
-  _includeHeaders: boolean,
-  apiKey: string,
-): Promise<string> {
+async function structureContentForDocument(content: string, title: string, includeHeaders: boolean, apiKey: string): Promise<string> {
   const prompt = `Strukturera följande innehåll för att skapa ett professionellt dokument med komplett källhänvisningsförteckning:
 
 TITEL: ${title}
@@ -130,21 +98,17 @@ INSTRUKTIONER:
 Returnera endast det strukturerade innehållet som en komplett rapport:`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-5-2025-08-07",
+        model: 'gpt-5-2025-08-07',
         messages: [
-          {
-            role: "system",
-            content:
-              "Du är en expert på att skapa professionella fastighetsrapporter och analysrapporter med komplett dokumentation och källhänvisningar.",
-          },
-          { role: "user", content: prompt },
+          { role: 'system', content: 'Du är en expert på att skapa professionella fastighetsrapporter och analysrapporter med komplett dokumentation och källhänvisningar.' },
+          { role: 'user', content: prompt }
         ],
         max_completion_tokens: 4000,
       }),
@@ -153,18 +117,14 @@ Returnera endast det strukturerade innehållet som en komplett rapport:`;
     const data = await response.json();
     return data.choices[0]?.message?.content || content;
   } catch (error) {
-    console.error("Error structuring content:", error);
+    console.error('Error structuring content:', error);
     return content; // Fallback to original content
   }
 }
 
-async function generateHTML(
-  content: string,
-  title: string,
-  metadata?: any,
-): Promise<string> {
+async function generateHTML(content: string, title: string, metadata?: any): Promise<string> {
   const htmlContent = markdownToHTML(content);
-
+  
   return `<!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -269,66 +229,51 @@ async function generateHTML(
         <h1>${title}</h1>
     </div>
     
-    ${
-      metadata
-        ? `
+    ${metadata ? `
     <div class="metadata">
         <strong>📋 Dokumentinformation</strong><br><br>
         <strong>Titel:</strong> ${title}<br>
-        ${metadata.author ? `<strong>Genererad av:</strong> ${metadata.author}<br>` : ""}
-        ${metadata.subject ? `<strong>Ämnesområde:</strong> ${metadata.subject}<br>` : ""}
-        <strong>Genereringsdatum:</strong> ${new Date().toLocaleDateString(
-          "sv-SE",
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          },
-        )}<br>
+        ${metadata.author ? `<strong>Genererad av:</strong> ${metadata.author}<br>` : ''}
+        ${metadata.subject ? `<strong>Ämnesområde:</strong> ${metadata.subject}<br>` : ''}
+        <strong>Genereringsdatum:</strong> ${new Date().toLocaleDateString('sv-SE', {
+          year: 'numeric',
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}<br>
         <strong>AI-modell:</strong> GPT-5 med Real-time Data<br>
-        ${metadata.keywords ? `<strong>Nyckelord:</strong> ${metadata.keywords.join(", ")}<br>` : ""}
+        ${metadata.keywords ? `<strong>Nyckelord:</strong> ${metadata.keywords.join(', ')}<br>` : ''}
     </div>
-    `
-        : ""
-    }
+    ` : ''}
     
     ${htmlContent}
     
     <div class="footer">
         <strong>Framtidsboet.se AI-Rådgivare</strong><br>
-        Genererat: ${new Date().toLocaleDateString("sv-SE")} • Powered by GPT-5 & Real-time Swedish Data
+        Genererat: ${new Date().toLocaleDateString('sv-SE')} • Powered by GPT-5 & Real-time Swedish Data
     </div>
 </body>
 </html>`;
 }
 
-async function generateWordContent(
-  content: string,
-  title: string,
-  metadata?: any,
-): Promise<string> {
+async function generateWordContent(content: string, title: string, metadata?: any): Promise<string> {
   return `
 FRAMTIDSBOET.SE - FASTIGHETSANALYS
 ==================================
 
 ${title}
 
-${
-  metadata
-    ? `
+${metadata ? `
 DOKUMENTINFORMATION:
 Titel: ${title}
-Genererad av: ${metadata.author || "Framtidsboet AI-rådgivare"}
-Ämnesområde: ${metadata.subject || "Fastighetsanalys"}
-Genereringsdatum: ${new Date().toLocaleDateString("sv-SE")}
+Genererad av: ${metadata.author || 'Framtidsboet AI-rådgivare'}
+Ämnesområde: ${metadata.subject || 'Fastighetsanalys'}
+Genereringsdatum: ${new Date().toLocaleDateString('sv-SE')}
 AI-modell: GPT-5 med Real-time Data
-${metadata.keywords ? `Nyckelord: ${metadata.keywords.join(", ")}` : ""}
+${metadata.keywords ? `Nyckelord: ${metadata.keywords.join(', ')}` : ''}
 
-`
-    : ""
-}
+` : ''}
 
 ${content}
 
@@ -336,77 +281,60 @@ ${content}
 DOKUMENTSLUT
 
 Genererat av Framtidsboet.se AI-Rådgivare
-Datum: ${new Date().toLocaleDateString("sv-SE")}
+Datum: ${new Date().toLocaleDateString('sv-SE')}
 Teknik: GPT-5 + Real-time Swedish Data Sources
 `;
 }
 
 function markdownToHTML(markdown: string): string {
-  return (
-    markdown
-      // Headers
-      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-
-      // Bold and italic
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-
-      // Source citations with enhanced styling
-      .replace(
-        /📋 Källa: (.*)/g,
-        '<div class="source">📋 <strong>Källa:</strong> $1</div>',
-      )
-      .replace(
-        /📊 Data: (.*)/g,
-        '<div class="source">📊 <strong>Data:</strong> $1</div>',
-      )
-      .replace(
-        /🔍 Analys: (.*)/g,
-        '<div class="source">🔍 <strong>Analys:</strong> $1</div>',
-      )
-      .replace(
-        /⚠️ Observera: (.*)/g,
-        '<div class="source" style="border-left-color: #f59e0b;">⚠️ <strong>Observera:</strong> $1</div>',
-      )
-
-      // Important highlights
-      .replace(
-        /VIKTIGT: (.*)/g,
-        '<span class="highlight"><strong>VIKTIGT:</strong> $1</span>',
-      )
-
-      // Lists
-      .replace(/^- (.*$)/gim, "<li>$1</li>")
-      .replace(/^\* (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$2</li>")
-
-      // Tables (basic markdown table support)
-      .replace(/\|(.+)\|/g, (_match, content) => {
-        const cells = content.split("|").map((cell: string) => cell.trim());
-        return `<tr>${cells.map((cell: string) => `<td>${cell}</td>`).join("")}</tr>`;
-      })
-
-      // Line breaks and paragraphs
-      .replace(/\n\n/g, "</p><p>")
-      .replace(/^(?!<[h|u|o|t|d])/gm, "<p>")
-      .replace(/$/gm, "</p>")
-
-      // Clean up
-      .replace(/<p><\/p>/g, "")
-      .replace(/<p>(<[h|u|o|t|d])/g, "$1")
-      .replace(/(<\/[h|u|o|t|d][^>]*>)<\/p>/g, "$1")
-      .replace(/<p><li>/g, "<li>")
-      .replace(/<\/li><\/p>/g, "</li>")
-      .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
-  );
+  return markdown
+    // Headers
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    
+    // Bold and italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    
+    // Source citations with enhanced styling
+    .replace(/📋 Källa: (.*)/g, '<div class="source">📋 <strong>Källa:</strong> $1</div>')
+    .replace(/📊 Data: (.*)/g, '<div class="source">📊 <strong>Data:</strong> $1</div>')
+    .replace(/🔍 Analys: (.*)/g, '<div class="source">🔍 <strong>Analys:</strong> $1</div>')
+    .replace(/⚠️ Observera: (.*)/g, '<div class="source" style="border-left-color: #f59e0b;">⚠️ <strong>Observera:</strong> $1</div>')
+    
+    // Important highlights
+    .replace(/VIKTIGT: (.*)/g, '<span class="highlight"><strong>VIKTIGT:</strong> $1</span>')
+    
+    // Lists
+    .replace(/^\- (.*$)/gim, '<li>$1</li>')
+    .replace(/^\* (.*$)/gim, '<li>$1</li>')
+    .replace(/^(\d+)\. (.*$)/gim, '<li>$2</li>')
+    
+    // Tables (basic markdown table support)
+    .replace(/\|(.+)\|/g, (match, content) => {
+      const cells = content.split('|').map((cell: string) => cell.trim());
+      return '<tr>' + cells.map((cell: string) => `<td>${cell}</td>`).join('') + '</tr>';
+    })
+    
+    // Line breaks and paragraphs
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[h|u|o|t|d])/gm, '<p>')
+    .replace(/$/gm, '</p>')
+    
+    // Clean up
+    .replace(/<p><\/p>/g, '')
+    .replace(/<p>(<[h|u|o|t|d])/g, '$1')
+    .replace(/(<\/[h|u|o|t|d][^>]*>)<\/p>/g, '$1')
+    .replace(/<p><li>/g, '<li>')
+    .replace(/<\/li><\/p>/g, '</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
 }
 
 function sanitizeFilename(filename: string): string {
   return filename
-    .replace(/[^a-z0-9åäöÅÄÖ\s-]/gi, "")
-    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9åäöÅÄÖ\s-]/gi, '')
+    .replace(/\s+/g, '-')
     .toLowerCase()
     .substring(0, 100);
 }

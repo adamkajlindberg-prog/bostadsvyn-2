@@ -1,5 +1,4 @@
-import type React from "react";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 
 interface FocusTrapProps {
   active: boolean;
@@ -11,11 +10,7 @@ interface FocusTrapProps {
  * FocusTrap component ensures keyboard focus stays within a container
  * when active (e.g., in modals or dialogs). This is crucial for WCAG 2.4.3.
  */
-const FocusTrap: React.FC<FocusTrapProps> = ({
-  active,
-  children,
-  className,
-}) => {
+const FocusTrap: React.FC<FocusTrapProps> = ({ active, children, className }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -27,7 +22,7 @@ const FocusTrap: React.FC<FocusTrapProps> = ({
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
 
     if (focusableElements.length === 0) return;
@@ -39,7 +34,7 @@ const FocusTrap: React.FC<FocusTrapProps> = ({
     firstElement.focus();
 
     const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
+      if (e.key !== 'Tab') return;
 
       if (e.shiftKey) {
         // Shift + Tab: moving backwards
@@ -56,10 +51,10 @@ const FocusTrap: React.FC<FocusTrapProps> = ({
       }
     };
 
-    container.addEventListener("keydown", handleTabKey);
+    container.addEventListener('keydown', handleTabKey);
 
     return () => {
-      container.removeEventListener("keydown", handleTabKey);
+      container.removeEventListener('keydown', handleTabKey);
       // Restore focus when trap deactivates
       if (previousFocusRef.current) {
         previousFocusRef.current.focus();

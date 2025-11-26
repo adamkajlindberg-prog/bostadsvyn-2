@@ -1,28 +1,25 @@
-import {
-  ArrowLeftRight,
-  Calendar,
-  Download,
-  Heart,
-  HeartOff,
-  Home,
-  Share2,
-  Sparkles,
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  Download, 
+  Share2, 
+  Heart, 
+  HeartOff, 
+  Eye, 
   Trash2,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Calendar,
+  Home,
+  Sparkles,
+  ArrowLeftRight
+} from 'lucide-react';
 
 interface AIEdit {
   id: string;
@@ -48,23 +45,23 @@ const AIImageGallery = () => {
     if (user) {
       loadUserEdits();
     }
-  }, [user, loadUserEdits]);
+  }, [user]);
 
   const loadUserEdits = async () => {
     if (!user) return;
-
+    
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from("user_ai_edits")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from('user_ai_edits')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setEdits(data || []);
     } catch (error: any) {
-      console.error("Error loading edits:", error);
+      console.error('Error loading edits:', error);
       toast({
         title: "Kunde inte ladda bildgalleri",
         description: error.message,
@@ -78,27 +75,19 @@ const AIImageGallery = () => {
   const toggleFavorite = async (editId: string, currentFavorite: boolean) => {
     try {
       const { error } = await supabase
-        .from("user_ai_edits")
+        .from('user_ai_edits')
         .update({ is_favorite: !currentFavorite })
-        .eq("id", editId);
+        .eq('id', editId);
 
       if (error) throw error;
 
-      setEdits((prev) =>
-        prev.map((edit) =>
-          edit.id === editId
-            ? { ...edit, is_favorite: !currentFavorite }
-            : edit,
-        ),
-      );
+      setEdits(prev => prev.map(edit => 
+        edit.id === editId ? { ...edit, is_favorite: !currentFavorite } : edit
+      ));
 
       toast({
-        title: currentFavorite
-          ? "Borttaget från favoriter"
-          : "Tillagt som favorit",
-        description: currentFavorite
-          ? "Bilden har tagits bort från dina favoriter"
-          : "Bilden har lagts till som favorit",
+        title: currentFavorite ? "Borttaget från favoriter" : "Tillagt som favorit",
+        description: currentFavorite ? "Bilden har tagits bort från dina favoriter" : "Bilden har lagts till som favorit",
       });
     } catch (error: any) {
       toast({
@@ -112,13 +101,13 @@ const AIImageGallery = () => {
   const deleteEdit = async (editId: string) => {
     try {
       const { error } = await supabase
-        .from("user_ai_edits")
+        .from('user_ai_edits')
         .delete()
-        .eq("id", editId);
+        .eq('id', editId);
 
       if (error) throw error;
 
-      setEdits((prev) => prev.filter((edit) => edit.id !== editId));
+      setEdits(prev => prev.filter(edit => edit.id !== editId));
       toast({
         title: "Redigering borttagen",
         description: "Bilden har tagits bort från ditt galleri",
@@ -137,14 +126,14 @@ const AIImageGallery = () => {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: "Nedladdning misslyckades",
         description: "Kunde inte ladda ner bilden.",
@@ -157,12 +146,12 @@ const AIImageGallery = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "AI-redigerad fastighetsbild",
+          title: 'AI-redigerad fastighetsbild',
           text: `Kolla in den här AI-redigeringen: ${prompt}`,
           url: imageUrl,
         });
-      } catch (_error) {
-        console.log("Share cancelled");
+      } catch (error) {
+        console.log('Share cancelled');
       }
     } else {
       navigator.clipboard.writeText(imageUrl);
@@ -173,7 +162,7 @@ const AIImageGallery = () => {
     }
   };
 
-  const favoriteEdits = edits.filter((edit) => edit.is_favorite);
+  const favoriteEdits = edits.filter(edit => edit.is_favorite);
   const recentEdits = edits.slice(0, 12);
 
   if (loading) {
@@ -191,30 +180,24 @@ const AIImageGallery = () => {
     );
   }
 
-  const EditGrid = ({ edits, title }: { edits: AIEdit[]; title: string }) => (
+  const EditGrid = ({ edits, title }: { edits: AIEdit[], title: string }) => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold flex items-center gap-2">
         <Sparkles className="h-5 w-5 text-primary" />
         {title}
         <Badge variant="secondary">{edits.length}</Badge>
       </h3>
-
+      
       {edits.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Inga redigeringar ännu</p>
-          <p className="text-sm">
-            Använd AI-bildredigeraren för att skapa dina första
-            renoveringsvisualiseringar!
-          </p>
+          <p className="text-sm">Använd AI-bildredigeraren för att skapa dina första renoveringsvisualiseringar!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {edits.map((edit) => (
-            <Card
-              key={edit.id}
-              className="group hover:shadow-lg transition-all duration-300"
-            >
+            <Card key={edit.id} className="group hover:shadow-lg transition-all duration-300">
               <div className="relative overflow-hidden">
                 <img
                   src={edit.edited_image_url}
@@ -223,7 +206,7 @@ const AIImageGallery = () => {
                   onClick={() => setSelectedEdit(edit)}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-
+                
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
                     size="sm"
@@ -257,11 +240,11 @@ const AIImageGallery = () => {
                 <div className="absolute bottom-2 left-2">
                   <Badge variant="secondary" className="text-xs">
                     <Calendar className="h-3 w-3 mr-1" />
-                    {new Date(edit.created_at).toLocaleDateString("sv-SE")}
+                    {new Date(edit.created_at).toLocaleDateString('sv-SE')}
                   </Badge>
                 </div>
               </div>
-
+              
               <CardContent className="p-4">
                 <div className="space-y-2">
                   {edit.property_title && (
@@ -270,21 +253,14 @@ const AIImageGallery = () => {
                       <span className="truncate">{edit.property_title}</span>
                     </div>
                   )}
-                  <p className="text-sm font-medium line-clamp-2">
-                    {edit.edit_prompt}
-                  </p>
-
+                  <p className="text-sm font-medium line-clamp-2">{edit.edit_prompt}</p>
+                  
                   <div className="flex gap-2 pt-2">
                     <Button
                       size="sm"
                       variant="outline"
                       className="flex-1 text-xs"
-                      onClick={() =>
-                        handleDownload(
-                          edit.edited_image_url,
-                          `ai-edit-${edit.id}.jpg`,
-                        )
-                      }
+                      onClick={() => handleDownload(edit.edited_image_url, `ai-edit-${edit.id}.jpg`)}
                     >
                       <Download className="h-3 w-3 mr-1" />
                       Ladda ner
@@ -293,9 +269,7 @@ const AIImageGallery = () => {
                       size="sm"
                       variant="outline"
                       className="flex-1 text-xs"
-                      onClick={() =>
-                        handleShare(edit.edited_image_url, edit.edit_prompt)
-                      }
+                      onClick={() => handleShare(edit.edited_image_url, edit.edit_prompt)}
                     >
                       <Share2 className="h-3 w-3 mr-1" />
                       Dela
@@ -327,11 +301,10 @@ const AIImageGallery = () => {
             Mitt AI-bildgalleri
           </CardTitle>
           <p className="text-muted-foreground">
-            Alla dina AI-redigerade fastighetsbilder och
-            renoveringsvisualiseringar
+            Alla dina AI-redigerade fastighetsbilder och renoveringsvisualiseringar
           </p>
         </CardHeader>
-
+        
         <CardContent>
           <Tabs defaultValue="recent" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2">
@@ -339,19 +312,16 @@ const AIImageGallery = () => {
                 <Calendar className="h-4 w-4" />
                 Senaste
               </TabsTrigger>
-              <TabsTrigger
-                value="favorites"
-                className="flex items-center gap-2"
-              >
+              <TabsTrigger value="favorites" className="flex items-center gap-2">
                 <Heart className="h-4 w-4" />
                 Favoriter
               </TabsTrigger>
             </TabsList>
-
+            
             <TabsContent value="recent">
               <EditGrid edits={recentEdits} title="Senaste redigeringar" />
             </TabsContent>
-
+            
             <TabsContent value="favorites">
               <EditGrid edits={favoriteEdits} title="Dina favoriter" />
             </TabsContent>
@@ -360,18 +330,12 @@ const AIImageGallery = () => {
       </Card>
 
       {/* Detailed View Dialog */}
-      <Dialog
-        open={!!selectedEdit}
-        onOpenChange={() => {
-          setSelectedEdit(null);
-          setShowComparison(false);
-        }}
-      >
+      <Dialog open={!!selectedEdit} onOpenChange={() => {setSelectedEdit(null); setShowComparison(false);}}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>AI-redigering</DialogTitle>
           </DialogHeader>
-
+          
           {selectedEdit && (
             <div className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -385,10 +349,8 @@ const AIImageGallery = () => {
                     />
                   </div>
                 )}
-
-                <div
-                  className={`space-y-2 ${showComparison ? "" : "md:col-span-2"}`}
-                >
+                
+                <div className={`space-y-2 ${showComparison ? '' : 'md:col-span-2'}`}>
                   <h3 className="font-semibold">Efter (AI-redigerad)</h3>
                   <img
                     src={selectedEdit.edited_image_url}
@@ -397,63 +359,47 @@ const AIImageGallery = () => {
                   />
                 </div>
               </div>
-
+              
               <div className="space-y-4 pt-4 border-t">
                 <div>
                   <h4 className="font-medium mb-2">Redigeringsprompt:</h4>
-                  <p className="text-muted-foreground">
-                    {selectedEdit.edit_prompt}
-                  </p>
+                  <p className="text-muted-foreground">{selectedEdit.edit_prompt}</p>
                 </div>
-
+                
                 {selectedEdit.property_title && (
                   <div>
                     <h4 className="font-medium mb-2">Fastighet:</h4>
-                    <p className="text-muted-foreground">
-                      {selectedEdit.property_title}
-                    </p>
+                    <p className="text-muted-foreground">{selectedEdit.property_title}</p>
                   </div>
                 )}
-
+                
                 <div className="flex gap-2">
                   <Button
                     onClick={() => setShowComparison(!showComparison)}
                     variant="outline"
                   >
                     <ArrowLeftRight className="h-4 w-4 mr-2" />
-                    {showComparison ? "Dölj jämförelse" : "Visa före/efter"}
+                    {showComparison ? 'Dölj jämförelse' : 'Visa före/efter'}
                   </Button>
-
+                  
                   <Button
-                    onClick={() =>
-                      handleDownload(
-                        selectedEdit.edited_image_url,
-                        `ai-edit-${selectedEdit.id}.jpg`,
-                      )
-                    }
+                    onClick={() => handleDownload(selectedEdit.edited_image_url, `ai-edit-${selectedEdit.id}.jpg`)}
                     variant="outline"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Ladda ner
                   </Button>
-
+                  
                   <Button
-                    onClick={() =>
-                      handleShare(
-                        selectedEdit.edited_image_url,
-                        selectedEdit.edit_prompt,
-                      )
-                    }
+                    onClick={() => handleShare(selectedEdit.edited_image_url, selectedEdit.edit_prompt)}
                     variant="outline"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
                     Dela
                   </Button>
-
+                  
                   <Button
-                    onClick={() =>
-                      toggleFavorite(selectedEdit.id, selectedEdit.is_favorite)
-                    }
+                    onClick={() => toggleFavorite(selectedEdit.id, selectedEdit.is_favorite)}
                     variant="outline"
                   >
                     {selectedEdit.is_favorite ? (
@@ -461,9 +407,7 @@ const AIImageGallery = () => {
                     ) : (
                       <Heart className="h-4 w-4 mr-2" />
                     )}
-                    {selectedEdit.is_favorite
-                      ? "Ta bort favorit"
-                      : "Lägg till favorit"}
+                    {selectedEdit.is_favorite ? 'Ta bort favorit' : 'Lägg till favorit'}
                   </Button>
                 </div>
               </div>

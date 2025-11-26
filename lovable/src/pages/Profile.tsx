@@ -1,13 +1,13 @@
-import { Shield, User } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { UserProfile } from "@/components/UserProfile";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import BankIDVerification from "@/components/verification/BankIDVerification";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { UserProfile } from '@/components/UserProfile';
+import BankIDVerification from '@/components/verification/BankIDVerification';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { User, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
   const { user, loading, profile } = useAuth();
@@ -18,21 +18,21 @@ const Profile = () => {
     if (user && profile) {
       checkBankIDStatus();
     }
-  }, [user, profile, checkBankIDStatus]);
+  }, [user, profile]);
 
   const checkBankIDStatus = async () => {
     try {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("bankid_verified")
-        .eq("user_id", user?.id)
+        .from('profiles')
+        .select('bankid_verified')
+        .eq('user_id', user?.id)
         .maybeSingle();
 
       if (data && !error) {
         setIsVerified(data.bankid_verified || false);
       }
     } catch (error) {
-      console.error("Error checking BankID status:", error);
+      console.error('Error checking BankID status:', error);
     } finally {
       setCheckingVerification(false);
     }
@@ -66,22 +66,19 @@ const Profile = () => {
               <User className="h-4 w-4" />
               Profil
             </TabsTrigger>
-            <TabsTrigger
-              value="verification"
-              className="flex items-center gap-2"
-            >
+            <TabsTrigger value="verification" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Verifiering
             </TabsTrigger>
           </TabsList>
-
+          
           <TabsContent value="profile">
             <UserProfile />
           </TabsContent>
 
           <TabsContent value="verification">
             <BankIDVerification
-              userId={user?.id}
+              userId={user!.id}
               isVerified={isVerified}
               onVerificationComplete={() => {
                 setIsVerified(true);

@@ -1,4 +1,4 @@
-import type React from "react";
+import React from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,11 +6,8 @@ interface LogoProps {
 }
 
 // Kompakt B-bostad
-const LogoVariant37: React.FC<LogoProps> = ({
-  className = "h-10 w-10",
-  title = "Bostadsvyn logotyp",
-}) => {
-  const titleId = "logoTitle37";
+const LogoVariant37: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
+  const titleId = 'logoTitle37';
   return (
     <svg
       viewBox="0 0 64 64"
@@ -20,13 +17,7 @@ const LogoVariant37: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <title id={titleId}>{title}</title>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 54 L22 14 L30 14 Q38 14 38 20 Q38 25 34 27 Q38 29 38 34 Q38 40 30 40 L22 40 M22 54 L30 54" />
         <path d="M22 14 L30 8 L38 14" strokeWidth="4" />
       </g>

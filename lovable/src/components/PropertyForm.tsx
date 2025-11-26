@@ -1,35 +1,28 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Upload, X } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Upload, X, Plus, ImageIcon } from 'lucide-react';
 
 const propertySchema = z.object({
-  title: z.string().min(1, "Titel krävs"),
+  title: z.string().min(1, 'Titel krävs'),
   description: z.string().optional(),
-  property_type: z.string().min(1, "Fastighetstyp krävs"),
-  price: z.number().min(0, "Pris måste vara positivt"),
-  address_street: z.string().min(1, "Gatuadress krävs"),
-  address_postal_code: z.string().min(1, "Postnummer krävs"),
-  address_city: z.string().min(1, "Stad krävs"),
+  property_type: z.string().min(1, 'Fastighetstyp krävs'),
+  price: z.number().min(0, 'Pris måste vara positivt'),
+  address_street: z.string().min(1, 'Gatuadress krävs'),
+  address_postal_code: z.string().min(1, 'Postnummer krävs'),
+  address_city: z.string().min(1, 'Stad krävs'),
   living_area: z.number().optional(),
   plot_area: z.number().optional(),
   rooms: z.number().optional(),
@@ -50,44 +43,44 @@ interface PropertyFormProps {
 }
 
 const propertyTypes = [
-  "Villa",
-  "Lägenhet",
-  "Radhus",
-  "Bostadsrätt",
-  "Fritidshus",
-  "Tomt",
-  "Kommersiell",
+  'Villa',
+  'Lägenhet',
+  'Radhus',
+  'Bostadsrätt',
+  'Fritidshus',
+  'Tomt',
+  'Kommersiell',
 ];
 
 const statusOptions = [
-  { value: "FOR_SALE", label: "Till salu" },
-  { value: "FOR_RENT", label: "Till uthyrning" },
-  { value: "COMING_SOON", label: "Kommer snart" },
-  { value: "SOLD", label: "Såld" },
-  { value: "DRAFT", label: "Utkast" },
+  { value: 'FOR_SALE', label: 'Till salu' },
+  { value: 'FOR_RENT', label: 'Till uthyrning' },
+  { value: 'COMING_SOON', label: 'Kommer snart' },
+  { value: 'SOLD', label: 'Såld' },
+  { value: 'DRAFT', label: 'Utkast' },
 ];
 
 const featuresList = [
-  "Balkong",
-  "Terrass",
-  "Trädgård",
-  "Garage",
-  "Parkering",
-  "Hiss",
-  "Förråd",
-  "Tvättstuga",
-  "Öppen spis",
-  "Pool",
-  "Gym",
-  "Bastu",
-  "Vinkällare",
-  "Fiber",
+  'Balkong',
+  'Terrass',
+  'Trädgård',
+  'Garage',
+  'Parkering',
+  'Hiss',
+  'Förråd',
+  'Tvättstuga',
+  'Öppen spis',
+  'Pool',
+  'Gym',
+  'Bastu',
+  'Vinkällare',
+  'Fiber',
 ];
 
-export const PropertyForm: React.FC<PropertyFormProps> = ({
-  propertyId,
-  onSuccess,
-  onCancel,
+export const PropertyForm: React.FC<PropertyFormProps> = ({ 
+  propertyId, 
+  onSuccess, 
+  onCancel 
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -107,8 +100,8 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      status: "DRAFT",
-      property_type: "",
+      status: 'DRAFT',
+      property_type: '',
     },
   });
 
@@ -117,14 +110,14 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
     if (propertyId) {
       loadProperty();
     }
-  }, [propertyId, loadProperty]);
+  }, [propertyId]);
 
   const loadProperty = async () => {
     try {
       const { data, error } = await supabase
-        .from("properties")
-        .select("*")
-        .eq("id", propertyId)
+        .from('properties')
+        .select('*')
+        .eq('id', propertyId)
         .single();
 
       if (error) throw error;
@@ -133,30 +126,30 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
         ...data,
         price: Number(data.price),
       });
-
+      
       setSelectedFeatures(data.features || []);
       setImageUrls(data.images || []);
-    } catch (_error: any) {
+    } catch (error: any) {
       toast({
-        title: "Fel",
-        description: "Kunde inte ladda fastighet",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte ladda fastighet',
+        variant: 'destructive',
       });
     }
   };
 
   const handleImageUpload = (files: FileList | null) => {
     if (!files) return;
-
+    
     const newImages = Array.from(files).slice(0, 10 - images.length);
-    setImages((prev) => [...prev, ...newImages]);
+    setImages(prev => [...prev, ...newImages]);
   };
 
   const removeImage = (index: number, isUploaded: boolean = false) => {
     if (isUploaded) {
-      setImageUrls((prev) => prev.filter((_, i) => i !== index));
+      setImageUrls(prev => prev.filter((_, i) => i !== index));
     } else {
-      setImages((prev) => prev.filter((_, i) => i !== index));
+      setImages(prev => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -168,29 +161,29 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
 
     try {
       for (const image of images) {
-        const fileExt = image.name.split(".").pop();
+        const fileExt = image.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `${user?.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("property-images")
+          .from('property-images')
           .upload(filePath, image);
 
         if (uploadError) throw uploadError;
 
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("property-images").getPublicUrl(filePath);
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(filePath);
 
         uploadedUrls.push(publicUrl);
       }
 
       return [...imageUrls, ...uploadedUrls];
-    } catch (_error: any) {
+    } catch (error: any) {
       toast({
-        title: "Fel",
-        description: "Ett fel uppstod vid bilduppladdning",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Ett fel uppstod vid bilduppladdning',
+        variant: 'destructive',
       });
       return imageUrls;
     } finally {
@@ -211,40 +204,40 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
         features: selectedFeatures,
         images: uploadedImageUrls,
         user_id: user.id,
-        address_country: "SE", // Default to Sweden
+        address_country: 'SE', // Default to Sweden
       } as any; // Temporary type assertion to fix build
 
       if (propertyId) {
         const { error } = await supabase
-          .from("properties")
+          .from('properties')
           .update(propertyData)
-          .eq("id", propertyId);
+          .eq('id', propertyId);
 
         if (error) throw error;
 
         toast({
-          title: "Framgång",
-          description: "Fastighet uppdaterad",
+          title: 'Framgång',
+          description: 'Fastighet uppdaterad',
         });
       } else {
         const { error } = await supabase
-          .from("properties")
+          .from('properties')
           .insert(propertyData);
 
         if (error) throw error;
 
         toast({
-          title: "Framgång",
-          description: "Fastighet skapad",
+          title: 'Framgång',
+          description: 'Fastighet skapad',
         });
       }
 
       onSuccess?.();
     } catch (error: any) {
       toast({
-        title: "Fel",
-        description: error.message || "Ett fel uppstod",
-        variant: "destructive",
+        title: 'Fel',
+        description: error.message || 'Ett fel uppstod',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -252,10 +245,10 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
   };
 
   const toggleFeature = (feature: string) => {
-    setSelectedFeatures((prev) =>
+    setSelectedFeatures(prev =>
       prev.includes(feature)
-        ? prev.filter((f) => f !== feature)
-        : [...prev, feature],
+        ? prev.filter(f => f !== feature)
+        : [...prev, feature]
     );
   };
 
@@ -270,13 +263,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
             <Label htmlFor="title">Titel *</Label>
             <Input
               id="title"
-              {...register("title")}
+              {...register('title')}
               placeholder="T.ex. Modern villa med havsutsikt"
             />
             {errors.title && (
-              <p className="text-sm text-destructive mt-1">
-                {errors.title.message}
-              </p>
+              <p className="text-sm text-destructive mt-1">{errors.title.message}</p>
             )}
           </div>
 
@@ -284,7 +275,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
             <Label htmlFor="description">Beskrivning</Label>
             <Textarea
               id="description"
-              {...register("description")}
+              {...register('description')}
               placeholder="Beskriv fastigheten..."
               rows={4}
             />
@@ -293,9 +284,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="property_type">Fastighetstyp *</Label>
-              <Select
-                onValueChange={(value) => setValue("property_type", value)}
-              >
+              <Select onValueChange={(value) => setValue('property_type', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Välj typ" />
                 </SelectTrigger>
@@ -308,9 +297,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
                 </SelectContent>
               </Select>
               {errors.property_type && (
-                <p className="text-sm text-destructive mt-1">
-                  {errors.property_type.message}
-                </p>
+                <p className="text-sm text-destructive mt-1">{errors.property_type.message}</p>
               )}
             </div>
 
@@ -319,23 +306,18 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="price"
                 type="number"
-                {...register("price", { valueAsNumber: true })}
+                {...register('price', { valueAsNumber: true })}
                 placeholder="5000000"
               />
               {errors.price && (
-                <p className="text-sm text-destructive mt-1">
-                  {errors.price.message}
-                </p>
+                <p className="text-sm text-destructive mt-1">{errors.price.message}</p>
               )}
             </div>
           </div>
 
           <div>
             <Label htmlFor="status">Status</Label>
-            <Select
-              onValueChange={(value) => setValue("status", value)}
-              defaultValue="DRAFT"
-            >
+            <Select onValueChange={(value) => setValue('status', value)} defaultValue="DRAFT">
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -360,13 +342,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
             <Label htmlFor="address_street">Gatuadress *</Label>
             <Input
               id="address_street"
-              {...register("address_street")}
+              {...register('address_street')}
               placeholder="Storgatan 1"
             />
             {errors.address_street && (
-              <p className="text-sm text-destructive mt-1">
-                {errors.address_street.message}
-              </p>
+              <p className="text-sm text-destructive mt-1">{errors.address_street.message}</p>
             )}
           </div>
 
@@ -375,13 +355,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Label htmlFor="address_postal_code">Postnummer *</Label>
               <Input
                 id="address_postal_code"
-                {...register("address_postal_code")}
+                {...register('address_postal_code')}
                 placeholder="123 45"
               />
               {errors.address_postal_code && (
-                <p className="text-sm text-destructive mt-1">
-                  {errors.address_postal_code.message}
-                </p>
+                <p className="text-sm text-destructive mt-1">{errors.address_postal_code.message}</p>
               )}
             </div>
 
@@ -389,13 +367,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Label htmlFor="address_city">Stad *</Label>
               <Input
                 id="address_city"
-                {...register("address_city")}
+                {...register('address_city')}
                 placeholder="Stockholm"
               />
               {errors.address_city && (
-                <p className="text-sm text-destructive mt-1">
-                  {errors.address_city.message}
-                </p>
+                <p className="text-sm text-destructive mt-1">{errors.address_city.message}</p>
               )}
             </div>
           </div>
@@ -413,7 +389,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="living_area"
                 type="number"
-                {...register("living_area", { valueAsNumber: true })}
+                {...register('living_area', { valueAsNumber: true })}
               />
             </div>
 
@@ -422,7 +398,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="plot_area"
                 type="number"
-                {...register("plot_area", { valueAsNumber: true })}
+                {...register('plot_area', { valueAsNumber: true })}
               />
             </div>
 
@@ -431,7 +407,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="rooms"
                 type="number"
-                {...register("rooms", { valueAsNumber: true })}
+                {...register('rooms', { valueAsNumber: true })}
               />
             </div>
 
@@ -440,7 +416,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="bedrooms"
                 type="number"
-                {...register("bedrooms", { valueAsNumber: true })}
+                {...register('bedrooms', { valueAsNumber: true })}
               />
             </div>
 
@@ -449,7 +425,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="bathrooms"
                 type="number"
-                {...register("bathrooms", { valueAsNumber: true })}
+                {...register('bathrooms', { valueAsNumber: true })}
               />
             </div>
 
@@ -458,7 +434,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="year_built"
                 type="number"
-                {...register("year_built", { valueAsNumber: true })}
+                {...register('year_built', { valueAsNumber: true })}
               />
             </div>
 
@@ -467,20 +443,18 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Input
                 id="monthly_fee"
                 type="number"
-                {...register("monthly_fee", { valueAsNumber: true })}
+                {...register('monthly_fee', { valueAsNumber: true })}
               />
             </div>
 
             <div>
               <Label htmlFor="energy_class">Energiklass</Label>
-              <Select
-                onValueChange={(value) => setValue("energy_class", value)}
-              >
+              <Select onValueChange={(value) => setValue('energy_class', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Välj klass" />
                 </SelectTrigger>
                 <SelectContent>
-                  {["A", "B", "C", "D", "E", "F", "G"].map((cls) => (
+                  {['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((cls) => (
                     <SelectItem key={cls} value={cls}>
                       {cls}
                     </SelectItem>
@@ -545,7 +519,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => document.getElementById("images")?.click()}
+                onClick={() => document.getElementById('images')?.click()}
                 className="w-full"
                 disabled={images.length + imageUrls.length >= 10}
               >
@@ -606,10 +580,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({
           className="flex-1"
         >
           {isSubmitting || isUploading
-            ? "Sparar..."
+            ? 'Sparar...'
             : propertyId
-              ? "Uppdatera fastighet"
-              : "Skapa fastighet"}
+            ? 'Uppdatera fastighet'
+            : 'Skapa fastighet'
+          }
         </Button>
         {onCancel && (
           <Button

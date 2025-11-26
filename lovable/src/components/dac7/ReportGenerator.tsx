@@ -1,32 +1,18 @@
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
-import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const ReportGenerator = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [reportingYear, setReportingYear] = useState(
-    new Date().getFullYear().toString(),
-  );
-  const [format, setFormat] = useState<"csv" | "xml">("csv");
+  const [reportingYear, setReportingYear] = useState(new Date().getFullYear().toString());
+  const [format, setFormat] = useState<'csv' | 'xml'>('csv');
 
   // Generate year options (current year and previous 5 years)
   const currentYear = new Date().getFullYear();
@@ -36,22 +22,20 @@ const ReportGenerator = () => {
     setLoading(true);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
         toast({
-          title: "Ej inloggad",
-          description: "Du måste vara inloggad för att generera rapporter.",
-          variant: "destructive",
+          title: 'Ej inloggad',
+          description: 'Du måste vara inloggad för att generera rapporter.',
+          variant: 'destructive',
         });
         return;
       }
 
-      const response = await supabase.functions.invoke("generate-dac7-report", {
+      const response = await supabase.functions.invoke('generate-dac7-report', {
         body: {
-          reportingYear: parseInt(reportingYear, 10),
+          reportingYear: parseInt(reportingYear),
           format,
         },
       });
@@ -62,10 +46,10 @@ const ReportGenerator = () => {
 
       // Create blob and download
       const blob = new Blob([response.data], {
-        type: format === "csv" ? "text/csv" : "application/xml",
+        type: format === 'csv' ? 'text/csv' : 'application/xml',
       });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = `DAC7_Report_${reportingYear}.${format}`;
       document.body.appendChild(a);
@@ -74,16 +58,15 @@ const ReportGenerator = () => {
       document.body.removeChild(a);
 
       toast({
-        title: "Rapport genererad",
+        title: 'Rapport genererad',
         description: `Din DAC7-rapport för ${reportingYear} har laddats ner.`,
       });
     } catch (error: any) {
-      console.error("Error generating report:", error);
+      console.error('Error generating report:', error);
       toast({
-        title: "Fel",
-        description:
-          error.message || "Kunde inte generera rapporten. Försök igen.",
-        variant: "destructive",
+        title: 'Fel',
+        description: error.message || 'Kunde inte generera rapporten. Försök igen.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -106,9 +89,8 @@ const ReportGenerator = () => {
           <FileText className="h-4 w-4" />
           <AlertTitle>Information</AlertTitle>
           <AlertDescription>
-            Rapporten innehåller all registrerad hyresinformation för det valda
-            året enligt DAC7-kraven. Ladda ner och skicka till Skatteverket
-            innan den årliga deadlinen.
+            Rapporten innehåller all registrerad hyresinformation för det valda året enligt DAC7-kraven.
+            Ladda ner och skicka till Skatteverket innan den årliga deadlinen.
           </AlertDescription>
         </Alert>
 
@@ -131,10 +113,7 @@ const ReportGenerator = () => {
 
           <div className="space-y-2">
             <Label htmlFor="format">Filformat</Label>
-            <Select
-              value={format}
-              onValueChange={(value: "csv" | "xml") => setFormat(value)}
-            >
+            <Select value={format} onValueChange={(value: 'csv' | 'xml') => setFormat(value)}>
               <SelectTrigger id="format">
                 <SelectValue />
               </SelectTrigger>
@@ -163,7 +142,7 @@ const ReportGenerator = () => {
           size="lg"
         >
           <Download className="h-4 w-4 mr-2" />
-          {loading ? "Genererar rapport..." : "Ladda ner rapport"}
+          {loading ? 'Genererar rapport...' : 'Ladda ner rapport'}
         </Button>
 
         <div className="text-sm text-muted-foreground space-y-1">

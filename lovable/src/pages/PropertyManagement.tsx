@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { PropertyDashboard } from "@/components/PropertyDashboard";
-import { useAuth } from "@/hooks/useAuth";
+import React from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { PropertyDashboard } from '@/components/PropertyDashboard';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const PropertyManagement = () => {
   const { user, loading } = useAuth();

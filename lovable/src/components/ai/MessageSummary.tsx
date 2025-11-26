@@ -1,6 +1,7 @@
-import { Clock, MessageSquare, Star, ThumbsUp, TrendingUp } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Clock, TrendingUp, MessageSquare, ThumbsUp, Star } from 'lucide-react';
 
 interface MessageSummaryProps {
   message: {
@@ -19,13 +20,10 @@ interface MessageSummaryProps {
   onQuickQuestion: (question: string) => void;
 }
 
-export default function MessageSummary({
-  message,
-  onQuickQuestion,
-}: MessageSummaryProps) {
-  const wordCount = message.content.split(" ").length;
+export default function MessageSummary({ message, onQuickQuestion }: MessageSummaryProps) {
+  const wordCount = message.content.split(' ').length;
   const isLongMessage = wordCount > 150;
-
+  
   if (!isLongMessage) return null;
 
   return (
@@ -34,15 +32,13 @@ export default function MessageSummary({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">
-              Sammanfattning
-            </span>
+            <span className="text-sm font-medium text-foreground">Sammanfattning</span>
           </div>
           <Badge variant="secondary" className="text-xs">
             {wordCount} ord
           </Badge>
         </div>
-
+        
         <div className="space-y-2 text-sm text-muted-foreground">
           {message.category && (
             <div className="flex items-center gap-2">
@@ -52,15 +48,10 @@ export default function MessageSummary({
               </Badge>
             </div>
           )}
-
+          
           <div className="flex items-center gap-2">
             <Clock className="h-3 w-3" />
-            <span>
-              Svarstid:{" "}
-              {Date.now() - message.timestamp.getTime() < 10000
-                ? "Snabb"
-                : "Normal"}
-            </span>
+            <span>Svarstid: {new Date().getTime() - message.timestamp.getTime() < 10000 ? 'Snabb' : 'Normal'}</span>
           </div>
 
           {message.rating && (
@@ -70,16 +61,12 @@ export default function MessageSummary({
             </div>
           )}
 
-          {message.reactions &&
-            (message.reactions.thumbsUp > 0 || message.reactions.heart > 0) && (
-              <div className="flex items-center gap-2">
-                <ThumbsUp className="h-3 w-3 text-green-600" />
-                <span>
-                  Positiva reaktioner:{" "}
-                  {message.reactions.thumbsUp + message.reactions.heart}
-                </span>
-              </div>
-            )}
+          {message.reactions && (message.reactions.thumbsUp > 0 || message.reactions.heart > 0) && (
+            <div className="flex items-center gap-2">
+              <ThumbsUp className="h-3 w-3 text-green-600" />
+              <span>Positiva reaktioner: {message.reactions.thumbsUp + message.reactions.heart}</span>
+            </div>
+          )}
         </div>
 
         {message.followUpQuestions && message.followUpQuestions.length > 0 && (

@@ -1,17 +1,12 @@
-import { ArrowLeft, HelpCircle, Mail, Phone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import SEOOptimization from "@/components/seo/SEOOptimization";
-import IncidentReportForm from "@/components/support/IncidentReportForm";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import SEOOptimization from '@/components/seo/SEOOptimization';
+import IncidentReportForm from '@/components/support/IncidentReportForm';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, HelpCircle, Mail, Phone } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Support = () => {
   const navigate = useNavigate();
@@ -33,7 +28,7 @@ const Support = () => {
                 Vi finns här för att hjälpa dig
               </p>
             </div>
-            <Button variant="outline" onClick={() => navigate("/")}>
+            <Button variant="outline" onClick={() => navigate('/')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Tillbaka
             </Button>
@@ -108,18 +103,14 @@ const Support = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">
-                    Tvister mellan köpare/säljare och fastighetsmäklare
-                  </h4>
+                  <h4 className="font-medium mb-2">Tvister mellan köpare/säljare och fastighetsmäklare</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Tvister mellan köpare, säljare och fastighetsmäklare
-                    hanteras enligt fastighetsmäklarlagen. Vi rekommenderar att
-                    först försöka lösa konflikten genom dialog med mäklaren.
+                    Tvister mellan köpare, säljare och fastighetsmäklare hanteras enligt fastighetsmäklarlagen.
+                    Vi rekommenderar att först försöka lösa konflikten genom dialog med mäklaren.
                   </p>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>Fastighetsmäklarnämnden</strong> kan hjälpa till vid
-                    klagomål mot mäklare och bedöma om mäklaren brutit mot
-                    fastighetsmäklarlagen eller god fastighetsmäklarsed.
+                    <strong>Fastighetsmäklarnämnden</strong> kan hjälpa till vid klagomål mot mäklare och 
+                    bedöma om mäklaren brutit mot fastighetsmäklarlagen eller god fastighetsmäklarsed.
                   </p>
                   <a
                     href="https://www.fmn.se"
@@ -132,18 +123,14 @@ const Support = () => {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-2">
-                    Hyrestvister mellan hyresvärdar och hyresgäster
-                  </h4>
+                  <h4 className="font-medium mb-2">Hyrestvister mellan hyresvärdar och hyresgäster</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Tvister mellan hyresvärd och hyresgäst hanteras enligt
-                    hyreslagen. Vi rekommenderar att först försöka lösa
-                    konflikten genom direkt dialog.
+                    Tvister mellan hyresvärd och hyresgäst hanteras enligt hyreslagen. Vi rekommenderar att 
+                    först försöka lösa konflikten genom direkt dialog.
                   </p>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>Hyresnämnden</strong> kan medla i hyrestvister och
-                    hjälpa till att hitta en lösning vid oenighet om hyra,
-                    besittningsskydd, underhåll och andra hyresfrågor.
+                    <strong>Hyresnämnden</strong> kan medla i hyrestvister och hjälpa till att hitta en lösning 
+                    vid oenighet om hyra, besittningsskydd, underhåll och andra hyresfrågor.
                   </p>
                   <a
                     href="https://www.hyresnamnden.se"
@@ -158,9 +145,8 @@ const Support = () => {
                 <div className="pt-4 border-t">
                   <h4 className="font-medium mb-2">Tvister med Bostadsvyn</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Om du har en tvist med Bostadsvyn kan du kontakta oss först
-                    för att försöka lösa konflikten. Om det inte fungerar kan du
-                    vända dig till Allmänna reklamationsnämnden (ARN).
+                    Om du har en tvist med Bostadsvyn kan du kontakta oss först för att försöka lösa 
+                    konflikten. Om det inte fungerar kan du vända dig till Allmänna reklamationsnämnden (ARN).
                   </p>
                   <a
                     href="https://www.arn.se"
@@ -173,12 +159,10 @@ const Support = () => {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-2">
-                    EU:s plattform för onlinetvistlösning
-                  </h4>
+                  <h4 className="font-medium mb-2">EU:s plattform för onlinetvistlösning</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    EU-kommissionen erbjuder en plattform för onlinetvistlösning
-                    (ODR) som kan användas för tvister om onlineköp.
+                    EU-kommissionen erbjuder en plattform för onlinetvistlösning (ODR) som kan användas 
+                    för tvister om onlineköp.
                   </p>
                   <a
                     href="https://ec.europa.eu/consumers/odr"
@@ -192,13 +176,10 @@ const Support = () => {
 
                 <div className="pt-4 border-t bg-muted/30 p-3 rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Viktig information:</strong> Bostadsvyn Sverige AB
-                    fungerar som en marknadsplatsplattform och ansvarar inte för
-                    transaktioner mellan användare. Alla försäljningar av
-                    bostäder sker via licensierad fastighetsmäklare som bär
-                    huvudansvaret för transaktionen. För hyreskontrakt signerade
-                    via vår plattform tillhandahåller vi enbart den digitala
-                    infrastrukturen.
+                    <strong>Viktig information:</strong> Bostadsvyn Sverige AB fungerar som en marknadsplatsplattform 
+                    och ansvarar inte för transaktioner mellan användare. Alla försäljningar av bostäder sker 
+                    via licensierad fastighetsmäklare som bär huvudansvaret för transaktionen. För hyreskontrakt 
+                    signerade via vår plattform tillhandahåller vi enbart den digitala infrastrukturen.
                   </p>
                 </div>
               </CardContent>

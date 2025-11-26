@@ -1,29 +1,25 @@
-import {
-  BarChart3,
-  Calendar,
-  DollarSign,
-  Download,
-  Eye,
-  Heart,
-  MapPin,
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  BarChart3, 
+  TrendingUp, 
+  TrendingDown, 
+  Eye, 
+  Heart, 
   MessageSquare,
+  Calendar,
+  Download,
   RefreshCw,
   Target,
-  TrendingUp,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Users,
+  MapPin,
+  DollarSign
+} from 'lucide-react';
 
 interface AnalyticsData {
   propertyViews: { date: string; views: number; unique_views: number }[];
@@ -44,23 +40,19 @@ interface DashboardAnalyticsProps {
   timeRange?: string;
 }
 
-export default function DashboardAnalytics({
-  propertyId,
-  timeRange = "30d",
-}: DashboardAnalyticsProps) {
+export default function DashboardAnalytics({ propertyId, timeRange = '30d' }: DashboardAnalyticsProps) {
   const { user, userRoles } = useAuth();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange);
-  const [_selectedMetric, _setSelectedMetric] = useState("views");
+  const [selectedMetric, setSelectedMetric] = useState('views');
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const isPremiumUser =
-    userRoles.includes("broker") || userRoles.includes("admin");
+  const isPremiumUser = userRoles.includes('broker') || userRoles.includes('admin');
 
   useEffect(() => {
     loadAnalytics();
-  }, [loadAnalytics]);
+  }, [selectedTimeRange, propertyId]);
 
   const loadAnalytics = async () => {
     setLoading(true);
@@ -68,41 +60,41 @@ export default function DashboardAnalytics({
       // Get date range
       const endDate = new Date();
       const startDate = new Date();
-
+      
       switch (selectedTimeRange) {
-        case "7d":
+        case '7d':
           startDate.setDate(endDate.getDate() - 7);
           break;
-        case "30d":
+        case '30d':
           startDate.setDate(endDate.getDate() - 30);
           break;
-        case "90d":
+        case '90d':
           startDate.setDate(endDate.getDate() - 90);
           break;
-        case "1y":
+        case '1y':
           startDate.setFullYear(endDate.getFullYear() - 1);
           break;
       }
 
       // Load property views
       let viewsQuery = supabase
-        .from("property_views")
-        .select("viewed_at, property_id, user_id")
-        .gte("viewed_at", startDate.toISOString())
-        .lte("viewed_at", endDate.toISOString());
+        .from('property_views')
+        .select('viewed_at, property_id, user_id')
+        .gte('viewed_at', startDate.toISOString())
+        .lte('viewed_at', endDate.toISOString());
 
       if (propertyId) {
-        viewsQuery = viewsQuery.eq("property_id", propertyId);
+        viewsQuery = viewsQuery.eq('property_id', propertyId);
       } else if (!isPremiumUser) {
         // For non-premium users, only show their own properties
         const { data: userProperties } = await supabase
-          .from("properties")
-          .select("id")
-          .eq("user_id", user?.id);
-
-        const propertyIds = userProperties?.map((p) => p.id) || [];
+          .from('properties')
+          .select('id')
+          .eq('user_id', user?.id);
+        
+        const propertyIds = userProperties?.map(p => p.id) || [];
         if (propertyIds.length > 0) {
-          viewsQuery = viewsQuery.in("property_id", propertyIds);
+          viewsQuery = viewsQuery.in('property_id', propertyIds);
         }
       }
 
@@ -110,22 +102,22 @@ export default function DashboardAnalytics({
 
       // Load favorites data
       let favoritesQuery = supabase
-        .from("property_favorites")
-        .select("created_at, property_id")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString());
+        .from('property_favorites')
+        .select('created_at, property_id')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
 
       if (propertyId) {
-        favoritesQuery = favoritesQuery.eq("property_id", propertyId);
+        favoritesQuery = favoritesQuery.eq('property_id', propertyId);
       } else if (!isPremiumUser) {
         const { data: userProperties } = await supabase
-          .from("properties")
-          .select("id")
-          .eq("user_id", user?.id);
-
-        const propertyIds = userProperties?.map((p) => p.id) || [];
+          .from('properties')
+          .select('id')
+          .eq('user_id', user?.id);
+        
+        const propertyIds = userProperties?.map(p => p.id) || [];
         if (propertyIds.length > 0) {
-          favoritesQuery = favoritesQuery.in("property_id", propertyIds);
+          favoritesQuery = favoritesQuery.in('property_id', propertyIds);
         }
       }
 
@@ -133,22 +125,22 @@ export default function DashboardAnalytics({
 
       // Load inquiries data
       let inquiriesQuery = supabase
-        .from("property_inquiries")
-        .select("created_at, property_id")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString());
+        .from('property_inquiries')
+        .select('created_at, property_id')
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
 
       if (propertyId) {
-        inquiriesQuery = inquiriesQuery.eq("property_id", propertyId);
+        inquiriesQuery = inquiriesQuery.eq('property_id', propertyId);
       } else if (!isPremiumUser) {
         const { data: userProperties } = await supabase
-          .from("properties")
-          .select("id")
-          .eq("user_id", user?.id);
-
-        const propertyIds = userProperties?.map((p) => p.id) || [];
+          .from('properties')
+          .select('id')
+          .eq('user_id', user?.id);
+        
+        const propertyIds = userProperties?.map(p => p.id) || [];
         if (propertyIds.length > 0) {
-          inquiriesQuery = inquiriesQuery.in("property_id", propertyIds);
+          inquiriesQuery = inquiriesQuery.in('property_id', propertyIds);
         }
       }
 
@@ -156,62 +148,42 @@ export default function DashboardAnalytics({
 
       // Process data for charts
       const processedAnalytics: AnalyticsData = {
-        propertyViews: processViewsData(
-          viewsData || [],
-          "viewed_at",
-          selectedTimeRange,
-        ),
-        favoritesTrend: processFavoritesData(
-          favoritesData || [],
-          "created_at",
-          selectedTimeRange,
-        ),
-        inquiriesTrend: processInquiriesData(
-          inquiriesData || [],
-          "created_at",
-          selectedTimeRange,
-        ),
+        propertyViews: processViewsData(viewsData || [], 'viewed_at', selectedTimeRange),
+        favoritesTrend: processFavoritesData(favoritesData || [], 'created_at', selectedTimeRange),
+        inquiriesTrend: processInquiriesData(inquiriesData || [], 'created_at', selectedTimeRange),
         marketComparison: [], // Would need market data API
         performanceMetrics: {
           totalViews: viewsData?.length || 0,
           totalFavorites: favoritesData?.length || 0,
           totalInquiries: inquiriesData?.length || 0,
           avgTimeOnMarket: calculateAvgTimeOnMarket(viewsData || []),
-          conversionRate: calculateConversionRate(
-            viewsData || [],
-            inquiriesData || [],
-          ),
-        },
+          conversionRate: calculateConversionRate(viewsData || [], inquiriesData || [])
+        }
       };
 
       setAnalytics(processedAnalytics);
       setLastUpdated(new Date());
     } catch (error) {
-      console.error("Error loading analytics:", error);
+      console.error('Error loading analytics:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const processViewsData = (
-    data: any[],
-    dateField: string,
-    timeRange: string,
-  ) => {
+  const processViewsData = (data: any[], dateField: string, timeRange: string) => {
     if (!data.length) return [];
 
     const grouped: { [key: string]: number } = {};
     const uniqueGrouped: { [key: string]: Set<string> } = {};
 
-    data.forEach((item) => {
+    data.forEach(item => {
       const date = new Date(item[dateField]);
-      const key =
-        timeRange === "7d" || timeRange === "30d"
-          ? date.toISOString().split("T")[0]
-          : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
+      const key = timeRange === '7d' || timeRange === '30d' 
+        ? date.toISOString().split('T')[0] 
+        : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
       grouped[key] = (grouped[key] || 0) + 1;
-
+      
       if (item.user_id) {
         if (!uniqueGrouped[key]) uniqueGrouped[key] = new Set();
         uniqueGrouped[key].add(item.user_id);
@@ -221,61 +193,51 @@ export default function DashboardAnalytics({
     return Object.entries(grouped).map(([date, count]) => ({
       date,
       views: count,
-      unique_views: uniqueGrouped[date]?.size || count,
+      unique_views: uniqueGrouped[date]?.size || count
     }));
   };
 
-  const processFavoritesData = (
-    data: any[],
-    dateField: string,
-    timeRange: string,
-  ) => {
+  const processFavoritesData = (data: any[], dateField: string, timeRange: string) => {
     if (!data.length) return [];
 
     const grouped: { [key: string]: number } = {};
 
-    data.forEach((item) => {
+    data.forEach(item => {
       const date = new Date(item[dateField]);
-      const key =
-        timeRange === "7d" || timeRange === "30d"
-          ? date.toISOString().split("T")[0]
-          : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
+      const key = timeRange === '7d' || timeRange === '30d' 
+        ? date.toISOString().split('T')[0] 
+        : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
       grouped[key] = (grouped[key] || 0) + 1;
     });
 
     return Object.entries(grouped).map(([date, count]) => ({
       date,
-      favorites: count,
+      favorites: count
     }));
   };
 
-  const processInquiriesData = (
-    data: any[],
-    dateField: string,
-    timeRange: string,
-  ) => {
+  const processInquiriesData = (data: any[], dateField: string, timeRange: string) => {
     if (!data.length) return [];
 
     const grouped: { [key: string]: number } = {};
 
-    data.forEach((item) => {
+    data.forEach(item => {
       const date = new Date(item[dateField]);
-      const key =
-        timeRange === "7d" || timeRange === "30d"
-          ? date.toISOString().split("T")[0]
-          : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
+      const key = timeRange === '7d' || timeRange === '30d' 
+        ? date.toISOString().split('T')[0] 
+        : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
       grouped[key] = (grouped[key] || 0) + 1;
     });
 
     return Object.entries(grouped).map(([date, count]) => ({
       date,
-      inquiries: count,
+      inquiries: count
     }));
   };
 
-  const calculateAvgTimeOnMarket = (_viewsData: any[]) => {
+  const calculateAvgTimeOnMarket = (viewsData: any[]) => {
     // Simplified calculation - would need property creation dates
     return 24; // placeholder
   };
@@ -291,16 +253,14 @@ export default function DashboardAnalytics({
 
   const exportData = () => {
     if (!analytics) return;
-
-    const csvData = analytics.propertyViews
-      .map((item) => `${item.date},${item.views},${item.unique_views}`)
-      .join("\n");
-
-    const blob = new Blob([`Date,Views,Unique Views\n${csvData}`], {
-      type: "text/csv",
-    });
+    
+    const csvData = analytics.propertyViews.map(item => 
+      `${item.date},${item.views},${item.unique_views}`
+    ).join('\n');
+    
+    const blob = new Blob([`Date,Views,Unique Views\n${csvData}`], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `analytics-${selectedTimeRange}.csv`;
     a.click();
@@ -310,7 +270,7 @@ export default function DashboardAnalytics({
   if (loading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4].map(i => (
           <Card key={i} className="shadow-card">
             <CardContent className="p-6">
               <div className="animate-pulse">
@@ -331,15 +291,12 @@ export default function DashboardAnalytics({
         <div>
           <h2 className="text-2xl font-bold">Analys & Statistik</h2>
           <p className="text-muted-foreground">
-            Senast uppdaterad: {lastUpdated.toLocaleString("sv-SE")}
+            Senast uppdaterad: {lastUpdated.toLocaleString('sv-SE')}
           </p>
         </div>
-
+        
         <div className="flex gap-2">
-          <Select
-            value={selectedTimeRange}
-            onValueChange={setSelectedTimeRange}
-          >
+          <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -350,12 +307,12 @@ export default function DashboardAnalytics({
               <SelectItem value="1y">Senaste året</SelectItem>
             </SelectContent>
           </Select>
-
+          
           <Button variant="outline" onClick={refreshAnalytics}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Uppdatera
           </Button>
-
+          
           <Button variant="outline" onClick={exportData}>
             <Download className="h-4 w-4 mr-2" />
             Exportera
@@ -369,12 +326,8 @@ export default function DashboardAnalytics({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Totala visningar
-                </p>
-                <p className="text-2xl font-bold">
-                  {analytics?.performanceMetrics.totalViews || 0}
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Totala visningar</p>
+                <p className="text-2xl font-bold">{analytics?.performanceMetrics.totalViews || 0}</p>
               </div>
               <Eye className="h-8 w-8 text-primary" />
             </div>
@@ -385,12 +338,8 @@ export default function DashboardAnalytics({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Favoriter
-                </p>
-                <p className="text-2xl font-bold">
-                  {analytics?.performanceMetrics.totalFavorites || 0}
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Favoriter</p>
+                <p className="text-2xl font-bold">{analytics?.performanceMetrics.totalFavorites || 0}</p>
               </div>
               <Heart className="h-8 w-8 text-red-500" />
             </div>
@@ -401,12 +350,8 @@ export default function DashboardAnalytics({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Förfrågningar
-                </p>
-                <p className="text-2xl font-bold">
-                  {analytics?.performanceMetrics.totalInquiries || 0}
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Förfrågningar</p>
+                <p className="text-2xl font-bold">{analytics?.performanceMetrics.totalInquiries || 0}</p>
               </div>
               <MessageSquare className="h-8 w-8 text-green-500" />
             </div>
@@ -417,12 +362,8 @@ export default function DashboardAnalytics({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Konvertering
-                </p>
-                <p className="text-2xl font-bold">
-                  {analytics?.performanceMetrics.conversionRate.toFixed(1)}%
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Konvertering</p>
+                <p className="text-2xl font-bold">{analytics?.performanceMetrics.conversionRate.toFixed(1)}%</p>
               </div>
               <Target className="h-8 w-8 text-purple-500" />
             </div>
@@ -433,12 +374,8 @@ export default function DashboardAnalytics({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Snitt tid
-                </p>
-                <p className="text-2xl font-bold">
-                  {analytics?.performanceMetrics.avgTimeOnMarket} dagar
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Snitt tid</p>
+                <p className="text-2xl font-bold">{analytics?.performanceMetrics.avgTimeOnMarket} dagar</p>
               </div>
               <Calendar className="h-8 w-8 text-orange-500" />
             </div>
@@ -491,13 +428,11 @@ export default function DashboardAnalytics({
                 <div className="flex gap-2 justify-center">
                   <Badge variant="secondary">
                     <Heart className="h-3 w-3 mr-1" />
-                    {analytics?.performanceMetrics.totalFavorites || 0}{" "}
-                    favoriter
+                    {analytics?.performanceMetrics.totalFavorites || 0} favoriter
                   </Badge>
                   <Badge variant="secondary">
                     <MessageSquare className="h-3 w-3 mr-1" />
-                    {analytics?.performanceMetrics.totalInquiries || 0}{" "}
-                    förfrågningar
+                    {analytics?.performanceMetrics.totalInquiries || 0} förfrågningar
                   </Badge>
                 </div>
               </div>
@@ -525,9 +460,7 @@ export default function DashboardAnalytics({
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-lg">
-                    {(
-                      (analytics?.performanceMetrics.totalViews || 0) / 30
-                    ).toFixed(1)}
+                    {((analytics?.performanceMetrics.totalViews || 0) / 30).toFixed(1)}
                   </p>
                   <Badge variant="secondary" className="text-xs">
                     <TrendingUp className="h-3 w-3 mr-1" />
@@ -539,20 +472,13 @@ export default function DashboardAnalytics({
               <div className="flex justify-between items-center p-3 rounded-lg border">
                 <div>
                   <p className="font-semibold text-sm">Intressenivå</p>
-                  <p className="text-xs text-muted-foreground">
-                    Favoriter/visningar
-                  </p>
+                  <p className="text-xs text-muted-foreground">Favoriter/visningar</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-lg">
-                    {analytics?.performanceMetrics.totalViews
-                      ? (
-                          (analytics.performanceMetrics.totalFavorites /
-                            analytics.performanceMetrics.totalViews) *
-                          100
-                        ).toFixed(1)
-                      : 0}
-                    %
+                    {analytics?.performanceMetrics.totalViews 
+                      ? ((analytics.performanceMetrics.totalFavorites / analytics.performanceMetrics.totalViews) * 100).toFixed(1)
+                      : 0}%
                   </p>
                   <Badge variant="secondary" className="text-xs">
                     <Heart className="h-3 w-3 mr-1" />
@@ -564,9 +490,7 @@ export default function DashboardAnalytics({
               <div className="flex justify-between items-center p-3 rounded-lg border">
                 <div>
                   <p className="font-semibold text-sm">Kontaktfrekvens</p>
-                  <p className="text-xs text-muted-foreground">
-                    Förfrågningar/visningar
-                  </p>
+                  <p className="text-xs text-muted-foreground">Förfrågningar/visningar</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-lg">
@@ -574,9 +498,7 @@ export default function DashboardAnalytics({
                   </p>
                   <Badge variant="secondary" className="text-xs">
                     <MessageSquare className="h-3 w-3 mr-1" />
-                    {analytics?.performanceMetrics.conversionRate > 5
-                      ? "Utmärkt"
-                      : "Normal"}
+                    {analytics?.performanceMetrics.conversionRate > 5 ? 'Utmärkt' : 'Normal'}
                   </Badge>
                 </div>
               </div>
@@ -603,7 +525,7 @@ export default function DashboardAnalytics({
                   <span className="text-xs text-muted-foreground">75%</span>
                 </div>
               </div>
-
+              
               <div className="flex justify-between items-center">
                 <span className="text-sm">Göteborg</span>
                 <div className="flex items-center gap-2">
@@ -613,7 +535,7 @@ export default function DashboardAnalytics({
                   <span className="text-xs text-muted-foreground">20%</span>
                 </div>
               </div>
-
+              
               <div className="flex justify-between items-center">
                 <span className="text-sm">Malmö</span>
                 <div className="flex items-center gap-2">
@@ -624,7 +546,7 @@ export default function DashboardAnalytics({
                 </div>
               </div>
             </div>
-
+            
             <div className="mt-4 pt-4 border-t">
               <p className="text-xs text-muted-foreground">
                 Baserat på besökarnas IP-adresser och profildata
@@ -646,24 +568,24 @@ export default function DashboardAnalytics({
               <p className="text-2xl font-bold text-primary">8.5/10</p>
               <p className="text-sm text-muted-foreground">Konkurrenskraft</p>
             </div>
-
+            
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm">Prisposition</span>
                 <Badge variant="secondary">Konkurrenskraftig</Badge>
               </div>
-
+              
               <div className="flex justify-between">
                 <span className="text-sm">Marknadsexponering</span>
                 <Badge variant="secondary">Hög</Badge>
               </div>
-
+              
               <div className="flex justify-between">
                 <span className="text-sm">Intressenivå</span>
                 <Badge variant="secondary">Över genomsnitt</Badge>
               </div>
             </div>
-
+            
             <div className="pt-4 border-t">
               <p className="text-xs text-muted-foreground">
                 Jämfört med liknande fastigheter i området

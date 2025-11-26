@@ -1,15 +1,9 @@
-import { format } from "date-fns";
-import { sv } from "date-fns/locale";
-import { Calendar, DollarSign, Home } from "lucide-react";
-import type React from "react";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, DollarSign, Home } from 'lucide-react';
+import { format } from 'date-fns';
+import { sv } from 'date-fns/locale';
 
 interface RentalIncome {
   id: string;
@@ -30,10 +24,10 @@ interface RentalIncomeListProps {
 const RentalIncomeList: React.FC<RentalIncomeListProps> = ({ incomes }) => {
   const getPropertyTypeLabel = (type: string) => {
     const types: Record<string, string> = {
-      apartment: "Lägenhet",
-      house: "Villa",
-      vacation_home: "Fritidshus",
-      commercial: "Kommersiell",
+      apartment: 'Lägenhet',
+      house: 'Villa',
+      vacation_home: 'Fritidshus',
+      commercial: 'Kommersiell',
     };
     return types[type] || type;
   };
@@ -54,8 +48,7 @@ const RentalIncomeList: React.FC<RentalIncomeListProps> = ({ incomes }) => {
       <CardHeader>
         <CardTitle>Registrerade hyresintäkter</CardTitle>
         <CardDescription>
-          {incomes.length}{" "}
-          {incomes.length === 1 ? "hyresintäkt" : "hyresintäkter"} registrerade
+          {incomes.length} {incomes.length === 1 ? 'hyresintäkt' : 'hyresintäkter'} registrerade
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -74,14 +67,8 @@ const RentalIncomeList: React.FC<RentalIncomeListProps> = ({ incomes }) => {
                   {getPropertyTypeLabel(income.property_type)}
                 </p>
               </div>
-              <Badge
-                variant={
-                  income.reported_to_skatteverket ? "default" : "secondary"
-                }
-              >
-                {income.reported_to_skatteverket
-                  ? "Rapporterad"
-                  : "Ej rapporterad"}
+              <Badge variant={income.reported_to_skatteverket ? 'default' : 'secondary'}>
+                {income.reported_to_skatteverket ? 'Rapporterad' : 'Ej rapporterad'}
               </Badge>
             </div>
 
@@ -89,7 +76,7 @@ const RentalIncomeList: React.FC<RentalIncomeListProps> = ({ incomes }) => {
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">
-                  {income.rental_income.toLocaleString("sv-SE")} SEK
+                  {income.rental_income.toLocaleString('sv-SE')} SEK
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -99,20 +86,13 @@ const RentalIncomeList: React.FC<RentalIncomeListProps> = ({ incomes }) => {
             </div>
 
             <div className="text-sm text-muted-foreground pt-2 border-t">
-              Period:{" "}
-              {format(new Date(income.reporting_period_start), "P", {
-                locale: sv,
-              })}{" "}
-              -{" "}
-              {format(new Date(income.reporting_period_end), "P", {
-                locale: sv,
-              })}
+              Period: {format(new Date(income.reporting_period_start), 'P', { locale: sv })} -{' '}
+              {format(new Date(income.reporting_period_end), 'P', { locale: sv })}
             </div>
 
             {income.reported_to_skatteverket && income.reported_date && (
               <div className="text-xs text-muted-foreground pt-1">
-                Rapporterad:{" "}
-                {format(new Date(income.reported_date), "PPP", { locale: sv })}
+                Rapporterad: {format(new Date(income.reported_date), 'PPP', { locale: sv })}
               </div>
             )}
           </div>

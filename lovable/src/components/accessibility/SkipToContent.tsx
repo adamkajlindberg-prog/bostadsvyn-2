@@ -1,7 +1,9 @@
+import React from 'react';
+
 /**
  * SkipToContent component provides keyboard users with a quick way to skip navigation
  * and jump directly to the main content. This is a WCAG 2.4.1 (Level A) requirement.
- *
+ * 
  * The link is visually hidden by default but becomes visible when focused with Tab key.
  */
 const SkipToContent = () => {

@@ -1,8 +1,7 @@
-import { Loader2 } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import PropertyMap from "./PropertyMap";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import PropertyMap from './PropertyMap';
+import { Loader2 } from 'lucide-react';
 
 interface FritidsMapProps {
   search?: string;
@@ -25,43 +24,43 @@ const FritidsMap: React.FC<FritidsMapProps> = ({
   useEffect(() => {
     loadFritidsProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadFritidsProperties]);
+  }, [search, minPrice, maxPrice, type, environment]);
 
   const loadFritidsProperties = async () => {
     try {
       setIsLoading(true);
       let query = supabase
-        .from("properties")
-        .select("*")
-        .in("property_type", ["COTTAGE", "PLOT"])
-        .in("status", ["FOR_SALE", "COMING_SOON"])
-        .not("latitude", "is", null)
-        .not("longitude", "is", null);
+        .from('properties')
+        .select('*')
+        .in('property_type', ['COTTAGE', 'PLOT'])
+        .in('status', ['FOR_SALE', 'COMING_SOON'])
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
 
-      if (type && type !== "ALL") {
-        query = query.eq("property_type", type);
+      if (type && type !== 'ALL') {
+        query = query.eq('property_type', type);
       }
-      if (typeof minPrice === "number") {
-        query = query.gte("price", minPrice);
+      if (typeof minPrice === 'number') {
+        query = query.gte('price', minPrice);
       }
-      if (typeof maxPrice === "number") {
-        query = query.lte("price", maxPrice);
+      if (typeof maxPrice === 'number') {
+        query = query.lte('price', maxPrice);
       }
       if (search && search.trim().length > 0) {
         const s = search.trim();
         query = query.or(
-          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`,
+          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`
         );
       }
 
-      query = query.order("created_at", { ascending: false });
+      query = query.order('created_at', { ascending: false });
 
       const { data, error } = await query;
       if (error) throw error;
 
       setProperties(data || []);
     } catch (error) {
-      console.error("Error loading fritids properties for map:", error);
+      console.error('Error loading fritids properties for map:', error);
       setProperties([]);
     } finally {
       setIsLoading(false);

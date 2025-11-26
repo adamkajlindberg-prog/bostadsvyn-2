@@ -1,15 +1,15 @@
-import { Minus, ThumbsDown, ThumbsUp, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { ThumbsUp, ThumbsDown, Minus, Users } from 'lucide-react';
 
 interface GroupVote {
   id: string;
   user_id: string;
-  vote: "yes" | "no" | "maybe";
+  vote: 'yes' | 'no' | 'maybe';
   profiles?: {
     full_name: string;
   };
@@ -22,12 +22,7 @@ interface PropertyVotingProps {
   onVoteUpdated: () => void;
 }
 
-export function PropertyVoting({
-  groupId,
-  propertyId,
-  currentStatus,
-  onVoteUpdated,
-}: PropertyVotingProps) {
+export function PropertyVoting({ groupId, propertyId, currentStatus, onVoteUpdated }: PropertyVotingProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [votes, setVotes] = useState<GroupVote[]>([]);
@@ -36,41 +31,37 @@ export function PropertyVoting({
 
   useEffect(() => {
     loadVotes();
-  }, [loadVotes]);
+  }, [groupId, propertyId]);
 
   const loadVotes = async () => {
     try {
       const { data: votesData, error } = await supabase
-        .from("group_property_votes")
-        .select("*, profiles(full_name)")
-        .eq("group_id", groupId)
-        .eq("property_id", propertyId);
+        .from('group_property_votes')
+        .select('*, profiles(full_name)')
+        .eq('group_id', groupId)
+        .eq('property_id', propertyId);
 
       if (error) {
-        console.error("Error loading votes:", error);
+        console.error('Error loading votes:', error);
         return;
       }
 
-      setVotes(
-        (votesData as any[])?.map((vote) => ({
-          id: vote.id,
-          user_id: vote.user_id,
-          vote: vote.vote as "yes" | "no" | "maybe",
-          profiles: vote.profiles,
-        })) || [],
-      );
-
+      setVotes((votesData as any[])?.map(vote => ({
+        id: vote.id,
+        user_id: vote.user_id,
+        vote: vote.vote as 'yes' | 'no' | 'maybe',
+        profiles: vote.profiles
+      })) || []);
+      
       // Find user's current vote
-      const currentUserVote = votesData?.find(
-        (vote) => vote.user_id === user?.id,
-      );
+      const currentUserVote = votesData?.find(vote => vote.user_id === user?.id);
       setUserVote(currentUserVote?.vote || null);
     } catch (error) {
-      console.error("Error loading votes:", error);
+      console.error('Error loading votes:', error);
     }
   };
 
-  const castVote = async (voteType: "yes" | "no" | "maybe") => {
+  const castVote = async (voteType: 'yes' | 'no' | 'maybe') => {
     if (!user) return;
 
     setIsVoting(true);
@@ -79,21 +70,23 @@ export function PropertyVoting({
       if (userVote) {
         // Update existing vote
         const { error } = await supabase
-          .from("group_property_votes")
+          .from('group_property_votes')
           .update({ vote: voteType })
-          .eq("group_id", groupId)
-          .eq("property_id", propertyId)
-          .eq("user_id", user.id);
+          .eq('group_id', groupId)
+          .eq('property_id', propertyId)
+          .eq('user_id', user.id);
 
         if (error) throw error;
       } else {
         // Create new vote
-        const { error } = await supabase.from("group_property_votes").insert({
-          group_id: groupId,
-          property_id: propertyId,
-          user_id: user.id,
-          vote: voteType,
-        });
+        const { error } = await supabase
+          .from('group_property_votes')
+          .insert({
+            group_id: groupId,
+            property_id: propertyId,
+            user_id: user.id,
+            vote: voteType
+          });
 
         if (error) throw error;
       }
@@ -101,13 +94,13 @@ export function PropertyVoting({
       setUserVote(voteType);
       loadVotes();
       onVoteUpdated();
-
+      
       toast({
         title: "Röst registrerad!",
-        description: `Du röstade ${voteType === "yes" ? "ja" : voteType === "no" ? "nej" : "kanske"} på detta objekt.`,
+        description: `Du röstade ${voteType === 'yes' ? 'ja' : voteType === 'no' ? 'nej' : 'kanske'} på detta objekt.`,
       });
     } catch (error) {
-      console.error("Error casting vote:", error);
+      console.error('Error casting vote:', error);
       toast({
         title: "Fel vid röstning",
         description: "Kunde inte registrera din röst",
@@ -119,9 +112,9 @@ export function PropertyVoting({
   };
 
   const getVoteCounts = () => {
-    const yes = votes.filter((v) => v.vote === "yes").length;
-    const no = votes.filter((v) => v.vote === "no").length;
-    const maybe = votes.filter((v) => v.vote === "maybe").length;
+    const yes = votes.filter(v => v.vote === 'yes').length;
+    const no = votes.filter(v => v.vote === 'no').length;
+    const maybe = votes.filter(v => v.vote === 'maybe').length;
     return { yes, no, maybe };
   };
 
@@ -133,8 +126,8 @@ export function PropertyVoting({
       <div className="flex gap-2">
         <Button
           size="sm"
-          variant={userVote === "yes" ? "default" : "outline"}
-          onClick={() => castVote("yes")}
+          variant={userVote === 'yes' ? 'default' : 'outline'}
+          onClick={() => castVote('yes')}
           disabled={isVoting}
           className="flex-1"
         >
@@ -143,8 +136,8 @@ export function PropertyVoting({
         </Button>
         <Button
           size="sm"
-          variant={userVote === "maybe" ? "default" : "outline"}
-          onClick={() => castVote("maybe")}
+          variant={userVote === 'maybe' ? 'default' : 'outline'}
+          onClick={() => castVote('maybe')}
           disabled={isVoting}
           className="flex-1"
         >
@@ -153,8 +146,8 @@ export function PropertyVoting({
         </Button>
         <Button
           size="sm"
-          variant={userVote === "no" ? "destructive" : "outline"}
-          onClick={() => castVote("no")}
+          variant={userVote === 'no' ? 'destructive' : 'outline'}
+          onClick={() => castVote('no')}
           disabled={isVoting}
           className="flex-1"
         >
@@ -168,16 +161,16 @@ export function PropertyVoting({
         <div className="space-y-2">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Users className="h-3 w-3" />
-            {votes.length} röst{votes.length !== 1 ? "er" : ""}
+            {votes.length} röst{votes.length !== 1 ? 'er' : ''}
           </div>
-
+          
           {/* Progress bars */}
           <div className="space-y-1">
             {yes > 0 && (
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-12 text-green-600">Ja ({yes})</div>
                 <div className="flex-1 bg-muted rounded-full h-2">
-                  <div
+                  <div 
                     className="bg-green-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(yes / votes.length) * 100}%` }}
                   />
@@ -188,7 +181,7 @@ export function PropertyVoting({
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-12 text-yellow-600">Kanske ({maybe})</div>
                 <div className="flex-1 bg-muted rounded-full h-2">
-                  <div
+                  <div 
                     className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(maybe / votes.length) * 100}%` }}
                   />
@@ -199,7 +192,7 @@ export function PropertyVoting({
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-12 text-red-600">Nej ({no})</div>
                 <div className="flex-1 bg-muted rounded-full h-2">
-                  <div
+                  <div 
                     className="bg-red-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${(no / votes.length) * 100}%` }}
                   />
@@ -213,9 +206,8 @@ export function PropertyVoting({
       {/* User's current vote */}
       {userVote && (
         <div className="text-xs text-muted-foreground">
-          Din röst:{" "}
-          <Badge variant="outline" className="text-xs">
-            {userVote === "yes" ? "Ja" : userVote === "no" ? "Nej" : "Kanske"}
+          Din röst: <Badge variant="outline" className="text-xs">
+            {userVote === 'yes' ? 'Ja' : userVote === 'no' ? 'Nej' : 'Kanske'}
           </Badge>
         </div>
       )}

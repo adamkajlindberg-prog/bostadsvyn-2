@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { UserDashboard } from "@/components/UserDashboard";
-import { useAuth } from "@/hooks/useAuth";
+import React from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { UserDashboard } from '@/components/UserDashboard';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();

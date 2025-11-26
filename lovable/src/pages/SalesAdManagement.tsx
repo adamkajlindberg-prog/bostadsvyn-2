@@ -1,26 +1,14 @@
-import {
-  ArrowLeft,
-  Calendar,
-  Eye,
-  Heart,
-  MessageSquare,
-  Sparkles,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { BarChart3, TrendingUp, Eye, Heart, MessageSquare, Calendar, Clock, Settings, Sparkles, Image as ImageIcon, ArrowLeft, Users, Target, Share2, DollarSign, Home } from 'lucide-react';
+import DirectMarketing from '@/components/ads/DirectMarketing';
 interface AdStats {
   views: number;
   favorites: number;
@@ -32,10 +20,16 @@ interface AdStats {
   lastViewed?: string;
 }
 export default function SalesAdManagement() {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const {
+    user
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [ad, setAd] = useState<any>(null);
   const [stats, setStats] = useState<AdStats>({
     views: 0,
@@ -44,7 +38,7 @@ export default function SalesAdManagement() {
     scheduledViewings: 0,
     offers: 0,
     aiImagesGenerated: 0,
-    aiEditsUsed: 0,
+    aiEditsUsed: 0
   });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -52,12 +46,13 @@ export default function SalesAdManagement() {
       loadAdData();
       loadStats();
     }
-  }, [user, id, loadAdData, loadStats]);
+  }, [user, id]);
   const loadAdData = async () => {
     try {
-      const { data, error } = await supabase
-        .from("ads")
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('ads').select(`
           *,
           properties (
             id,
@@ -71,18 +66,15 @@ export default function SalesAdManagement() {
             rooms,
             images
           )
-        `)
-        .eq("id", id)
-        .eq("user_id", user?.id)
-        .single();
+        `).eq('id', id).eq('user_id', user?.id).single();
       if (error) throw error;
       setAd(data);
     } catch (error) {
-      console.error("Error loading ad:", error);
+      console.error('Error loading ad:', error);
       toast({
         title: "Fel",
         description: "Kunde inte ladda annonsdata",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -99,81 +91,57 @@ export default function SalesAdManagement() {
         offers: Math.floor(Math.random() * 5),
         aiImagesGenerated: Math.floor(Math.random() * 10),
         aiEditsUsed: Math.floor(Math.random() * 15),
-        lastViewed: new Date().toISOString(),
+        lastViewed: new Date().toISOString()
       });
     } catch (error) {
-      console.error("Error loading stats:", error);
+      console.error('Error loading stats:', error);
     }
   };
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+    return <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </div>
-    );
+      </div>;
   }
   if (!ad) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+    return <div className="container mx-auto px-4 py-8">
         <Card>
           <CardContent className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">
-              Annonsen hittades inte
-            </h3>
-            <Button onClick={() => navigate("/dashboard")} className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Annonsen hittades inte</h3>
+            <Button onClick={() => navigate('/dashboard')} className="mt-4">
               Tillbaka till Dashboard
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-  const isPremium = ad.ad_tier === "premium";
-  const _isPlus = ad.ad_tier === "plus";
-  const _isBasic = ad.ad_tier === "basic";
+  const isPremium = ad.ad_tier === 'premium';
+  const isPlus = ad.ad_tier === 'plus';
+  const isBasic = ad.ad_tier === 'basic';
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Header */}
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/dashboard")}
-          className="mb-4"
-        >
+        <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Tillbaka till mina annonser
         </Button>
-
+        
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {ad.properties?.title || ad.title}
-            </h1>
+            <h1 className="text-3xl font-bold mb-2">{ad.properties?.title || ad.title}</h1>
             <p className="text-muted-foreground">
               {ad.properties?.address_street}, {ad.properties?.address_city}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge
-              variant={
-                ad.properties?.status === "active" ? "default" : "secondary"
-              }
-            >
-              {ad.properties?.status === "active" ? "Till salu" : "Inaktiv"}
+            <Badge variant={ad.properties?.status === 'active' ? 'default' : 'secondary'}>
+              {ad.properties?.status === 'active' ? 'Till salu' : 'Inaktiv'}
             </Badge>
-            <Badge
-              variant="outline"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0"
-            >
-              {ad.ad_tier === "premium"
-                ? "Exklusiv"
-                : ad.ad_tier === "plus"
-                  ? "Plus"
-                  : "Grund"}
+            <Badge variant="outline" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+              {ad.ad_tier === 'premium' ? 'Exklusiv' : ad.ad_tier === 'plus' ? 'Plus' : 'Grund'}
             </Badge>
             <Button onClick={() => navigate(`/annons/${ad.property_id}`)}>
               Visa annons
@@ -194,47 +162,32 @@ export default function SalesAdManagement() {
               <p className="text-3xl font-bold">{stats.views}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-1">
-                Senaste veckan
-              </p>
-              <p className="text-3xl font-bold">
-                {Math.floor(stats.views * 0.15)}
-              </p>
+              <p className="text-sm text-muted-foreground mb-1">Senaste veckan</p>
+              <p className="text-3xl font-bold">{Math.floor(stats.views * 0.15)}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Idag</p>
-              <p className="text-3xl font-bold">
-                {Math.floor(stats.views * 0.02)}
-              </p>
+              <p className="text-3xl font-bold">{Math.floor(stats.views * 0.02)}</p>
             </div>
           </div>
-
+          
           <div className="mb-4">
-            <h3 className="text-sm font-medium mb-2">
-              Besök senaste 7 dagarna
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              Från Till salu-annonsen
-            </p>
+            <h3 className="text-sm font-medium mb-2">Besök senaste 7 dagarna</h3>
+            <p className="text-xs text-muted-foreground">Från Till salu-annonsen</p>
           </div>
-
+          
           <div className="h-64 flex items-end justify-between gap-2">
             {[5, 8, 12, 6, 15, 10, 7].map((value, index) => (
-              <div
-                key={index}
-                className="flex-1 flex flex-col items-center gap-1"
-              >
-                <div
-                  className="w-full bg-primary rounded-t"
+              <div key={index} className="flex-1 flex flex-col items-center gap-1">
+                <div 
+                  className="w-full bg-primary rounded-t" 
                   style={{ height: `${(value / 15) * 100}%` }}
                 />
-                <span className="text-xs text-muted-foreground">
-                  {value}/11
-                </span>
+                <span className="text-xs text-muted-foreground">{value}/11</span>
               </div>
             ))}
           </div>
-
+          
           <p className="text-xs text-muted-foreground mt-4">
             Grafen uppdateras så fort du uppdaterar sidan.
           </p>
@@ -248,11 +201,12 @@ export default function SalesAdManagement() {
             <Sparkles className="h-5 w-5 text-primary" />
             AI-Bildredigerare Statistik
           </CardTitle>
-          <CardDescription>För Exklusivpaketet</CardDescription>
+          <CardDescription>
+            För Exklusivpaketet
+          </CardDescription>
           {!isPremium && (
             <p className="text-sm text-muted-foreground mt-2">
-              Se hur dina bilder engagerar spekulanter med AI-verktyg och vilka
-              rum som väcker mest intresse!
+              Se hur dina bilder engagerar spekulanter med AI-verktyg och vilka rum som väcker mest intresse!
             </p>
           )}
         </CardHeader>
@@ -263,15 +217,9 @@ export default function SalesAdManagement() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Exklusiv
-                      </p>
-                      <p className="text-4xl font-bold mb-1">
-                        {stats.aiEditsUsed}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Totala AI-redigeringar
-                      </p>
+                      <p className="text-sm text-muted-foreground mb-1">Exklusiv</p>
+                      <p className="text-4xl font-bold mb-1">{stats.aiEditsUsed}</p>
+                      <p className="text-xs text-muted-foreground">Totala AI-redigeringar</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Antal gånger besökare använt bildredigeraren
                       </p>
@@ -285,9 +233,7 @@ export default function SalesAdManagement() {
                       <p className="text-4xl font-bold mb-1">
                         {Math.floor(stats.aiEditsUsed * 0.6)}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Unika användare
-                      </p>
+                      <p className="text-xs text-muted-foreground">Unika användare</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Olika personer som redigerat bilder
                       </p>
@@ -301,9 +247,7 @@ export default function SalesAdManagement() {
                       <p className="text-4xl font-bold mb-1">
                         {Math.min(Math.floor(stats.aiEditsUsed * 0.4), 3)}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        Redigerade bilder
-                      </p>
+                      <p className="text-xs text-muted-foreground">Redigerade bilder</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Av 3 totala bilder i annonsen
                       </p>
@@ -315,31 +259,19 @@ export default function SalesAdManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm font-semibold mb-2">Engagemangsmått</p>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Redigeringsgrad
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-1">Redigeringsgrad</p>
                   <p className="text-2xl font-bold">
-                    {Math.min(
-                      Math.floor(((stats.aiEditsUsed * 0.4) / 3) * 100),
-                      100,
-                    )}
-                    %
+                    {Math.min(Math.floor((stats.aiEditsUsed * 0.4 / 3) * 100), 100)}%
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {Math.min(Math.floor(stats.aiEditsUsed * 0.4), 3)}/3 av dina
-                    bilder har redigerats
+                    {Math.min(Math.floor(stats.aiEditsUsed * 0.4), 3)}/3 av dina bilder har redigerats
                   </p>
                 </div>
 
                 <div className="p-4 border rounded-lg">
-                  <p className="text-sm font-semibold mb-2">
-                    Genomsnitt per bild
-                  </p>
+                  <p className="text-sm font-semibold mb-2">Genomsnitt per bild</p>
                   <p className="text-2xl font-bold">
-                    {Math.floor(
-                      stats.aiEditsUsed /
-                        Math.max(Math.floor(stats.aiEditsUsed * 0.4), 1),
-                    )}
+                    {Math.floor(stats.aiEditsUsed / Math.max(Math.floor(stats.aiEditsUsed * 0.4), 1))}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     redigeringar per redigerad bild i genomsnitt
@@ -349,13 +281,9 @@ export default function SalesAdManagement() {
 
               {stats.aiEditsUsed === 0 && (
                 <div className="p-6 bg-muted rounded-lg text-center">
-                  <p className="font-semibold mb-2">
-                    Inga AI-redigeringar ännu
-                  </p>
+                  <p className="font-semibold mb-2">Inga AI-redigeringar ännu</p>
                   <p className="text-sm text-muted-foreground">
-                    När köpare börjar använda bildredigeraren kommer detaljerad
-                    statistik att visas här. AI-redigeringar är en stark
-                    indikator på köpintresse.
+                    När köpare börjar använda bildredigeraren kommer detaljerad statistik att visas här. AI-redigeringar är en stark indikator på köpintresse.
                   </p>
                 </div>
               )}
@@ -363,21 +291,15 @@ export default function SalesAdManagement() {
           ) : (
             <div className="p-8 bg-muted/50 rounded-lg text-center border-2 border-dashed">
               <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">
-                AI-verktyg är låsta
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">AI-verktyg är låsta</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Uppgradera till Exklusivpaketet för att få tillgång till
-                AI-bildredigerare statistik och se hur besökare engagerar sig
-                med dina bilder.
+                Uppgradera till Exklusivpaketet för att få tillgång till AI-bildredigerare statistik och se hur besökare engagerar sig med dina bilder.
               </p>
-              <Button onClick={() => navigate("/packages")}>
+              <Button onClick={() => navigate('/packages')}>
                 Uppgradera till Exklusivpaketet
               </Button>
               <div className="mt-6 space-y-2 text-left">
-                <p className="text-sm font-medium">
-                  Fördelar med Exklusivpaketet:
-                </p>
+                <p className="text-sm font-medium">Fördelar med Exklusivpaketet:</p>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>✓ Se exakt hur besökare redigerar dina bilder</li>
                   <li>✓ Förstå vilka rum som väcker mest intresse</li>
@@ -405,8 +327,7 @@ export default function SalesAdManagement() {
               <div>
                 <p className="font-semibold mb-1">Uppdatera regelbundet</p>
                 <p className="text-sm text-muted-foreground">
-                  Annonser som uppdateras får i genomsnitt 40% fler visningar.
-                  Lägg till nya bilder eller justera beskrivningen.
+                  Annonser som uppdateras får i genomsnitt 40% fler visningar. Lägg till nya bilder eller justera beskrivningen.
                 </p>
               </div>
             </div>
@@ -417,8 +338,7 @@ export default function SalesAdManagement() {
               <div>
                 <p className="font-semibold mb-1">Boka fler visningstider</p>
                 <p className="text-sm text-muted-foreground">
-                  Fastigheter med fler visningstider får 3x fler förfrågningar.
-                  Överväg att lägga till extra visningstider.
+                  Fastigheter med fler visningstider får 3x fler förfrågningar. Överväg att lägga till extra visningstider.
                 </p>
               </div>
             </div>
@@ -427,12 +347,9 @@ export default function SalesAdManagement() {
                 <span className="text-sm font-bold text-primary">3</span>
               </div>
               <div>
-                <p className="font-semibold mb-1">
-                  Svara snabbt på förfrågningar
-                </p>
+                <p className="font-semibold mb-1">Svara snabbt på förfrågningar</p>
                 <p className="text-sm text-muted-foreground">
-                  Säljare som svarar inom 24 timmar har 65% högre chans att
-                  sälja snabbare.
+                  Säljare som svarar inom 24 timmar har 65% högre chans att sälja snabbare.
                 </p>
               </div>
             </div>
@@ -463,9 +380,7 @@ export default function SalesAdManagement() {
                 <Eye className="h-4 w-4 text-blue-500" />
                 <p className="text-sm font-medium">Bevakar slutpris</p>
               </div>
-              <p className="text-2xl font-bold">
-                {Math.floor(stats.favorites * 0.3)}
-              </p>
+              <p className="text-2xl font-bold">{Math.floor(stats.favorites * 0.3)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Bevakar slutpriset
               </p>
@@ -495,8 +410,7 @@ export default function SalesAdManagement() {
           </div>
 
           <p className="text-xs text-muted-foreground mt-4">
-            <span className="font-medium">{stats.inquiries}</span> Har klickat
-            på fastighetsmäklaren separata kontaktuppgifter, nummer/mejl
+            <span className="font-medium">{stats.inquiries}</span> Har klickat på fastighetsmäklaren separata kontaktuppgifter, nummer/mejl
           </p>
         </CardContent>
       </Card>

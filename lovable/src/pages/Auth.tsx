@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthForm from "@/components/AuthForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import AuthForm from '@/components/AuthForm';
 
 export default function Auth() {
   const { user, loading } = useAuth();
@@ -10,7 +10,7 @@ export default function Auth() {
   useEffect(() => {
     // Redirect authenticated users to home page
     if (user && !loading) {
-      navigate("/");
+      navigate('/');
     }
   }, [user, loading, navigate]);
 

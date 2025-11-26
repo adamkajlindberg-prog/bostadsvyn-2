@@ -2,8 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -14,7 +13,7 @@ serve(async (req) => {
   try {
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-
+    
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
@@ -183,7 +182,7 @@ Mäklaren ser i mäklarportalen:
 
 **Hyra ut:**
 - Privatpersoner och företag kan lägga upp hyresannonser direkt (gratis)
-- Digitala hyreskontrakt via Idura med BankID-signering
+- Digitala hyreskontrakt via Criipto med BankID-signering
 - Automatisk kontraktsgenerering enligt svensk hyreslagstiftning
 - Säker lagring i molnet
 - Efter signering: Båda parter får digitala kopior via e-mail och kontrakt arkiveras i användarprofilerna
@@ -214,7 +213,7 @@ Mäklaren ser i mäklarportalen:
 - Alla betalningar via säkra **PCI DSS-certifierade** tjänster (Stripe)
 - Användare har full kontroll över sina uppgifter
 - Tvåfaktorsautentisering tillgänglig
-- Hyreskontrakt signeras med BankID via Idura för juridisk säkerhet
+- Hyreskontrakt signeras med BankID via Criipto för juridisk säkerhet
 
 **PRISER:**
 **Annonspaket (Säljaren betalar efter godkännande via Stripe Checkout):**
@@ -304,7 +303,7 @@ FÖRETAG (Ex. moms, 200 kr/mån mer än privatpersoner):
 
 **För uthyrare:**
 "Kan jag hyra ut min bostad?" → Ja, privatpersoner kan, förklara processen
-"Hur fungerar digitala kontrakt?" → Idura + BankID-signering, automatisk generering, arkivering i profiler
+"Hur fungerar digitala kontrakt?" → Criipto + BankID-signering, automatisk generering, arkivering i profiler
 "Är hyresavtalen juridiskt bindande?" → Ja, följer svensk lag
 
 **DITT BETEENDE:**
@@ -327,48 +326,37 @@ FÖRETAG (Ex. moms, 200 kr/mån mer än privatpersoner):
 
 Svara alltid på **svenska** och håll en **vänlig, professionell och engagerad** ton. Du representerar Bostadsvyn och ska förmedla innovation, trygghet och kompetens.`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          temperature: 0.7,
-          max_tokens: 1000,
-        }),
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...messages
+        ],
+        temperature: 0.7,
+        max_tokens: 1000
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({
-            error: "För många förfrågningar. Vänta en stund och försök igen.",
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+          JSON.stringify({ error: "För många förfrågningar. Vänta en stund och försök igen." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({
-            error:
-              "Tjänsten är tillfälligt otillgänglig. Kontakta support@bostadsvyn.se",
-          }),
-          {
-            status: 402,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+          JSON.stringify({ error: "Tjänsten är tillfälligt otillgänglig. Kontakta support@bostadsvyn.se" }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
+      
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       throw new Error("AI gateway error");
@@ -377,22 +365,17 @@ Svara alltid på **svenska** och håll en **vänlig, professionell och engagerad
     const data = await response.json();
     const reply = data.choices[0].message.content;
 
-    return new Response(JSON.stringify({ reply }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ reply }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.error("Error in ai-support-chat:", error);
     return new Response(
-      JSON.stringify({
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ett oväntat fel uppstod. Försök igen senare.",
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : "Ett oväntat fel uppstod. Försök igen senare."
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
