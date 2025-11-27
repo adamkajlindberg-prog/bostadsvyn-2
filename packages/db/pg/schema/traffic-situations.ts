@@ -1,0 +1,50 @@
+import {
+    boolean,
+    index,
+    integer,
+    pgTable,
+    serial,
+    text,
+    timestamp,
+    varchar,
+    vector,
+} from "drizzle-orm/pg-core";
+import { env } from "../../env";
+
+export const trafficSituations = pgTable(
+    "traffic_situations",
+    {
+        id: serial("id").primaryKey(),
+        embedding: vector("embedding", { dimensions: env.EMBEDDING_DIMENSIONALITY }).notNull(),
+        trafficId: varchar("traffic_id", { length: 50 }).unique().notNull(),
+        roadName: varchar("road_name", { length: 100 }),
+        roadNumber: varchar("road_number", { length: 30 }),
+        locationDescriptor: text("location_descriptor"),
+        coordinates: varchar("coordinates", { length: 255 }),
+        messageType: varchar("message_type", { length: 50 }),
+        messageTypeValue: varchar("message_type_value", { length: 100 }),
+        messageCode: varchar("message_code", { length: 50 }),
+        messageCodeValue: varchar("message_code_value", { length: 100 }),
+        message: text("message"),
+        severityCode: integer("severity_code"),
+        severityText: varchar("severity_text", { length: 50 }),
+        startTime: varchar("start_time", { length: 50 }).notNull(),
+        endTime: varchar("end_time", { length: 50 }),
+        validUntilFurtherNotice: boolean("valid_until_further_notice"),
+        webLink: varchar("web_link", { length: 255 }),
+        countyNo: integer("county_no").array(),
+        affectedDirection: varchar("affected_direction", { length: 50 }),
+        affectedDirectionValue: varchar("affected_direction_value", { length: 50 }),
+        trafficRestrictionType: varchar("traffic_restriction_type", { length: 50 }),
+        numberOfLanesRestricted: integer("number_of_lanes_restricted"),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+        deletedAt: timestamp("deleted_at"),
+    },
+    (table) => ({
+        trafficEmbeddingIndex: index("traffic_embedding_index").using(
+            "hnsw",
+            table.embedding.op("vector_cosine_ops"),
+        ),
+    }),
+);
