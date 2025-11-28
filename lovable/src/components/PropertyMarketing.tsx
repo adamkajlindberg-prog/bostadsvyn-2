@@ -1,22 +1,24 @@
-import { Check, Play, Share2, Sparkles, Target } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
+import { 
+  Share2, 
+  Video, 
+  Image as ImageIcon,
+  Target,
+  Sparkles,
+  Check,
+  X,
+  Play
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PropertyMarketingProps {
   property: {
@@ -32,10 +34,10 @@ interface PropertyMarketingProps {
 
 const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
   const { toast } = useToast();
-
+  
   // Content type state
-  const [contentType, setContentType] = useState<"video" | "post">("post");
-
+  const [contentType, setContentType] = useState<'video' | 'post'>('post');
+  
   // Social media platforms
   const [selectedPlatforms, setSelectedPlatforms] = useState({
     youtube: false,
@@ -44,33 +46,32 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
     instagram: false,
     facebook: false,
   });
-
+  
   // Content state
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [customTitle, setCustomTitle] = useState(property.title);
   const [customDescription, setCustomDescription] = useState(
-    property.description ||
-      `${property.title} - ${property.address_street}, ${property.address_city}`,
+    property.description || `${property.title} - ${property.address_street}, ${property.address_city}`
   );
   const [videoDuration, setVideoDuration] = useState(15);
   const [slideTransitionTime, setSlideTransitionTime] = useState(3);
-
+  
   // Target audience state
   const [targetRadius, setTargetRadius] = useState(50);
   const [ageRange, setAgeRange] = useState([25, 55]);
-
+  
   // Loading states
   const [isVerifying, setIsVerifying] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
   const togglePlatform = (platform: keyof typeof selectedPlatforms) => {
-    setSelectedPlatforms((prev) => ({ ...prev, [platform]: !prev[platform] }));
+    setSelectedPlatforms(prev => ({ ...prev, [platform]: !prev[platform] }));
   };
 
   const toggleImage = (imageUrl: string) => {
-    setSelectedImages((prev) => {
+    setSelectedImages(prev => {
       if (prev.includes(imageUrl)) {
-        return prev.filter((img) => img !== imageUrl);
+        return prev.filter(img => img !== imageUrl);
       } else {
         return [...prev, imageUrl];
       }
@@ -83,7 +84,7 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
       toast({
         title: "Obligatoriska fält saknas",
         description: "Vänligen fyll i titel och beskrivning",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -92,17 +93,17 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
       toast({
         title: "Bilder saknas",
         description: "Vänligen välj minst en bild från objektet",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
 
-    const hasSelectedPlatform = Object.values(selectedPlatforms).some((v) => v);
+    const hasSelectedPlatform = Object.values(selectedPlatforms).some(v => v);
     if (!hasSelectedPlatform) {
       toast({
         title: "Ingen plattform vald",
         description: "Vänligen välj minst en social media-plattform",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -111,25 +112,25 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
       setIsVerifying(true);
 
       // Verify content with AI
-      const { data: verificationData, error: verificationError } =
-        await supabase.functions.invoke("verify-marketing-content", {
+      const { data: verificationData, error: verificationError } = await supabase.functions.invoke(
+        'verify-marketing-content',
+        {
           body: {
             title: customTitle,
             description: customDescription,
             images: selectedImages,
-            contentType,
-          },
-        });
+            contentType
+          }
+        }
+      );
 
       if (verificationError) throw verificationError;
 
       if (!verificationData.approved) {
         toast({
           title: "Innehåll avvisat",
-          description:
-            verificationData.reason ||
-            "Innehållet uppfyller inte våra riktlinjer",
-          variant: "destructive",
+          description: verificationData.reason || "Innehållet uppfyller inte våra riktlinjer",
+          variant: "destructive"
         });
         return;
       }
@@ -138,24 +139,25 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
       setIsPublishing(true);
 
       // Publish to social media
-      const { data: publishData, error: publishError } =
-        await supabase.functions.invoke("publish-social-media", {
+      const { data: publishData, error: publishError } = await supabase.functions.invoke(
+        'publish-social-media',
+        {
           body: {
             title: customTitle,
             description: customDescription,
             images: selectedImages,
             contentType,
             platforms: Object.keys(selectedPlatforms).filter(
-              (k) => selectedPlatforms[k as keyof typeof selectedPlatforms],
+              k => selectedPlatforms[k as keyof typeof selectedPlatforms]
             ),
-            videoDuration: contentType === "video" ? videoDuration : undefined,
-            slideTransitionTime:
-              contentType === "video" ? slideTransitionTime : undefined,
+            videoDuration: contentType === 'video' ? videoDuration : undefined,
+            slideTransitionTime: contentType === 'video' ? slideTransitionTime : undefined,
             targetRadius,
             ageRange,
-            propertyId: property.id,
-          },
-        });
+            propertyId: property.id
+          }
+        }
+      );
 
       if (publishError) throw publishError;
 
@@ -172,12 +174,13 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
         instagram: false,
         facebook: false,
       });
+
     } catch (error: any) {
-      console.error("Error publishing:", error);
+      console.error('Error publishing:', error);
       toast({
         title: "Ett fel uppstod",
         description: error.message || "Kunde inte publicera marknadsföringen",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsVerifying(false);
@@ -193,29 +196,21 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
           <CardTitle>Direktmarknadsföring</CardTitle>
         </div>
         <CardDescription>
-          Marknadsför detta objekt via våra sociala medier med AI-verifierad
-          kvalitet
+          Marknadsför detta objekt via våra sociala medier med AI-verifierad kvalitet
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Content Type Selection */}
         <div className="space-y-2">
           <Label>Innehållstyp</Label>
-          <RadioGroup
-            value={contentType}
-            onValueChange={(v) => setContentType(v as "video" | "post")}
-          >
+          <RadioGroup value={contentType} onValueChange={(v) => setContentType(v as 'video' | 'post')}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="post" id="post-type" />
-              <Label htmlFor="post-type" className="cursor-pointer">
-                Enskilt inlägg
-              </Label>
+              <Label htmlFor="post-type" className="cursor-pointer">Enskilt inlägg</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="video" id="video-type" />
-              <Label htmlFor="video-type" className="cursor-pointer">
-                Marknadsföringsvideo (Slideshow)
-              </Label>
+              <Label htmlFor="video-type" className="cursor-pointer">Marknadsföringsvideo (Slideshow)</Label>
             </div>
           </RadioGroup>
         </div>
@@ -225,29 +220,25 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
           <Label>Sociala medier-plattformar</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {[
-              { key: "youtube", label: "YouTube", videoOnly: true },
-              { key: "linkedin", label: "LinkedIn", videoOnly: false },
-              { key: "tiktok", label: "TikTok", videoOnly: true },
-              { key: "instagram", label: "Instagram", videoOnly: false },
-              { key: "facebook", label: "Facebook", videoOnly: false },
+              { key: 'youtube', label: 'YouTube', videoOnly: true },
+              { key: 'linkedin', label: 'LinkedIn', videoOnly: false },
+              { key: 'tiktok', label: 'TikTok', videoOnly: true },
+              { key: 'instagram', label: 'Instagram', videoOnly: false },
+              { key: 'facebook', label: 'Facebook', videoOnly: false },
             ].map(({ key, label, videoOnly }) => (
               <div key={key} className="flex items-center space-x-2">
                 <Checkbox
                   id={key}
-                  checked={
-                    selectedPlatforms[key as keyof typeof selectedPlatforms]
-                  }
-                  onCheckedChange={() =>
-                    togglePlatform(key as keyof typeof selectedPlatforms)
-                  }
-                  disabled={videoOnly && contentType !== "video"}
+                  checked={selectedPlatforms[key as keyof typeof selectedPlatforms]}
+                  onCheckedChange={() => togglePlatform(key as keyof typeof selectedPlatforms)}
+                  disabled={videoOnly && contentType !== 'video'}
                 />
-                <Label
-                  htmlFor={key}
-                  className={`cursor-pointer ${videoOnly && contentType !== "video" ? "text-muted-foreground" : ""}`}
+                <Label 
+                  htmlFor={key} 
+                  className={`cursor-pointer ${videoOnly && contentType !== 'video' ? 'text-muted-foreground' : ''}`}
                 >
                   {label}
-                  {videoOnly && contentType !== "video" && " (endast video)"}
+                  {videoOnly && contentType !== 'video' && ' (endast video)'}
                 </Label>
               </div>
             ))}
@@ -256,9 +247,7 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
 
         {/* Image Selection */}
         <div className="space-y-2">
-          <Label>
-            Välj bilder från objektet ({selectedImages.length} valda)
-          </Label>
+          <Label>Välj bilder från objektet ({selectedImages.length} valda)</Label>
           {property.images && property.images.length > 0 ? (
             <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
               {property.images.map((imageUrl, index) => (
@@ -266,8 +255,8 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
                   key={index}
                   className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                     selectedImages.includes(imageUrl)
-                      ? "border-primary ring-2 ring-primary ring-offset-2"
-                      : "border-transparent hover:border-muted"
+                      ? 'border-primary ring-2 ring-primary ring-offset-2'
+                      : 'border-transparent hover:border-muted'
                   }`}
                   onClick={() => toggleImage(imageUrl)}
                 >
@@ -283,30 +272,27 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
                       </div>
                     </div>
                   )}
-                  {contentType === "video" &&
-                    selectedImages.includes(imageUrl) && (
-                      <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                        {selectedImages.indexOf(imageUrl) + 1}
-                      </div>
-                    )}
+                  {contentType === 'video' && selectedImages.includes(imageUrl) && (
+                    <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                      {selectedImages.indexOf(imageUrl) + 1}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Inga bilder tillgängliga för detta objekt
-            </p>
+            <p className="text-sm text-muted-foreground">Inga bilder tillgängliga för detta objekt</p>
           )}
         </div>
 
         {/* Video Settings (only for video type) */}
-        {contentType === "video" && (
+        {contentType === 'video' && (
           <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Play className="h-4 w-4" />
               <span>Videoinställningar</span>
             </div>
-
+            
             <div>
               <Label>Total videolängd: {videoDuration} sekunder</Label>
               <Slider
@@ -330,8 +316,7 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
                 className="mt-2"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Totalt {Math.ceil(videoDuration / slideTransitionTime)} bilder
-                visas
+                Totalt {Math.ceil(videoDuration / slideTransitionTime)} bilder visas
               </p>
             </div>
           </div>
@@ -383,9 +368,7 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
           </div>
 
           <div>
-            <Label>
-              Åldersgrupp: {ageRange[0]}-{ageRange[1]} år
-            </Label>
+            <Label>Åldersgrupp: {ageRange[0]}-{ageRange[1]} år</Label>
             <Slider
               value={ageRange}
               onValueChange={setAgeRange}

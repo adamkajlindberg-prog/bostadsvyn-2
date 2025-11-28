@@ -1,53 +1,39 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  AlertCircle,
-  Bell,
-  Globe,
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Shield, 
+  Bell, 
+  Globe, 
   Palette,
   Save,
-  Shield,
-  Trash2,
-  User,
-} from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  AlertCircle,
+  Check,
+  Trash2
+} from 'lucide-react';
 
 const profileSchema = z.object({
-  full_name: z.string().min(2, "Namn måste vara minst 2 tecken"),
-  email: z.string().email("Ogiltig e-postadress"),
+  full_name: z.string().min(2, 'Namn måste vara minst 2 tecken'),
+  email: z.string().email('Ogiltig e-postadress'),
   phone: z.string().optional(),
 });
 
@@ -85,9 +71,9 @@ export const UserProfile: React.FC = () => {
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      full_name: profile?.full_name || "",
-      email: user?.email || "",
-      phone: profile?.phone || "",
+      full_name: profile?.full_name || '',
+      email: user?.email || '',
+      phone: profile?.phone || '',
     },
   });
 
@@ -97,18 +83,18 @@ export const UserProfile: React.FC = () => {
       email_notifications: true,
       sms_notifications: false,
       marketing_emails: false,
-      preferred_currency: "SEK",
-      preferred_language: "sv",
-      theme: "system",
+      preferred_currency: 'SEK',
+      preferred_language: 'sv',
+      theme: 'system',
     },
   });
 
   useEffect(() => {
     if (profile) {
       profileForm.reset({
-        full_name: profile.full_name || "",
-        email: user?.email || "",
-        phone: profile.phone || "",
+        full_name: profile.full_name || '',
+        email: user?.email || '',
+        phone: profile.phone || '',
       });
     }
   }, [profile, user, profileForm]);
@@ -117,19 +103,18 @@ export const UserProfile: React.FC = () => {
     if (user) {
       loadUserPreferences();
     }
-  }, [user, loadUserPreferences]);
+  }, [user]);
 
   const loadUserPreferences = async () => {
     try {
       setPreferencesLoading(true);
       const { data, error } = await supabase
-        .from("user_preferences")
-        .select("*")
-        .eq("user_id", user?.id)
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user?.id)
         .single();
 
-      if (error && error.code !== "PGRST116") {
-        // PGRST116 = no rows returned
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
         throw error;
       }
 
@@ -145,7 +130,7 @@ export const UserProfile: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error("Error loading user preferences:", error);
+      console.error('Error loading user preferences:', error);
     } finally {
       setPreferencesLoading(false);
     }
@@ -158,26 +143,26 @@ export const UserProfile: React.FC = () => {
       setLoading(true);
 
       const { error } = await supabase
-        .from("profiles")
+        .from('profiles')
         .update({
           full_name: data.full_name,
           phone: data.phone,
         })
-        .eq("user_id", user.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
       await refetchProfile();
-
+      
       toast({
-        title: "Profil uppdaterad",
-        description: "Dina profiluppgifter har sparats",
+        title: 'Profil uppdaterad',
+        description: 'Dina profiluppgifter har sparats',
       });
     } catch (error: any) {
       toast({
-        title: "Fel",
-        description: error.message || "Kunde inte uppdatera profilen",
-        variant: "destructive",
+        title: 'Fel',
+        description: error.message || 'Kunde inte uppdatera profilen',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -198,31 +183,31 @@ export const UserProfile: React.FC = () => {
       if (preferences?.id) {
         // Update existing preferences
         const { error } = await supabase
-          .from("user_preferences")
+          .from('user_preferences')
           .update(preferenceData)
-          .eq("user_id", user.id);
+          .eq('user_id', user.id);
 
         if (error) throw error;
       } else {
         // Create new preferences
         const { error } = await supabase
-          .from("user_preferences")
+          .from('user_preferences')
           .insert([preferenceData]);
 
         if (error) throw error;
       }
 
       await loadUserPreferences();
-
+      
       toast({
-        title: "Inställningar sparade",
-        description: "Dina preferenser har uppdaterats",
+        title: 'Inställningar sparade',
+        description: 'Dina preferenser har uppdaterats',
       });
     } catch (error: any) {
       toast({
-        title: "Fel",
-        description: error.message || "Kunde inte spara inställningar",
-        variant: "destructive",
+        title: 'Fel',
+        description: error.message || 'Kunde inte spara inställningar',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -233,13 +218,13 @@ export const UserProfile: React.FC = () => {
     try {
       setDeleteLoading(true);
       const { error } = await deleteAccount();
-
+      
       if (error) {
-        console.error("Delete account error:", error);
+        console.error('Delete account error:', error);
       }
       // If successful, user will be redirected automatically due to signout
     } catch (error) {
-      console.error("Delete account error:", error);
+      console.error('Delete account error:', error);
     } finally {
       setDeleteLoading(false);
     }
@@ -247,45 +232,31 @@ export const UserProfile: React.FC = () => {
 
   const getUserInitials = () => {
     if (profile?.full_name) {
-      return profile.full_name
-        .split(" ")
-        .map((n: string) => n[0])
-        .join("")
-        .toUpperCase();
+      return profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
     }
     if (user?.email) {
       return user.email.substring(0, 2).toUpperCase();
     }
-    return "AN";
+    return 'AN';
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case "buyer":
-        return "Köpare";
-      case "seller":
-        return "Säljare";
-      case "broker":
-        return "Mäklare";
-      case "admin":
-        return "Admin";
-      default:
-        return role;
+      case 'buyer': return 'Köpare';
+      case 'seller': return 'Säljare';
+      case 'broker': return 'Mäklare';
+      case 'admin': return 'Admin';
+      default: return role;
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case "admin":
-        return "bg-red-100 text-red-800";
-      case "broker":
-        return "bg-nordic-ice text-primary";
-      case "seller":
-        return "bg-green-100 text-green-800";
-      case "buyer":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'broker': return 'bg-nordic-ice text-primary';
+      case 'seller': return 'bg-green-100 text-green-800';
+      case 'buyer': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -300,9 +271,7 @@ export const UserProfile: React.FC = () => {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold">
-              Profil & Inställningar
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold">Profil & Inställningar</h1>
             <p className="font-medium text-foreground">
               Hantera ditt konto och personliga inställningar
             </p>
@@ -325,16 +294,13 @@ export const UserProfile: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form
-                  onSubmit={profileForm.handleSubmit(onSubmitProfile)}
-                  className="space-y-6"
-                >
+                <form onSubmit={profileForm.handleSubmit(onSubmitProfile)} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="full_name">Fullständigt namn</Label>
                       <Input
                         id="full_name"
-                        {...profileForm.register("full_name")}
+                        {...profileForm.register('full_name')}
                         className="mt-2"
                       />
                       {profileForm.formState.errors.full_name && (
@@ -349,7 +315,7 @@ export const UserProfile: React.FC = () => {
                       <Input
                         id="email"
                         type="email"
-                        {...profileForm.register("email")}
+                        {...profileForm.register('email')}
                         disabled
                         className="mt-2"
                       />
@@ -363,7 +329,7 @@ export const UserProfile: React.FC = () => {
                       <Input
                         id="phone"
                         type="tel"
-                        {...profileForm.register("phone")}
+                        {...profileForm.register('phone')}
                         placeholder="+46 70 123 45 67"
                         className="mt-2"
                       />
@@ -373,7 +339,10 @@ export const UserProfile: React.FC = () => {
                       <Label>Användarroller</Label>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {userRoles.map((role) => (
-                          <Badge key={role} className={getRoleColor(role)}>
+                          <Badge
+                            key={role}
+                            className={getRoleColor(role)}
+                          >
                             {getRoleLabel(role)}
                           </Badge>
                         ))}
@@ -409,10 +378,7 @@ export const UserProfile: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              <form
-                onSubmit={preferencesForm.handleSubmit(onSubmitPreferences)}
-                className="space-y-6"
-              >
+              <form onSubmit={preferencesForm.handleSubmit(onSubmitPreferences)} className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-xl md:text-2xl font-semibold flex items-center gap-2">
@@ -423,31 +389,27 @@ export const UserProfile: React.FC = () => {
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="email_notifications">
-                          E-postnotifieringar
-                        </Label>
+                        <Label htmlFor="email_notifications">E-postnotifieringar</Label>
                         <p className="text-sm font-medium text-foreground">
                           Få meddelanden om nya fastigheter och uppdateringar
                         </p>
                       </div>
                       <Switch
                         id="email_notifications"
-                        {...preferencesForm.register("email_notifications")}
+                        {...preferencesForm.register('email_notifications')}
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="sms_notifications">
-                          SMS-notifieringar
-                        </Label>
+                        <Label htmlFor="sms_notifications">SMS-notifieringar</Label>
                         <p className="text-sm font-medium text-foreground">
                           Få viktiga meddelanden via SMS
                         </p>
                       </div>
                       <Switch
                         id="sms_notifications"
-                        {...preferencesForm.register("sms_notifications")}
+                        {...preferencesForm.register('sms_notifications')}
                       />
                     </div>
 
@@ -460,7 +422,7 @@ export const UserProfile: React.FC = () => {
                       </div>
                       <Switch
                         id="marketing_emails"
-                        {...preferencesForm.register("marketing_emails")}
+                        {...preferencesForm.register('marketing_emails')}
                       />
                     </div>
                   </CardContent>
@@ -478,13 +440,8 @@ export const UserProfile: React.FC = () => {
                       <div>
                         <Label htmlFor="preferred_currency">Valuta</Label>
                         <Select
-                          value={preferencesForm.watch("preferred_currency")}
-                          onValueChange={(value) =>
-                            preferencesForm.setValue(
-                              "preferred_currency",
-                              value,
-                            )
-                          }
+                          value={preferencesForm.watch('preferred_currency')}
+                          onValueChange={(value) => preferencesForm.setValue('preferred_currency', value)}
                         >
                           <SelectTrigger className="mt-2">
                             <SelectValue placeholder="Välj valuta" />
@@ -500,13 +457,8 @@ export const UserProfile: React.FC = () => {
                       <div>
                         <Label htmlFor="preferred_language">Språk</Label>
                         <Select
-                          value={preferencesForm.watch("preferred_language")}
-                          onValueChange={(value) =>
-                            preferencesForm.setValue(
-                              "preferred_language",
-                              value,
-                            )
-                          }
+                          value={preferencesForm.watch('preferred_language')}
+                          onValueChange={(value) => preferencesForm.setValue('preferred_language', value)}
                         >
                           <SelectTrigger className="mt-2">
                             <SelectValue placeholder="Välj språk" />
@@ -532,10 +484,8 @@ export const UserProfile: React.FC = () => {
                     <div>
                       <Label htmlFor="theme">Tema</Label>
                       <Select
-                        value={preferencesForm.watch("theme")}
-                        onValueChange={(value) =>
-                          preferencesForm.setValue("theme", value)
-                        }
+                        value={preferencesForm.watch('theme')}
+                        onValueChange={(value) => preferencesForm.setValue('theme', value)}
                       >
                         <SelectTrigger className="mt-2">
                           <SelectValue placeholder="Välj tema" />
@@ -578,9 +528,8 @@ export const UserProfile: React.FC = () => {
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Lösenordsändringar och andra säkerhetsinställningar hanteras
-                    via Supabase Auth. Kontakta support för hjälp med
-                    kontosäkerhet.
+                    Lösenordsändringar och andra säkerhetsinställningar hanteras via Supabase Auth.
+                    Kontakta support för hjälp med kontosäkerhet.
                   </AlertDescription>
                 </Alert>
 
@@ -639,23 +588,20 @@ export const UserProfile: React.FC = () => {
                   <Alert className="border-red-200 bg-red-50">
                     <AlertCircle className="h-4 w-4 text-red-600" />
                     <AlertDescription className="text-red-800">
-                      <strong>Varning:</strong> Denna åtgärd kan inte ångras.
-                      Alla dina fastigheter, meddelanden, sparade sökningar och
-                      annan data kommer att raderas permanent.
+                      <strong>Varning:</strong> Denna åtgärd kan inte ångras. Alla dina fastigheter, meddelanden, 
+                      sparade sökningar och annan data kommer att raderas permanent.
                     </AlertDescription>
                   </Alert>
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
+                      <Button 
+                        variant="destructive" 
                         className="w-full bg-red-600 hover:bg-red-700"
                         disabled={deleteLoading}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        {deleteLoading
-                          ? "Raderar konto..."
-                          : "Radera mitt konto permanent"}
+                        {deleteLoading ? 'Raderar konto...' : 'Radera mitt konto permanent'}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -664,17 +610,14 @@ export const UserProfile: React.FC = () => {
                           Radera konto permanent?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          Denna åtgärd kan inte ångras. Genom att radera ditt
-                          konto kommer följande data att förloras permanent:
+                          Denna åtgärd kan inte ångras. Genom att radera ditt konto kommer följande data att förloras permanent:
                           <ul className="list-disc list-inside mt-2 space-y-1">
                             <li>Alla dina fastighetsannonser</li>
                             <li>Meddelanden och konversationer</li>
                             <li>Sparade sökningar och bevakningar</li>
                             <li>Användarinställningar och preferenser</li>
                             <li>AI-genererade bilder och data</li>
-                            {userRoles.includes("broker") && (
-                              <li>Mäklardata och statistik</li>
-                            )}
+                            {userRoles.includes('broker') && <li>Mäklardata och statistik</li>}
                           </ul>
                           <p className="mt-4 text-red-600 font-medium">
                             Skriv "RADERA" nedan för att bekräfta:
@@ -685,11 +628,9 @@ export const UserProfile: React.FC = () => {
                         <Input
                           placeholder="Skriv RADERA här"
                           onChange={(e) => {
-                            const button = document.querySelector(
-                              "[data-confirm-delete]",
-                            ) as HTMLButtonElement;
+                            const button = document.querySelector('[data-confirm-delete]') as HTMLButtonElement;
                             if (button) {
-                              button.disabled = e.target.value !== "RADERA";
+                              button.disabled = e.target.value !== 'RADERA';
                             }
                           }}
                         />

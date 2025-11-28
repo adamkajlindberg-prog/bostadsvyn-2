@@ -1,4 +1,4 @@
-import type React from "react";
+import React from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,11 +6,8 @@ interface LogoProps {
 }
 
 // Original design - minimalist house + B
-const LogoVariant1: React.FC<LogoProps> = ({
-  className = "h-10 w-10",
-  title = "Bostadsvyn logotyp",
-}) => {
-  const titleId = "logoTitle1";
+const LogoVariant1: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
+  const titleId = 'logoTitle1';
   return (
     <svg
       viewBox="0 0 64 64"
@@ -20,28 +17,13 @@ const LogoVariant1: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <title id={titleId}>{title}</title>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <g fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
         <path d="M8 26 L32 10 L56 26" />
         <path d="M14 26 V52" />
         <path d="M50 26 V52" />
         <path d="M10 52 H54" />
       </g>
-      <text
-        x="32"
-        y="44"
-        textAnchor="middle"
-        fontSize="30"
-        fontWeight="700"
-        fill="currentColor"
-      >
-        B
-      </text>
+      <text x="32" y="44" textAnchor="middle" fontSize="30" fontWeight="700" fill="currentColor">B</text>
       <g fill="currentColor">
         <rect x="28" y="18" width="4" height="4" rx="0.5" />
         <rect x="33" y="18" width="4" height="4" rx="0.5" />

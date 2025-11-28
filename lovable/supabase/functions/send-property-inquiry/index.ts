@@ -186,8 +186,8 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div class="property-info">
                 <h2>${propertyTitle}</h2>
-                ${propertyAddress ? `<p><strong>📍 Adress:</strong> ${propertyAddress}</p>` : ""}
-                ${propertyPrice ? `<p><strong>💰 Pris:</strong> ${propertyPrice.toLocaleString("sv-SE")} kr</p>` : ""}
+                ${propertyAddress ? `<p><strong>📍 Adress:</strong> ${propertyAddress}</p>` : ''}
+                ${propertyPrice ? `<p><strong>💰 Pris:</strong> ${propertyPrice.toLocaleString('sv-SE')} kr</p>` : ''}
                 <p><strong>🔑 Objektnummer:</strong> ${propertyId.substring(0, 8)}</p>
               </div>
 
@@ -208,8 +208,8 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="info-row">
                   <span class="info-label">Lånelöfte:</span>
                   <span class="info-value">
-                    <span class="badge ${hasLoanPromise ? "badge-yes" : "badge-no"}">
-                      ${hasLoanPromise ? "Ja" : "Nej"}
+                    <span class="badge ${hasLoanPromise ? 'badge-yes' : 'badge-no'}">
+                      ${hasLoanPromise ? 'Ja' : 'Nej'}
                     </span>
                   </span>
                 </div>
@@ -218,7 +218,7 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="section">
                 <h3>Meddelande från spekulant</h3>
                 <div class="message-box">
-                  ${message.replace(/\n/g, "<br>")}
+                  ${message.replace(/\n/g, '<br>')}
                 </div>
               </div>
 
@@ -248,10 +248,13 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in send-property-inquiry function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
   }
 };
 

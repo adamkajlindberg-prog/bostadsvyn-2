@@ -1,10 +1,14 @@
-import { BarChart3, Calculator } from "lucide-react";
-import PropertyComparison from "@/components/comparison/PropertyComparison";
-import LegalFooter from "@/components/LegalFooter";
-import MortgageCalculator from "@/components/mortgage/MortgageCalculator";
-import Navigation from "@/components/Navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/useAuth";
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import PropertyComparison from '@/components/comparison/PropertyComparison';
+import MortgageCalculator from '@/components/mortgage/MortgageCalculator';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  BarChart3, 
+  Calculator
+} from 'lucide-react';
 
 const Tools = () => {
   const { user } = useAuth();

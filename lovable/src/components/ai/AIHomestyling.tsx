@@ -1,94 +1,57 @@
-import {
-  Camera,
-  Download,
-  Eye,
-  Home,
+import React, { useState, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  Upload, 
+  Wand2, 
+  Download, 
+  Sparkles, 
+  Home, 
+  Palette, 
+  Sofa, 
   Lightbulb,
-  Palette,
+  Camera,
   RefreshCw,
-  Sofa,
-  Sparkles,
-  Star,
-  Upload,
-  Wand2,
-} from "lucide-react";
-import type React from "react";
-import { useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+  Eye,
+  Star
+} from 'lucide-react';
 
 const AIHomestyling = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [originalImage, setOriginalImage] = useState<string>("");
-  const [styledImage, setStyledImage] = useState<string>("");
-  const [selectedStyle, setSelectedStyle] = useState("");
-  const [selectedRoom, setSelectedRoom] = useState("");
-  const [customPrompt, setCustomPrompt] = useState("");
+  const [originalImage, setOriginalImage] = useState<string>('');
+  const [styledImage, setStyledImage] = useState<string>('');
+  const [selectedStyle, setSelectedStyle] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [customPrompt, setCustomPrompt] = useState('');
   const [intensity, setIntensity] = useState([70]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const stylePresets = [
-    {
-      id: "scandinavian",
-      name: "Skandinavisk",
-      description: "Minimalistisk, ljus och naturlig",
-      icon: "🌿",
-    },
-    {
-      id: "modern",
-      name: "Modern",
-      description: "Ren design med raka linjer",
-      icon: "🏢",
-    },
-    {
-      id: "bohemian",
-      name: "Bohemisk",
-      description: "Färgglad och konstnärlig",
-      icon: "🎨",
-    },
-    {
-      id: "industrial",
-      name: "Industriell",
-      description: "Rå material och mörka toner",
-      icon: "🏭",
-    },
-    {
-      id: "luxury",
-      name: "Lyxig",
-      description: "Exklusiva material och finish",
-      icon: "👑",
-    },
-    {
-      id: "cozy",
-      name: "Mysig",
-      description: "Varm och inbjudande atmosfär",
-      icon: "🕯️",
-    },
+    { id: 'scandinavian', name: 'Skandinavisk', description: 'Minimalistisk, ljus och naturlig', icon: '🌿' },
+    { id: 'modern', name: 'Modern', description: 'Ren design med raka linjer', icon: '🏢' },
+    { id: 'bohemian', name: 'Bohemisk', description: 'Färgglad och konstnärlig', icon: '🎨' },
+    { id: 'industrial', name: 'Industriell', description: 'Rå material och mörka toner', icon: '🏭' },
+    { id: 'luxury', name: 'Lyxig', description: 'Exklusiva material och finish', icon: '👑' },
+    { id: 'cozy', name: 'Mysig', description: 'Varm och inbjudande atmosfär', icon: '🕯️' }
   ];
 
   const roomTypes = [
-    { id: "living", name: "Vardagsrum", icon: Sofa },
-    { id: "kitchen", name: "Kök", icon: Home },
-    { id: "bedroom", name: "Sovrum", icon: Home },
-    { id: "bathroom", name: "Badrum", icon: Home },
-    { id: "office", name: "Hemkontor", icon: Home },
-    { id: "dining", name: "Matsal", icon: Home },
+    { id: 'living', name: 'Vardagsrum', icon: Sofa },
+    { id: 'kitchen', name: 'Kök', icon: Home },
+    { id: 'bedroom', name: 'Sovrum', icon: Home },
+    { id: 'bathroom', name: 'Badrum', icon: Home },
+    { id: 'office', name: 'Hemkontor', icon: Home },
+    { id: 'dining', name: 'Matsal', icon: Home }
   ];
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +61,7 @@ const AIHomestyling = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setOriginalImage(e.target?.result as string);
-        setStyledImage(""); // Clear previous result
+        setStyledImage(''); // Clear previous result
       };
       reader.readAsDataURL(file);
     }
@@ -107,9 +70,9 @@ const AIHomestyling = () => {
   const generateStyledImage = async () => {
     if (!selectedFile || !selectedStyle || !selectedRoom) {
       toast({
-        title: "Komplettera uppgifterna",
-        description: "Välj bild, stil och rumstyp för att fortsätta.",
-        variant: "destructive",
+        title: 'Komplettera uppgifterna',
+        description: 'Välj bild, stil och rumstyp för att fortsätta.',
+        variant: 'destructive'
       });
       return;
     }
@@ -121,28 +84,22 @@ const AIHomestyling = () => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Image = e.target?.result as string;
-
-        const selectedStyleData = stylePresets.find(
-          (s) => s.id === selectedStyle,
-        );
-        const selectedRoomData = roomTypes.find((r) => r.id === selectedRoom);
-
-        const prompt =
-          customPrompt ||
+        
+        const selectedStyleData = stylePresets.find(s => s.id === selectedStyle);
+        const selectedRoomData = roomTypes.find(r => r.id === selectedRoom);
+        
+        const prompt = customPrompt || 
           `Redesign this ${selectedRoomData?.name.toLowerCase()} in ${selectedStyleData?.name.toLowerCase()} style. ${selectedStyleData?.description}. Keep the room structure but update furniture, colors, lighting, and decor to match the style perfectly.`;
 
-        const { data, error } = await supabase.functions.invoke(
-          "ai-homestyling",
-          {
-            body: {
-              image: base64Image,
-              prompt,
-              style: selectedStyle,
-              room: selectedRoom,
-              intensity: intensity[0] / 100,
-            },
-          },
-        );
+        const { data, error } = await supabase.functions.invoke('ai-homestyling', {
+          body: {
+            image: base64Image,
+            prompt,
+            style: selectedStyle,
+            room: selectedRoom,
+            intensity: intensity[0] / 100
+          }
+        });
 
         if (error) {
           throw error;
@@ -150,18 +107,18 @@ const AIHomestyling = () => {
 
         setStyledImage(data.image_url);
         toast({
-          title: "Homestyling klar!",
-          description: "Din inredningsvisualisering är redo.",
+          title: 'Homestyling klar!',
+          description: 'Din inredningsvisualisering är redo.',
         });
       };
 
       reader.readAsDataURL(selectedFile);
     } catch (error) {
-      console.error("Error styling image:", error);
+      console.error('Error styling image:', error);
       toast({
-        title: "Fel vid homestyling",
-        description: "Något gick fel. Försök igen.",
-        variant: "destructive",
+        title: 'Fel vid homestyling',
+        description: 'Något gick fel. Försök igen.',
+        variant: 'destructive'
       });
     } finally {
       setIsProcessing(false);
@@ -170,7 +127,7 @@ const AIHomestyling = () => {
 
   const downloadImage = () => {
     if (styledImage) {
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = styledImage;
       link.download = `homestyling-${selectedStyle}-${Date.now()}.png`;
       link.click();
@@ -254,9 +211,7 @@ const AIHomestyling = () => {
                     {stylePresets.map((style) => (
                       <Button
                         key={style.id}
-                        variant={
-                          selectedStyle === style.id ? "default" : "outline"
-                        }
+                        variant={selectedStyle === style.id ? "default" : "outline"}
                         onClick={() => setSelectedStyle(style.id)}
                         className="h-auto p-3 flex flex-col items-start"
                       >
@@ -279,9 +234,7 @@ const AIHomestyling = () => {
                       return (
                         <Button
                           key={room.id}
-                          variant={
-                            selectedRoom === room.id ? "default" : "outline"
-                          }
+                          variant={selectedRoom === room.id ? "default" : "outline"}
                           onClick={() => setSelectedRoom(room.id)}
                           className="h-12 flex items-center gap-2"
                         >
@@ -323,9 +276,7 @@ const AIHomestyling = () => {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="custom-prompt">
-                  Anpassad instruktion (valfri)
-                </Label>
+                <Label htmlFor="custom-prompt">Anpassad instruktion (valfri)</Label>
                 <Input
                   id="custom-prompt"
                   placeholder="T.ex. 'Lägg till en stor soffa och växter'"
@@ -339,9 +290,7 @@ const AIHomestyling = () => {
           {/* Generate Button */}
           <Button
             onClick={generateStyledImage}
-            disabled={
-              !selectedFile || !selectedStyle || !selectedRoom || isProcessing
-            }
+            disabled={!selectedFile || !selectedStyle || !selectedRoom || isProcessing}
             className="w-full h-12 bg-gradient-nordic hover:opacity-90"
           >
             {isProcessing ? (
@@ -437,9 +386,7 @@ const AIHomestyling = () => {
                 <li>• Undvik för rörliga eller suddiga bilder</li>
                 <li>• Experimentera med olika intensitetsnivåer</li>
                 <li>• Prova anpassade instruktioner för specifika önskemål</li>
-                <li>
-                  • Skandinavisk stil fungerar särskilt bra för svenska hem
-                </li>
+                <li>• Skandinavisk stil fungerar särskilt bra för svenska hem</li>
               </ul>
             </CardContent>
           </Card>

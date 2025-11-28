@@ -1,28 +1,13 @@
-import {
-  Building2,
-  Check,
-  CheckCircle2,
-  CreditCard,
-  Edit2,
-  FileText,
-  Package,
-  X,
-} from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { CheckCircle2, Package, CreditCard, FileText, Building2, User, Edit2, Check, X } from 'lucide-react';
 
 interface SellerProjectReviewProps {
   ad: any;
@@ -33,49 +18,46 @@ interface SellerProjectReviewProps {
 export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
   ad,
   onApproved,
-  onRejected,
+  onRejected
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [editingBillingAddress, setEditingBillingAddress] = useState(false);
-  const [editedBillingAddress, setEditedBillingAddress] = useState("");
+  const [editedBillingAddress, setEditedBillingAddress] = useState('');
   const [selectedPackage, setSelectedPackage] = useState(ad.ad_tier);
 
   const brokerData = ad.broker_form_data || {};
   const projectDetails = brokerData.projectDetails || {};
-  const _property = ad.properties;
+  const property = ad.properties;
 
   const handleApprove = async () => {
     try {
       setLoading(true);
 
       // För nyproduktionsprojekt, starta betalningsprocess
-      const { data, error } = await supabase.functions.invoke(
-        "create-ad-payment",
-        {
-          body: {
-            adId: ad.id,
-            adTier: selectedPackage,
-          },
-        },
-      );
+      const { data, error } = await supabase.functions.invoke('create-ad-payment', {
+        body: {
+          adId: ad.id,
+          adTier: selectedPackage
+        }
+      });
 
       if (error) throw error;
-      if (!data?.url) throw new Error("Ingen betalningslänk mottagen");
+      if (!data?.url) throw new Error('Ingen betalningslänk mottagen');
 
       // Öppna Stripe Checkout
-      window.open(data.url, "_blank");
-
+      window.open(data.url, '_blank');
+      
       toast({
-        title: "Betalsida öppnad",
-        description: "Slutför betalningen för att publicera projektet.",
+        title: 'Betalsida öppnad',
+        description: 'Slutför betalningen för att publicera projektet.'
       });
     } catch (error) {
-      console.error("Error starting payment:", error);
+      console.error('Error starting payment:', error);
       toast({
-        title: "Ett fel uppstod",
-        description: "Kunde inte starta betalningen. Försök igen.",
-        variant: "destructive",
+        title: 'Ett fel uppstod',
+        description: 'Kunde inte starta betalningen. Försök igen.',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -84,43 +66,43 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
 
   const getPackageDetails = (tier: string) => {
     switch (tier) {
-      case "premium":
+      case 'premium':
         return {
-          name: "Exklusivpaket",
-          price: "8 999 kr",
+          name: 'Exklusivpaket',
+          price: '8 999 kr',
           features: [
-            "Premium placering i sökresultat",
-            "Framhävd i projektlistningar",
-            "Obegränsade bilder och videor",
-            "AI-verktyg för marknadsföring",
-            "3D-visningar och virtuella turer",
-            "Prioriterad support",
-            "Detaljerad statistik",
-            "Social media marknadsföring",
-          ],
+            'Premium placering i sökresultat',
+            'Framhävd i projektlistningar',
+            'Obegränsade bilder och videor',
+            'AI-verktyg för marknadsföring',
+            '3D-visningar och virtuella turer',
+            'Prioriterad support',
+            'Detaljerad statistik',
+            'Social media marknadsföring'
+          ]
         };
-      case "plus":
+      case 'plus':
         return {
-          name: "Pluspaket",
-          price: "4 999 kr",
+          name: 'Pluspaket',
+          price: '4 999 kr',
           features: [
-            "Förhöjd placering i sökresultat",
-            "Upp till 30 bilder",
-            "Video och 3D-visning",
-            "Grundläggande statistik",
-            "Projektsida med alla enheter",
-          ],
+            'Förhöjd placering i sökresultat',
+            'Upp till 30 bilder',
+            'Video och 3D-visning',
+            'Grundläggande statistik',
+            'Projektsida med alla enheter'
+          ]
         };
       default:
         return {
-          name: "Grundpaket",
-          price: "Gratis",
+          name: 'Grundpaket',
+          price: 'Gratis',
           features: [
-            "Standard placering",
-            "Upp till 10 bilder",
-            "Projektsida",
-            "Grundläggande exponering",
-          ],
+            'Standard placering',
+            'Upp till 10 bilder',
+            'Projektsida',
+            'Grundläggande exponering'
+          ]
         };
     }
   };
@@ -133,10 +115,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
             <Building2 className="h-5 w-5" />
             Granska Nyproduktionsprojekt
           </CardTitle>
-          <Badge
-            variant="outline"
-            className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400"
-          >
+          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
             Inväntar godkännande
           </Badge>
         </div>
@@ -152,59 +131,35 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Projektnamn
-              </span>
-              <p className="text-base font-semibold text-foreground">
-                {projectDetails.projectName}
-              </p>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Projektnamn</span>
+              <p className="text-base font-semibold text-foreground">{projectDetails.projectName}</p>
             </div>
             <div className="space-y-1">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Adress
-              </span>
-              <p className="text-base font-semibold text-foreground">
-                {brokerData.propertyInfo?.address}
-              </p>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Adress</span>
+              <p className="text-base font-semibold text-foreground">{brokerData.propertyInfo?.address}</p>
             </div>
             <div className="space-y-1">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Antal enheter
-              </span>
-              <p className="text-base font-semibold text-foreground">
-                {projectDetails.totalUnits} st
-              </p>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Antal enheter</span>
+              <p className="text-base font-semibold text-foreground">{projectDetails.totalUnits} st</p>
             </div>
             {projectDetails.completionDate && (
               <div className="space-y-1">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Färdigställande
-                </span>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Färdigställande</span>
                 <p className="text-base font-semibold text-foreground">
-                  {new Date(projectDetails.completionDate).toLocaleDateString(
-                    "sv-SE",
-                  )}
+                  {new Date(projectDetails.completionDate).toLocaleDateString('sv-SE')}
                 </p>
               </div>
             )}
             {projectDetails.builderCompany && (
               <div className="space-y-1">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Byggföretag
-                </span>
-                <p className="text-base font-semibold text-foreground">
-                  {projectDetails.builderCompany}
-                </p>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Byggföretag</span>
+                <p className="text-base font-semibold text-foreground">{projectDetails.builderCompany}</p>
               </div>
             )}
             {projectDetails.architectFirm && (
               <div className="space-y-1">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Arkitektfirma
-                </span>
-                <p className="text-base font-semibold text-foreground">
-                  {projectDetails.architectFirm}
-                </p>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Arkitektfirma</span>
+                <p className="text-base font-semibold text-foreground">{projectDetails.architectFirm}</p>
               </div>
             )}
           </div>
@@ -214,9 +169,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-3">
                 Projektbeskrivning
               </span>
-              <p className="text-sm text-foreground leading-relaxed">
-                {projectDetails.projectDescription}
-              </p>
+              <p className="text-sm text-foreground leading-relaxed">{projectDetails.projectDescription}</p>
             </div>
           )}
 
@@ -225,9 +178,9 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-2">
                 Projektwebbsida
               </span>
-              <a
-                href={projectDetails.projectWebsite}
-                target="_blank"
+              <a 
+                href={projectDetails.projectWebsite} 
+                target="_blank" 
                 rel="noopener noreferrer"
                 className="text-sm underline text-primary hover:text-primary/80"
               >
@@ -250,15 +203,11 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               {projectDetails.videoUrl && (
                 <>
                   <div className="space-y-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
-                      Film
-                    </span>
-                    <p className="text-base font-semibold text-foreground">
-                      Filmlänk har lagts till
-                    </p>
-                    <a
-                      href={projectDetails.videoUrl}
-                      target="_blank"
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">Film</span>
+                    <p className="text-base font-semibold text-foreground">Filmlänk har lagts till</p>
+                    <a 
+                      href={projectDetails.videoUrl} 
+                      target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm underline text-primary break-all hover:text-primary/80 transition-colors block mt-1"
                     >
@@ -271,23 +220,17 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
                       </p>
                     )}
                   </div>
-                  {projectDetails.threedTourUrl && (
-                    <Separator className="bg-border/50" />
-                  )}
+                  {projectDetails.threedTourUrl && <Separator className="bg-border/50" />}
                 </>
               )}
 
               {projectDetails.threedTourUrl && (
                 <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">
-                    3D-visning
-                  </span>
-                  <p className="text-base font-semibold text-foreground">
-                    3D-visningslänk har lagts till
-                  </p>
-                  <a
-                    href={projectDetails.threedTourUrl}
-                    target="_blank"
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">3D-visning</span>
+                  <p className="text-base font-semibold text-foreground">3D-visningslänk har lagts till</p>
+                  <a 
+                    href={projectDetails.threedTourUrl} 
+                    target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm underline text-primary break-all hover:text-primary/80 transition-colors block mt-1"
                   >
@@ -307,42 +250,27 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
             </div>
             Välj annonspaket
           </h3>
-
+          
           <p className="text-sm text-muted-foreground mb-6">
-            Mäklaren rekommenderar{" "}
-            <strong>{getPackageDetails(ad.ad_tier).name}</strong>
+            Mäklaren rekommenderar <strong>{getPackageDetails(ad.ad_tier).name}</strong>
             {brokerData.brokerRecommendation && (
-              <span className="block mt-2 italic">
-                &quot;{brokerData.brokerRecommendation}&quot;
-              </span>
+              <span className="block mt-2 italic">&quot;{brokerData.brokerRecommendation}&quot;</span>
             )}
           </p>
 
-          <Accordion
-            type="single"
-            collapsible
-            defaultValue={ad.ad_tier}
-            className="space-y-4"
-          >
+          <Accordion type="single" collapsible defaultValue={ad.ad_tier} className="space-y-4">
             {/* Premium Package */}
-            <AccordionItem
-              value="premium"
-              className="border rounded-lg overflow-hidden"
-            >
-              <AccordionTrigger
+            <AccordionItem value="premium" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger 
                 className="px-6 hover:no-underline hover:bg-muted/50 data-[state=open]:bg-primary/5"
-                onClick={() => setSelectedPackage("premium")}
+                onClick={() => setSelectedPackage('premium')}
               >
                 <div className="flex items-center justify-between w-full pr-4">
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        selectedPackage === "premium"
-                          ? "border-primary bg-primary"
-                          : "border-muted-foreground"
-                      }`}
-                    >
-                      {selectedPackage === "premium" && (
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedPackage === 'premium' ? 'border-primary bg-primary' : 'border-muted-foreground'
+                    }`}>
+                      {selectedPackage === 'premium' && (
                         <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground" />
                       )}
                     </div>
@@ -351,16 +279,14 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
                       <p className="text-sm text-muted-foreground">8 999 kr</p>
                     </div>
                   </div>
-                  {ad.ad_tier === "premium" && (
-                    <Badge variant="default" className="mr-8">
-                      Rekommenderad
-                    </Badge>
+                  {ad.ad_tier === 'premium' && (
+                    <Badge variant="default" className="mr-8">Rekommenderad</Badge>
                   )}
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <ul className="space-y-2 text-sm">
-                  {getPackageDetails("premium").features.map((feature, idx) => (
+                  {getPackageDetails('premium').features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
@@ -371,23 +297,16 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
             </AccordionItem>
 
             {/* Plus Package */}
-            <AccordionItem
-              value="plus"
-              className="border rounded-lg overflow-hidden"
-            >
-              <AccordionTrigger
+            <AccordionItem value="plus" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger 
                 className="px-6 hover:no-underline hover:bg-muted/50"
-                onClick={() => setSelectedPackage("plus")}
+                onClick={() => setSelectedPackage('plus')}
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedPackage === "plus"
-                        ? "border-primary bg-primary"
-                        : "border-muted-foreground"
-                    }`}
-                  >
-                    {selectedPackage === "plus" && (
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    selectedPackage === 'plus' ? 'border-primary bg-primary' : 'border-muted-foreground'
+                  }`}>
+                    {selectedPackage === 'plus' && (
                       <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground" />
                     )}
                   </div>
@@ -399,7 +318,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <ul className="space-y-2 text-sm">
-                  {getPackageDetails("plus").features.map((feature, idx) => (
+                  {getPackageDetails('plus').features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
@@ -410,23 +329,16 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
             </AccordionItem>
 
             {/* Free Package */}
-            <AccordionItem
-              value="free"
-              className="border rounded-lg overflow-hidden"
-            >
-              <AccordionTrigger
+            <AccordionItem value="free" className="border rounded-lg overflow-hidden">
+              <AccordionTrigger 
                 className="px-6 hover:no-underline hover:bg-muted/50"
-                onClick={() => setSelectedPackage("free")}
+                onClick={() => setSelectedPackage('free')}
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedPackage === "free"
-                        ? "border-primary bg-primary"
-                        : "border-muted-foreground"
-                    }`}
-                  >
-                    {selectedPackage === "free" && (
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    selectedPackage === 'free' ? 'border-primary bg-primary' : 'border-muted-foreground'
+                  }`}>
+                    {selectedPackage === 'free' && (
                       <div className="w-2.5 h-2.5 rounded-full bg-primary-foreground" />
                     )}
                   </div>
@@ -438,7 +350,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <ul className="space-y-2 text-sm">
-                  {getPackageDetails("free").features.map((feature, idx) => (
+                  {getPackageDetails('free').features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
@@ -460,13 +372,9 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
           </h3>
           <div className="space-y-6">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Betalare
-              </span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Betalare</span>
               <p className="text-base font-semibold text-foreground">
-                {brokerData.paymentInfo?.payer === "seller"
-                  ? "Ditt företag"
-                  : "Mäklarkontoret"}
+                {brokerData.paymentInfo?.payer === 'seller' ? 'Ditt företag' : 'Mäklarkontoret'}
               </p>
             </div>
             <div>
@@ -480,9 +388,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
                     size="sm"
                     onClick={() => {
                       setEditingBillingAddress(true);
-                      setEditedBillingAddress(
-                        brokerData.paymentInfo?.billingAddress?.address || "",
-                      );
+                      setEditedBillingAddress(brokerData.paymentInfo?.billingAddress?.address || '');
                     }}
                     className="h-8 text-xs font-medium"
                   >
@@ -511,30 +417,26 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
                               ...brokerData.paymentInfo,
                               billingAddress: {
                                 ...brokerData.paymentInfo?.billingAddress,
-                                address: editedBillingAddress,
-                              },
-                            },
+                                address: editedBillingAddress
+                              }
+                            }
                           };
                           const { error } = await supabase
-                            .from("ads")
+                            .from('ads')
                             .update({ broker_form_data: updatedBrokerData })
-                            .eq("id", ad.id);
+                            .eq('id', ad.id);
                           if (error) throw error;
                           setEditingBillingAddress(false);
                           toast({
-                            title: "Adress uppdaterad",
-                            description: "Faktureringsadressen har sparats.",
+                            title: 'Adress uppdaterad',
+                            description: 'Faktureringsadressen har sparats.'
                           });
                         } catch (error) {
-                          console.error(
-                            "Error updating billing address:",
-                            error,
-                          );
+                          console.error('Error updating billing address:', error);
                           toast({
-                            title: "Ett fel uppstod",
-                            description:
-                              "Kunde inte spara adressen. Försök igen.",
-                            variant: "destructive",
+                            title: 'Ett fel uppstod',
+                            description: 'Kunde inte spara adressen. Försök igen.',
+                            variant: 'destructive'
                           });
                         }
                       }}
@@ -548,7 +450,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
                       size="sm"
                       onClick={() => {
                         setEditingBillingAddress(false);
-                        setEditedBillingAddress("");
+                        setEditedBillingAddress('');
                       }}
                       className="h-9 text-xs font-medium"
                     >
@@ -560,8 +462,7 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
               ) : (
                 <div>
                   <p className="text-base font-semibold text-foreground">
-                    {brokerData.paymentInfo?.billingAddress?.address ||
-                      "Ingen adress angiven"}
+                    {brokerData.paymentInfo?.billingAddress?.address || 'Ingen adress angiven'}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Faktureringsadress fylldes i av mäklaren
@@ -581,13 +482,12 @@ export const SellerProjectReview: React.FC<SellerProjectReviewProps> = ({
             size="lg"
           >
             <CheckCircle2 className="mr-2 h-5 w-5" />
-            {loading ? "Bearbetar..." : "Godkänn och fortsätt till betalning"}
+            {loading ? 'Bearbetar...' : 'Godkänn och fortsätt till betalning'}
           </Button>
         </div>
 
         <p className="text-xs text-center text-muted-foreground">
-          Efter godkännande kommer du att dirigeras till en säker betalsida för
-          att slutföra köpet.
+          Efter godkännande kommer du att dirigeras till en säker betalsida för att slutföra köpet.
         </p>
       </CardContent>
     </Card>

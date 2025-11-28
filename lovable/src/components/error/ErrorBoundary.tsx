@@ -1,7 +1,7 @@
-import { AlertTriangle, Home, RefreshCw } from "lucide-react";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -14,10 +14,7 @@ interface ErrorBoundaryProps {
   fallback?: React.ComponentType<{ error: Error; reset: () => void }>;
 }
 
-export default class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -35,8 +32,8 @@ export default class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
-
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    
     this.setState({
       error,
       errorInfo,
@@ -44,7 +41,7 @@ export default class ErrorBoundary extends React.Component<
 
     // In production, you would send this to your error reporting service
     // Example: Sentry, LogRocket, etc.
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
       // logErrorToService(error, errorInfo);
     }
   }
@@ -62,12 +59,7 @@ export default class ErrorBoundary extends React.Component<
       // Custom fallback component
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;
-        return (
-          <FallbackComponent
-            error={this.state.error!}
-            reset={this.handleReset}
-          />
-        );
+        return <FallbackComponent error={this.state.error!} reset={this.handleReset} />;
       }
 
       // Default error UI
@@ -83,38 +75,36 @@ export default class ErrorBoundary extends React.Component<
                 Ett oväntat fel inträffade. Vi ber om ursäkt för besväret.
               </p>
             </CardHeader>
-
+            
             <CardContent className="space-y-4">
-              {process.env.NODE_ENV === "development" && this.state.error && (
+              {process.env.NODE_ENV === 'development' && this.state.error && (
                 <div className="p-4 bg-muted rounded-lg">
-                  <h4 className="font-semibold text-sm mb-2">
-                    Fel information (endast utveckling):
-                  </h4>
+                  <h4 className="font-semibold text-sm mb-2">Fel information (endast utveckling):</h4>
                   <pre className="text-xs text-muted-foreground overflow-auto max-h-32">
                     {this.state.error.message}
                   </pre>
                 </div>
               )}
-
+              
               <div className="flex gap-2">
                 <Button onClick={this.handleReset} className="flex-1">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Försök igen
                 </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={() => (window.location.href = "/")}
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.location.href = '/'}
                   className="flex-1"
                 >
                   <Home className="h-4 w-4 mr-2" />
                   Hem
                 </Button>
               </div>
-
+              
               <div className="text-center">
-                <Button
-                  variant="link"
+                <Button 
+                  variant="link" 
                   onClick={() => window.location.reload()}
                   className="text-sm"
                 >
@@ -132,12 +122,12 @@ export default class ErrorBoundary extends React.Component<
 }
 
 // Functional component version using react-error-boundary (if you prefer hooks)
-export function ErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
+export function ErrorFallback({ 
+  error, 
+  resetErrorBoundary 
+}: { 
+  error: Error; 
+  resetErrorBoundary: () => void; 
 }) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -151,9 +141,9 @@ export function ErrorFallback({
             Ett oväntat fel inträffade. Vi ber om ursäkt för besväret.
           </p>
         </CardHeader>
-
+        
         <CardContent className="space-y-4">
-          {process.env.NODE_ENV === "development" && (
+          {process.env.NODE_ENV === 'development' && (
             <div className="p-4 bg-muted rounded-lg">
               <h4 className="font-semibold text-sm mb-2">Fel information:</h4>
               <pre className="text-xs text-muted-foreground overflow-auto max-h-32">
@@ -161,16 +151,16 @@ export function ErrorFallback({
               </pre>
             </div>
           )}
-
+          
           <div className="flex gap-2">
             <Button onClick={resetErrorBoundary} className="flex-1">
               <RefreshCw className="h-4 w-4 mr-2" />
               Försök igen
             </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/")}
+            
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/'}
               className="flex-1"
             >
               <Home className="h-4 w-4 mr-2" />

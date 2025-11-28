@@ -1,37 +1,20 @@
-import type { Session, User } from "@supabase/supabase-js";
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (
-    email: string,
-    password: string,
-    fullName: string,
-    extraData?: Record<string, any>,
-  ) => Promise<{ error: any }>;
-  signUpBroker: (
-    email: string,
-    password: string,
-    fullName: string,
-    phone?: string,
-    company?: string,
-  ) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, extraData?: Record<string, any>) => Promise<{ error: any }>;
+  signUpBroker: (email: string, password: string, fullName: string, phone?: string, company?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error: any }>;
   profile: any | null;
   userRoles: string[];
-  subscriptionTier: "basic" | "pro" | "pro_plus" | null;
+  subscriptionTier: 'basic' | 'pro' | 'pro_plus' | null;
   isPro: boolean;
   refetchProfile: () => Promise<void>;
 }
@@ -44,9 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any | null>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
-  const [subscriptionTier, setSubscriptionTier] = useState<
-    "basic" | "pro" | "pro_plus" | null
-  >(null);
+  const [subscriptionTier, setSubscriptionTier] = useState<'basic' | 'pro' | 'pro_plus' | null>(null);
   const { toast } = useToast();
 
   const fetchProfile = async (userId: string) => {
@@ -57,9 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Get profile (tolerate missing row)
       const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", userId)
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
         .maybeSingle();
 
       let currentProfile = profileData as any | null;
@@ -74,46 +55,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           org_number: authUser.user_metadata?.org_number || null,
         };
         const { data: inserted } = await supabase
-          .from("profiles")
+          .from('profiles')
           .insert(insertPayload)
-          .select("*")
+          .select('*')
           .maybeSingle();
         if (inserted) currentProfile = inserted as any;
       }
 
       // Fetch roles
       const { data: rolesData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId);
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
       let rolesList = (rolesData || []).map((r: any) => r.role);
 
       // Check Stripe subscription status
       try {
-        const { data: stripeSubData, error: stripeError } =
-          await supabase.functions.invoke("check-subscription");
-
+        const { data: stripeSubData, error: stripeError } = await supabase.functions.invoke('check-subscription');
+        
         if (!stripeError && stripeSubData) {
           // Map Stripe product IDs to subscription tiers
-          const productTierMap: Record<string, "pro" | "pro_plus"> = {
-            prod_TOs2jnacEEHmfU: "pro", // Pro Subscription (Personal)
-            prod_TOs2Kad3mW3IRa: "pro_plus", // Pro+ Subscription (Personal)
-            prod_TOs7r52GhNYjBj: "pro", // Pro Subscription (Company)
-            prod_TOs7LSUYPyMBob: "pro_plus", // Pro+ Subscription (Company)
+          const productTierMap: Record<string, 'pro' | 'pro_plus'> = {
+            'prod_TOs2jnacEEHmfU': 'pro',       // Pro Subscription (Personal)
+            'prod_TOs2Kad3mW3IRa': 'pro_plus', // Pro+ Subscription (Personal)
+            'prod_TOs7r52GhNYjBj': 'pro',       // Pro Subscription (Company)
+            'prod_TOs7LSUYPyMBob': 'pro_plus', // Pro+ Subscription (Company)
           };
-
+          
           if (stripeSubData.subscribed && stripeSubData.product_id) {
-            const tier = productTierMap[stripeSubData.product_id] || "basic";
+            const tier = productTierMap[stripeSubData.product_id] || 'basic';
             setSubscriptionTier(tier);
           } else {
-            setSubscriptionTier("basic");
+            setSubscriptionTier('basic');
           }
         } else {
-          setSubscriptionTier("basic");
+          setSubscriptionTier('basic');
         }
       } catch (error) {
-        console.error("Error checking subscription:", error);
-        setSubscriptionTier("basic");
+        console.error('Error checking subscription:', error);
+        setSubscriptionTier('basic');
       }
 
       // Ensure company role & profile from metadata on first login
@@ -121,31 +101,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const metaType = authUser.user_metadata?.account_type;
         const metaCompany = authUser.user_metadata?.company_name;
         const metaOrg = authUser.user_metadata?.org_number;
-
+        
         // Ensure company users get the 'company' role
-        if (metaType === "company" && !rolesList.includes("company")) {
-          const { error: roleErr } = await supabase
-            .from("user_roles")
-            .insert({ user_id: userId, role: "company" });
-          if (!roleErr) rolesList = [...rolesList, "company"];
+        if (metaType === 'company' && !rolesList.includes('company')) {
+          const { error: roleErr } = await supabase.from('user_roles').insert({ user_id: userId, role: 'company' });
+          if (!roleErr) rolesList = [...rolesList, 'company'];
         }
-
-        if (metaType === "company" && (metaCompany || metaOrg)) {
-          if (
-            !currentProfile ||
-            !currentProfile.company_name ||
-            !currentProfile.org_number
-          ) {
+        
+        if (metaType === 'company' && (metaCompany || metaOrg)) {
+          if (!currentProfile || !currentProfile.company_name || !currentProfile.org_number) {
             const { data: updated } = await supabase
-              .from("profiles")
+              .from('profiles')
               .update({
-                company_name:
-                  currentProfile?.company_name || metaCompany || null,
+                company_name: currentProfile?.company_name || metaCompany || null,
                 org_number: currentProfile?.org_number || metaOrg || null,
                 updated_at: new Date().toISOString(),
               })
-              .eq("user_id", userId)
-              .select("*")
+              .eq('user_id', userId)
+              .select('*')
               .maybeSingle();
             if (updated) currentProfile = updated as any;
           }
@@ -155,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (currentProfile) setProfile(currentProfile);
       setUserRoles(rolesList);
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -167,31 +140,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
 
-      // Defer profile fetching to avoid recursion
-      if (session?.user) {
-        setTimeout(() => {
-          fetchProfile(session.user.id);
-        }, 0);
-      } else {
-        setProfile(null);
-        setUserRoles([]);
-        setSubscriptionTier(null);
+        // Defer profile fetching to avoid recursion
+        if (session?.user) {
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+          setUserRoles([]);
+          setSubscriptionTier(null);
+        }
       }
-    });
+    );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-
+      
       if (session?.user) {
         setTimeout(() => {
           fetchProfile(session.user.id);
@@ -200,16 +173,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+  }, []);
 
-  const signUp = async (
-    email: string,
-    password: string,
-    fullName: string,
-    extraData?: Record<string, any>,
-  ) => {
+  const signUp = async (email: string, password: string, fullName: string, extraData?: Record<string, any>) => {
     const redirectUrl = `${window.location.origin}/`;
-
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -238,15 +206,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signUpBroker = async (
-    email: string,
-    password: string,
-    fullName: string,
-    phone?: string,
-    company?: string,
-  ) => {
+  const signUpBroker = async (email: string, password: string, fullName: string, phone?: string, company?: string) => {
     const redirectUrl = `${window.location.origin}/`;
-
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -270,8 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       toast({
         title: "Mäklarkonto skapat!",
-        description:
-          "Kontrollera din e-post för att bekräfta ditt konto. Du får automatiskt mäklarbehörighet.",
+        description: "Kontrollera din e-post för att bekräfta ditt konto. Du får automatiskt mäklarbehörighet.",
       });
     }
 
@@ -318,19 +279,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = async () => {
     if (!user) {
-      throw new Error("Ingen användare är inloggad");
+      throw new Error('Ingen användare är inloggad');
     }
 
     try {
       // Call our edge function to delete user and all related data
-      const { error: deleteError } = await supabase.functions.invoke(
-        "delete-user-account",
-        {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`,
-          },
+      const { error: deleteError } = await supabase.functions.invoke('delete-user-account', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
         },
-      );
+      });
 
       if (deleteError) {
         throw deleteError;
@@ -341,13 +299,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       toast({
         title: "Konto raderat",
-        description:
-          "Ditt konto och all associerad data har tagits bort permanent.",
+        description: "Ditt konto och all associerad data har tagits bort permanent.",
       });
 
       return { error: null };
     } catch (error: any) {
-      const errorMessage = error.message || "Kunde inte radera kontot";
+      const errorMessage = error.message || 'Kunde inte radera kontot';
       toast({
         title: "Fel vid kontoradering",
         description: errorMessage,
@@ -369,7 +326,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     userRoles,
     subscriptionTier,
-    isPro: subscriptionTier === "pro",
+    isPro: subscriptionTier === 'pro',
     refetchProfile,
   };
 
@@ -379,7 +336,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

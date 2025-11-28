@@ -1,7 +1,7 @@
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import PropertyCard, { type Property } from "./PropertyCard";
+import React, { useState, useEffect } from 'react';
+import PropertyCard, { Property } from './PropertyCard';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 interface SimilarPropertiesProps {
   currentProperty: {
@@ -13,15 +13,13 @@ interface SimilarPropertiesProps {
   };
 }
 
-export default function SimilarProperties({
-  currentProperty,
-}: SimilarPropertiesProps) {
+export default function SimilarProperties({ currentProperty }: SimilarPropertiesProps) {
   const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchSimilarProperties();
-  }, [fetchSimilarProperties]);
+  }, [currentProperty.id]);
 
   const fetchSimilarProperties = async () => {
     try {
@@ -33,25 +31,25 @@ export default function SimilarProperties({
 
       // Fetch similar properties with the same criteria
       const { data, error } = await supabase
-        .from("properties")
-        .select("*")
-        .eq("address_city", currentProperty.address_city)
-        .eq("property_type", currentProperty.property_type)
-        .eq("status", currentProperty.status) // Only show properties with same status
-        .neq("id", currentProperty.id) // Exclude current property
-        .gte("price", minPrice)
-        .lte("price", maxPrice)
-        .order("created_at", { ascending: false })
+        .from('properties')
+        .select('*')
+        .eq('address_city', currentProperty.address_city)
+        .eq('property_type', currentProperty.property_type)
+        .eq('status', currentProperty.status) // Only show properties with same status
+        .neq('id', currentProperty.id) // Exclude current property
+        .gte('price', minPrice)
+        .lte('price', maxPrice)
+        .order('created_at', { ascending: false })
         .limit(6);
 
       if (error) {
-        console.error("Error fetching similar properties:", error);
+        console.error('Error fetching similar properties:', error);
         return;
       }
 
       setSimilarProperties((data || []) as unknown as Property[]);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }

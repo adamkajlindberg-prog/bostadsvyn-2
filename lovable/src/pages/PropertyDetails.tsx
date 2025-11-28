@@ -1,6 +1,7 @@
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { PropertyDetails as PropertyDetailsComponent } from "@/components/PropertyDetails";
+import React from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { PropertyDetails as PropertyDetailsComponent } from '@/components/PropertyDetails';
 
 const PropertyDetails = () => {
   return (

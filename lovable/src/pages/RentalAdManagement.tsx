@@ -1,32 +1,17 @@
-import {
-  ArrowLeft,
-  Calendar,
-  CheckCircle2,
-  Eye,
-  FileText,
-  Heart,
-  MessageSquare,
-  Settings,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import RentalPropertyAnalytics from "@/components/analytics/RentalPropertyAnalytics";
-import PropertyCard, { type Property } from "@/components/PropertyCard";
-import RentalChat from "@/components/rental/RentalChat";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { BarChart3, TrendingUp, Eye, Heart, MessageSquare, Calendar, Clock, Settings, ArrowLeft, Users, Share2, CheckCircle2, AlertCircle, FileText } from 'lucide-react';
+import RentalChat from '@/components/rental/RentalChat';
+import { ChatShortcut } from '@/components/ChatShortcut';
+import PropertyCard, { Property } from '@/components/PropertyCard';
+import RentalPropertyAnalytics from '@/components/analytics/RentalPropertyAnalytics';
 interface AdStats {
   views: number;
   favorites: number;
@@ -47,26 +32,22 @@ export default function RentalAdManagement() {
     favorites: 0,
     inquiries: 0,
     applications: 0,
-    scheduledViewings: 0,
+    scheduledViewings: 0
   });
   const [loading, setLoading] = useState(true);
-  const initialTab =
-    (searchParams.get("tab") as
-      | "overview"
-      | "chat"
-      | "inquiries"
-      | "analytics") || "overview";
+  const initialTab = (searchParams.get('tab') as 'overview' | 'chat' | 'inquiries' | 'analytics') || 'overview';
   useEffect(() => {
     if (user && id) {
       loadAdData();
       loadStats();
     }
-  }, [user, id, loadAdData, loadStats]);
+  }, [user, id]);
   const loadAdData = async () => {
     try {
-      const { data, error } = await supabase
-        .from("ads")
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('ads').select(`
           *,
           properties (
             id,
@@ -81,18 +62,15 @@ export default function RentalAdManagement() {
             images,
             rental_info
           )
-        `)
-        .eq("id", id)
-        .eq("user_id", user?.id)
-        .single();
+        `).eq('id', id).eq('user_id', user?.id).single();
       if (error) throw error;
       setAd(data);
     } catch (error) {
-      console.error("Error loading ad:", error);
+      console.error('Error loading ad:', error);
       toast({
         title: "Fel",
         description: "Kunde inte ladda annonsdata",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -107,51 +85,39 @@ export default function RentalAdManagement() {
         inquiries: Math.floor(Math.random() * 20),
         applications: Math.floor(Math.random() * 8),
         scheduledViewings: Math.floor(Math.random() * 12),
-        lastViewed: new Date().toISOString(),
+        lastViewed: new Date().toISOString()
       });
     } catch (error) {
-      console.error("Error loading stats:", error);
+      console.error('Error loading stats:', error);
     }
   };
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+    return <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </div>
-    );
+      </div>;
   }
   if (!ad) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+    return <div className="container mx-auto px-4 py-8">
         <Card>
           <CardContent className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">
-              Annonsen hittades inte
-            </h3>
-            <Button onClick={() => navigate("/dashboard")} className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Annonsen hittades inte</h3>
+            <Button onClick={() => navigate('/dashboard')} className="mt-4">
               Tillbaka till Dashboard
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-  return (
-    <div className="container mx-auto px-4 py-8">
+  return <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/dashboard")}
-          className="mb-4"
-        >
+        <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Tillbaka till Dashboard
         </Button>
-
+        
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">{ad.title}</h1>
@@ -159,6 +125,7 @@ export default function RentalAdManagement() {
               {ad.properties?.address_street}, {ad.properties?.address_city}
             </p>
           </div>
+          
         </div>
       </div>
 
@@ -166,23 +133,18 @@ export default function RentalAdManagement() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold">Förhandsgranskning</h2>
-          <Button
-            onClick={() => navigate(`/redigera-hyresannons/${id}`)}
-            size="sm"
-          >
+          <Button onClick={() => navigate(`/redigera-hyresannons/${id}`)} size="sm">
             <Settings className="h-4 w-4 mr-2" />
             Redigera annons
           </Button>
         </div>
-        <PropertyCard
-          property={
-            {
-              ...ad.properties,
-              status: "FOR_RENT",
-              ad_tier: ad.ad_tier,
-              ad_id: ad.id,
-            } as Property
-          }
+        <PropertyCard 
+          property={{
+            ...ad.properties,
+            status: 'FOR_RENT',
+            ad_tier: ad.ad_tier,
+            ad_id: ad.id
+          } as Property}
           disableClick={true}
         />
       </div>
@@ -225,6 +187,8 @@ export default function RentalAdManagement() {
           </CardContent>
         </Card>
 
+        
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -256,27 +220,18 @@ export default function RentalAdManagement() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Hyra per månad</span>
-                    <span className="font-semibold">
-                      {ad.properties?.price?.toLocaleString("sv-SE")} kr
-                    </span>
+                    <span className="font-semibold">{ad.properties?.price?.toLocaleString('sv-SE')} kr</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Tillträdesdatum</span>
                     <span className="font-semibold">
-                      {ad.properties?.rental_info?.move_in_date
-                        ? new Date(
-                            ad.properties.rental_info.move_in_date,
-                          ).toLocaleDateString("sv-SE")
-                        : "Enligt överenskommelse"}
+                      {ad.properties?.rental_info?.move_in_date ? new Date(ad.properties.rental_info.move_in_date).toLocaleDateString('sv-SE') : 'Enligt överenskommelse'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Hyresperiod</span>
                     <span className="font-semibold">
-                      {ad.properties?.rental_info?.contract_type ===
-                      "first_hand"
-                        ? "Förstahandskontrakt"
-                        : "Andrahandskontrakt"}
+                      {ad.properties?.rental_info?.contract_type === 'first_hand' ? 'Förstahandskontrakt' : 'Andrahandskontrakt'}
                     </span>
                   </div>
                 </div>
@@ -294,29 +249,21 @@ export default function RentalAdManagement() {
                     <FileText className="h-4 w-4 text-muted-foreground mt-1" />
                     <div>
                       <p className="text-sm font-medium">Ny ansökan</p>
-                      <p className="text-xs text-muted-foreground">
-                        För 1 timme sedan
-                      </p>
+                      <p className="text-xs text-muted-foreground">För 1 timme sedan</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <MessageSquare className="h-4 w-4 text-muted-foreground mt-1" />
                     <div>
-                      <p className="text-sm font-medium">
-                        Nytt meddelande i chatt
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        För 3 timmar sedan
-                      </p>
+                      <p className="text-sm font-medium">Nytt meddelande i chatt</p>
+                      <p className="text-xs text-muted-foreground">För 3 timmar sedan</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Calendar className="h-4 w-4 text-muted-foreground mt-1" />
                     <div>
                       <p className="text-sm font-medium">Visningstid bokad</p>
-                      <p className="text-xs text-muted-foreground">
-                        För 5 timmar sedan
-                      </p>
+                      <p className="text-xs text-muted-foreground">För 5 timmar sedan</p>
                     </div>
                   </div>
                 </div>
@@ -338,12 +285,8 @@ export default function RentalAdManagement() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-semibold">Anna Andersson</p>
-                      <p className="text-sm text-muted-foreground">
-                        anna@example.com
-                      </p>
-                      <p className="text-sm mt-2">
-                        Intresserad av att hyra lägenheten. Jobbar som lärare.
-                      </p>
+                      <p className="text-sm text-muted-foreground">anna@example.com</p>
+                      <p className="text-sm mt-2">Intresserad av att hyra lägenheten. Jobbar som lärare.</p>
                     </div>
                     <Badge variant="secondary">Ny</Badge>
                   </div>
@@ -352,9 +295,7 @@ export default function RentalAdManagement() {
                       <CheckCircle2 className="h-4 w-4 mr-1" />
                       Godkänn
                     </Button>
-                    <Button size="sm" variant="outline">
-                      Svara
-                    </Button>
+                    <Button size="sm" variant="outline">Svara</Button>
                   </div>
                 </div>
 
@@ -362,22 +303,14 @@ export default function RentalAdManagement() {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-semibold">Erik Svensson</p>
-                      <p className="text-sm text-muted-foreground">
-                        erik@example.com
-                      </p>
-                      <p className="text-sm mt-2">
-                        Vill boka en visning nästa vecka.
-                      </p>
+                      <p className="text-sm text-muted-foreground">erik@example.com</p>
+                      <p className="text-sm mt-2">Vill boka en visning nästa vecka.</p>
                     </div>
                     <Badge variant="secondary">Ny</Badge>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <Button size="sm" variant="default">
-                      Boka visning
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      Svara
-                    </Button>
+                    <Button size="sm" variant="default">Boka visning</Button>
+                    <Button size="sm" variant="outline">Svara</Button>
                   </div>
                 </div>
               </div>
@@ -395,6 +328,5 @@ export default function RentalAdManagement() {
           <RentalChat adId={id!} propertyId={ad.property_id} />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 }

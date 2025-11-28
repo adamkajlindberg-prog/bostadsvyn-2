@@ -1,18 +1,19 @@
-import { ArrowLeft, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import ModerationQueue from "@/components/moderation/ModerationQueue";
-import Navigation from "@/components/Navigation";
-import SEOOptimization from "@/components/seo/SEOOptimization";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import SEOOptimization from '@/components/seo/SEOOptimization';
+import ModerationQueue from '@/components/moderation/ModerationQueue';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { Shield, ArrowLeft } from 'lucide-react';
 
 const AdminModeration = () => {
   const navigate = useNavigate();
   const { userRoles } = useAuth();
 
   // Check if user is admin
-  const isAdmin = userRoles.includes("admin");
+  const isAdmin = userRoles.includes('admin');
 
   if (!isAdmin) {
     return (
@@ -30,7 +31,7 @@ const AdminModeration = () => {
             <p className="text-muted-foreground">
               Du har inte behörighet att komma åt moderationspanelen.
             </p>
-            <Button onClick={() => navigate("/")}>
+            <Button onClick={() => navigate('/')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Tillbaka till startsidan
             </Button>
@@ -58,7 +59,7 @@ const AdminModeration = () => {
                 Granska och godkänn fastigheter och annonser innan publicering
               </p>
             </div>
-            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+            <Button variant="outline" onClick={() => navigate('/dashboard')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Tillbaka
             </Button>

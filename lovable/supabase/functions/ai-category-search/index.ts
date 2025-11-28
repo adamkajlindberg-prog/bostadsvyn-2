@@ -3,8 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -25,7 +24,7 @@ serve(async (req) => {
       rental: `Du är en AI-assistent som hjälper användare att söka efter hyresbostäder. Fokusera på hyresmarknaden och extrahera relevant information för hyresbostäder. Om användaren söker efter något som inte passar hyra, hitta ändå liknande hyresobjekt baserat på andra kriterier.`,
       nyproduktion: `Du är en AI-assistent som hjälper användare att söka efter nyproduktionsprojekt. Fokusera på nybyggda bostäder och kommande projekt. Om användaren söker efter något som inte är nyproduktion, hitta ändå liknande nyproduktionsobjekt baserat på andra kriterier.`,
       fritid: `Du är en AI-assistent som hjälper användare att söka efter fritidshus och tomter. Fokusera på fritidsboenden, sommarstugor och fritidstomter. Om användaren söker efter något som inte passar fritid, hitta ändå liknande fritidsobjekt baserat på andra kriterier.`,
-      kommersiell: `Du är en AI-assistent som hjälper användare att söka efter kommersiella fastigheter. Fokusera på kontor, butiker, lager och industrilokaler. Om användaren söker efter något som inte är kommersiellt, hitta ändå liknande kommersiella objekt baserat på andra kriterier.`,
+      kommersiell: `Du är en AI-assistent som hjälper användare att söka efter kommersiella fastigheter. Fokusera på kontor, butiker, lager och industrilokaler. Om användaren söker efter något som inte är kommersiellt, hitta ändå liknande kommersiella objekt baserat på andra kriterier.`
     };
 
     const systemPrompt = `${categoryPrompts[category as keyof typeof categoryPrompts]}
@@ -92,48 +91,34 @@ Svara ENDAST med ett JSON-objekt i följande format:
 
 Om något inte specificeras, använd null eller tom array.`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: query },
-          ],
-          temperature: 0.3,
-          max_tokens: 500,
-        }),
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: query }
+        ],
+        temperature: 0.3,
+        max_tokens: 500
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({
-            error: "För många förfrågningar. Vänta en stund och försök igen.",
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+          JSON.stringify({ error: "För många förfrågningar. Vänta en stund och försök igen." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({
-            error:
-              "Tjänsten är tillfälligt otillgänglig. Kontakta support@bostadsvyn.se",
-          }),
-          {
-            status: 402,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
+          JSON.stringify({ error: "Tjänsten är tillfälligt otillgänglig. Kontakta support@bostadsvyn.se" }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
@@ -152,7 +137,7 @@ Om något inte specificeras, använd null eller tom array.`;
       const jsonMatch = aiResponse.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
       const jsonString = jsonMatch ? jsonMatch[1] : aiResponse;
       parsedResponse = JSON.parse(jsonString);
-    } catch (_parseError) {
+    } catch (parseError) {
       console.error("Failed to parse AI response:", aiResponse);
       throw new Error("Failed to parse AI response");
     }
@@ -169,22 +154,20 @@ Om något inte specificeras, använd null eller tom array.`;
     const criteria = parsedResponse.searchCriteria;
 
     // Apply category-specific filters with fallback
-    if (category === "rental") {
-      query_builder = query_builder.eq("listing_type", "FOR_RENT");
-    } else if (category === "nyproduktion") {
-      query_builder = query_builder.or(
-        "status.eq.COMING_SOON,is_new_construction.eq.true",
-      );
-    } else if (category === "fritid") {
-      query_builder = query_builder.in("property_type", ["Fritidshus", "Tomt"]);
-    } else if (category === "kommersiell") {
-      query_builder = query_builder.eq("property_type", "Kommersiell");
+    if (category === 'rental') {
+      query_builder = query_builder.eq('listing_type', 'FOR_RENT');
+    } else if (category === 'nyproduktion') {
+      query_builder = query_builder.or('status.eq.COMING_SOON,is_new_construction.eq.true');
+    } else if (category === 'fritid') {
+      query_builder = query_builder.in('property_type', ['Fritidshus', 'Tomt']);
+    } else if (category === 'kommersiell') {
+      query_builder = query_builder.eq('property_type', 'Kommersiell');
     }
 
     // Apply location filter
     if (criteria.location) {
       query_builder = query_builder.or(
-        `address_city.ilike.%${criteria.location}%,address_street.ilike.%${criteria.location}%,address_region.ilike.%${criteria.location}%,address_municipality.ilike.%${criteria.location}%,address_postal_code.ilike.%${criteria.location}%`,
+        `address_city.ilike.%${criteria.location}%,address_street.ilike.%${criteria.location}%,address_region.ilike.%${criteria.location}%,address_municipality.ilike.%${criteria.location}%,address_postal_code.ilike.%${criteria.location}%`
       );
     }
 
@@ -194,22 +177,14 @@ Om något inte specificeras, använd null eller tom array.`;
     }
 
     // Apply other filters
-    if (criteria.minRooms)
-      query_builder = query_builder.gte("rooms", criteria.minRooms);
-    if (criteria.maxRooms)
-      query_builder = query_builder.lte("rooms", criteria.maxRooms);
-    if (criteria.minArea)
-      query_builder = query_builder.gte("living_area", criteria.minArea);
-    if (criteria.maxArea)
-      query_builder = query_builder.lte("living_area", criteria.maxArea);
-    if (criteria.minPrice)
-      query_builder = query_builder.gte("price", criteria.minPrice);
-    if (criteria.maxPrice)
-      query_builder = query_builder.lte("price", criteria.maxPrice);
-    if (criteria.minBedrooms)
-      query_builder = query_builder.gte("bedrooms", criteria.minBedrooms);
-    if (criteria.minBathrooms)
-      query_builder = query_builder.gte("bathrooms", criteria.minBathrooms);
+    if (criteria.minRooms) query_builder = query_builder.gte("rooms", criteria.minRooms);
+    if (criteria.maxRooms) query_builder = query_builder.lte("rooms", criteria.maxRooms);
+    if (criteria.minArea) query_builder = query_builder.gte("living_area", criteria.minArea);
+    if (criteria.maxArea) query_builder = query_builder.lte("living_area", criteria.maxArea);
+    if (criteria.minPrice) query_builder = query_builder.gte("price", criteria.minPrice);
+    if (criteria.maxPrice) query_builder = query_builder.lte("price", criteria.maxPrice);
+    if (criteria.minBedrooms) query_builder = query_builder.gte("bedrooms", criteria.minBedrooms);
+    if (criteria.minBathrooms) query_builder = query_builder.gte("bathrooms", criteria.minBathrooms);
 
     // Apply features filter
     if (criteria.features && criteria.features.length > 0) {
@@ -220,18 +195,15 @@ Om något inte specificeras, använd null eller tom array.`;
         featureConditions.push(`description.ilike.%${feature}%`);
       }
       if (featureConditions.length > 0) {
-        query_builder = query_builder.or(featureConditions.join(","));
+        query_builder = query_builder.or(featureConditions.join(','));
       }
     }
 
     // Apply keywords filter to search in description and title
     if (criteria.keywords) {
-      const keywordList = criteria.keywords
-        .toLowerCase()
-        .split(",")
-        .map((k) => k.trim());
+      const keywordList = criteria.keywords.toLowerCase().split(',').map(k => k.trim());
       const keywordConditions: string[] = [];
-
+      
       for (const keyword of keywordList) {
         if (keyword.length > 0) {
           keywordConditions.push(`description.ilike.%${keyword}%`);
@@ -239,9 +211,9 @@ Om något inte specificeras, använd null eller tom array.`;
           keywordConditions.push(`ai_keywords.cs.{${keyword}}`);
         }
       }
-
+      
       if (keywordConditions.length > 0) {
-        query_builder = query_builder.or(keywordConditions.join(","));
+        query_builder = query_builder.or(keywordConditions.join(','));
       }
     }
 
@@ -251,23 +223,17 @@ Om något inte specificeras, använd null eller tom array.`;
       JSON.stringify({
         ...parsedResponse,
         count: count || 0,
-        category: category,
+        category: category
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in ai-category-search:", error);
     return new Response(
       JSON.stringify({
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ett oväntat fel uppstod. Försök igen senare.",
+        error: error instanceof Error ? error.message : "Ett oväntat fel uppstod. Försök igen senare."
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

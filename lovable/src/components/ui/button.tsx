@@ -1,6 +1,6 @@
+import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -8,36 +8,26 @@ const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
-      variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-primary-deep shadow-nordic hover:shadow-elevated",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/80 shadow-lg",
-        outline:
-          "border-2 border-primary bg-background hover:bg-primary hover:text-primary-foreground shadow-sm",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/70 shadow-sm",
-        ghost: "hover:bg-accent hover:text-accent-foreground font-medium",
-        link: "text-primary underline-offset-4 hover:underline font-semibold",
-        hero: "bg-card/30 backdrop-blur-md border-2 border-primary-foreground/40 text-primary-foreground hover:bg-card/40 hover:border-primary-foreground/60 shadow-elevated hover:shadow-glow",
-        heroSecondary:
-          "bg-transparent border-2 border-primary-foreground/60 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground shadow-lg",
-        nordic:
-          "bg-gradient-nordic text-primary-foreground hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300 shadow-nordic",
-
-        // Enhanced Nordic variants with diverse color palette - Stronger
-        warm: "bg-gradient-warm text-accent-warm-foreground hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 shadow-card",
-        ocean:
-          "bg-gradient-ocean text-white hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 shadow-card",
-        sage: "bg-accent-sage text-accent-sage-foreground hover:bg-accent-sage/80 shadow-success hover:shadow-elevated",
-        success:
-          "bg-success text-success-foreground hover:bg-success-light shadow-success hover:shadow-elevated",
-        premium:
-          "bg-gradient-premium text-premium-foreground hover:shadow-glow-premium border-2 border-premium/30 shadow-premium",
-        critical:
-          "bg-critical text-critical-foreground hover:bg-critical/80 shadow-lg hover:shadow-elevated",
-        gold: "bg-gradient-gold text-accent-gold-foreground hover:shadow-gold border-2 border-accent-gold/40 shadow-gold",
-      },
+        variant: {
+          default: "bg-primary text-primary-foreground hover:bg-primary-deep shadow-nordic hover:shadow-elevated",
+          destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80 shadow-lg",
+          outline: "border-2 border-primary bg-background hover:bg-primary hover:text-primary-foreground shadow-sm",
+          secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70 shadow-sm",
+          ghost: "hover:bg-accent hover:text-accent-foreground font-medium",
+          link: "text-primary underline-offset-4 hover:underline font-semibold",
+          hero: "bg-card/30 backdrop-blur-md border-2 border-primary-foreground/40 text-primary-foreground hover:bg-card/40 hover:border-primary-foreground/60 shadow-elevated hover:shadow-glow",
+          heroSecondary: "bg-transparent border-2 border-primary-foreground/60 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground shadow-lg",
+          nordic: "bg-gradient-nordic text-primary-foreground hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300 shadow-nordic",
+          
+          // Enhanced Nordic variants with diverse color palette - Stronger
+          warm: "bg-gradient-warm text-accent-warm-foreground hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 shadow-card",
+          ocean: "bg-gradient-ocean text-white hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 shadow-card",
+          sage: "bg-accent-sage text-accent-sage-foreground hover:bg-accent-sage/80 shadow-success hover:shadow-elevated",
+          success: "bg-success text-success-foreground hover:bg-success-light shadow-success hover:shadow-elevated",
+          premium: "bg-gradient-premium text-premium-foreground hover:shadow-glow-premium border-2 border-premium/30 shadow-premium",
+          critical: "bg-critical text-critical-foreground hover:bg-critical/80 shadow-lg hover:shadow-elevated",
+          gold: "bg-gradient-gold text-accent-gold-foreground hover:shadow-gold border-2 border-accent-gold/40 shadow-gold",
+        },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
@@ -61,13 +51,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
+    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
   },
 );
 Button.displayName = "Button";

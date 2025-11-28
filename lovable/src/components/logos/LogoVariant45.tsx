@@ -1,4 +1,4 @@
-import type React from "react";
+import React from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,11 +6,8 @@ interface LogoProps {
 }
 
 // B-fyrkantig modern box
-const LogoVariant45: React.FC<LogoProps> = ({
-  className = "h-10 w-10",
-  title = "Bostadsvyn logotyp",
-}) => {
-  const titleId = "logoTitle45";
+const LogoVariant45: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
+  const titleId = 'logoTitle45';
   return (
     <svg
       viewBox="0 0 64 64"

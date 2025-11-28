@@ -1,27 +1,21 @@
-import {
-  Circle,
-  Canvas as FabricCanvas,
-  FabricImage,
-  PencilBrush,
-  Rect,
-} from "fabric";
-import {
-  Brush,
-  Circle as CircleIcon,
+import React, { useRef, useEffect, useState } from 'react';
+import { Canvas as FabricCanvas, Circle, Rect, PencilBrush, FabricImage } from 'fabric';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  Brush, 
+  Eraser, 
+  Square, 
+  Circle as CircleIcon, 
+  Undo, 
+  Redo, 
   Download,
-  Eraser,
-  Loader2,
-  Redo,
-  RefreshCw,
-  Square,
-  Undo,
   Wand2,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/hooks/use-toast";
+  Loader2,
+  RefreshCw
+} from 'lucide-react';
 
 interface AIImageMaskingProps {
   imageUrl: string;
@@ -29,17 +23,11 @@ interface AIImageMaskingProps {
   onClose: () => void;
 }
 
-export default function AIImageMasking({
-  imageUrl,
-  onMaskCreated,
-  onClose,
-}: AIImageMaskingProps) {
+export default function AIImageMasking({ imageUrl, onMaskCreated, onClose }: AIImageMaskingProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [brushSize, setBrushSize] = useState([20]);
-  const [activeTool, setActiveTool] = useState<
-    "brush" | "eraser" | "rectangle" | "circle" | "select"
-  >("brush");
+  const [activeTool, setActiveTool] = useState<'brush' | 'eraser' | 'rectangle' | 'circle' | 'select'>('brush');
   const [isProcessing, setIsProcessing] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -62,7 +50,7 @@ export default function AIImageMasking({
 
     // Configure drawing brush
     canvas.freeDrawingBrush = new PencilBrush(canvas);
-    canvas.freeDrawingBrush.color = "#FFFFFF"; // White for mask areas
+    canvas.freeDrawingBrush.color = '#FFFFFF'; // White for mask areas
     canvas.freeDrawingBrush.width = brushSize[0];
     canvas.isDrawingMode = true;
 
@@ -75,66 +63,66 @@ export default function AIImageMasking({
       setHistoryIndex(newHistory.length - 1);
     };
 
-    canvas.on("path:created", saveState);
-    canvas.on("object:added", saveState);
-    canvas.on("object:removed", saveState);
+    canvas.on('path:created', saveState);
+    canvas.on('object:added', saveState);
+    canvas.on('object:removed', saveState);
 
     setFabricCanvas(canvas);
 
     return () => {
       canvas.dispose();
     };
-  }, [brushSize[0], history.slice, historyIndex, imageUrl]);
+  }, []);
 
   useEffect(() => {
     if (!fabricCanvas) return;
 
     fabricCanvas.freeDrawingBrush.width = brushSize[0];
-
+    
     // Update tool behavior
     switch (activeTool) {
-      case "brush":
+      case 'brush':
         fabricCanvas.isDrawingMode = true;
-        fabricCanvas.freeDrawingBrush.color = "#FFFFFF";
+        fabricCanvas.freeDrawingBrush.color = '#FFFFFF';
         break;
-      case "eraser":
+      case 'eraser':
         fabricCanvas.isDrawingMode = true;
-        fabricCanvas.freeDrawingBrush.color = "#000000";
+        fabricCanvas.freeDrawingBrush.color = '#000000';
         break;
-      case "select":
+      case 'select':
         fabricCanvas.isDrawingMode = false;
         break;
-      case "rectangle":
-      case "circle":
+      case 'rectangle':
+      case 'circle':
         fabricCanvas.isDrawingMode = false;
         break;
     }
   }, [activeTool, brushSize, fabricCanvas]);
 
-  const handleShapeClick = (shape: "rectangle" | "circle") => {
+  const handleShapeClick = (shape: 'rectangle' | 'circle') => {
     if (!fabricCanvas) return;
-
+    
     setActiveTool(shape);
 
-    if (shape === "rectangle") {
+    if (shape === 'rectangle') {
       const rect = new Rect({
         left: 100,
         top: 100,
-        fill: "#FFFFFF",
+        fill: '#FFFFFF',
         width: 100,
         height: 100,
-        stroke: "#FFFFFF",
-        strokeWidth: 2,
+        stroke: '#FFFFFF',
+        strokeWidth: 2
       });
       fabricCanvas.add(rect);
-    } else if (shape === "circle") {
+    } else if (shape === 'circle') {
       const circle = new Circle({
         left: 100,
         top: 100,
-        fill: "#FFFFFF",
+        fill: '#FFFFFF',
         radius: 50,
-        stroke: "#FFFFFF",
-        strokeWidth: 2,
+        stroke: '#FFFFFF',
+        strokeWidth: 2
       });
       fabricCanvas.add(circle);
     }
@@ -163,7 +151,7 @@ export default function AIImageMasking({
   const handleClear = () => {
     if (!fabricCanvas) return;
     fabricCanvas.clear();
-    fabricCanvas.backgroundColor = "#000000";
+    fabricCanvas.backgroundColor = '#000000';
     fabricCanvas.renderAll();
     toast({
       title: "Mask rensad",
@@ -175,46 +163,42 @@ export default function AIImageMasking({
     setIsProcessing(true);
     try {
       // Use browser-based AI to detect main subject
-      const { pipeline } = await import("@huggingface/transformers");
+      const { pipeline } = await import('@huggingface/transformers');
       const segmenter = await pipeline(
-        "image-segmentation",
-        "Xenova/segformer-b0-finetuned-ade-512-512",
-        { device: "webgpu" },
+        'image-segmentation',
+        'Xenova/segformer-b0-finetuned-ade-512-512',
+        { device: 'webgpu' }
       );
 
       const result = await segmenter(imageUrl);
-
-      if (result?.[0]?.mask) {
+      
+      if (result && result[0] && result[0].mask) {
         // Convert segmentation result to canvas mask
-        const maskCanvas = document.createElement("canvas");
-        const maskCtx = maskCanvas.getContext("2d");
-        if (!maskCtx || !fabricCanvas)
-          throw new Error("Canvas context not available");
+        const maskCanvas = document.createElement('canvas');
+        const maskCtx = maskCanvas.getContext('2d');
+        if (!maskCtx || !fabricCanvas) throw new Error('Canvas context not available');
 
         maskCanvas.width = fabricCanvas.width;
         maskCanvas.height = fabricCanvas.height;
 
         // Create ImageData from segmentation mask
-        const imageData = maskCtx.createImageData(
-          maskCanvas.width,
-          maskCanvas.height,
-        );
+        const imageData = maskCtx.createImageData(maskCanvas.width, maskCanvas.height);
         const maskData = result[0].mask.data;
-
+        
         for (let i = 0; i < maskData.length; i++) {
           const pixelIndex = i * 4;
           const maskValue = Math.round(maskData[i] * 255);
-          imageData.data[pixelIndex] = maskValue; // R
+          imageData.data[pixelIndex] = maskValue;     // R
           imageData.data[pixelIndex + 1] = maskValue; // G
           imageData.data[pixelIndex + 2] = maskValue; // B
-          imageData.data[pixelIndex + 3] = 255; // A
+          imageData.data[pixelIndex + 3] = 255;       // A
         }
-
+        
         maskCtx.putImageData(imageData, 0, 0);
-
+        
         // Add the generated mask to the fabric canvas
         const maskDataUrl = maskCanvas.toDataURL();
-
+        
         // Create image element and add as overlay
         FabricImage.fromURL(maskDataUrl).then((fabricImg) => {
           fabricCanvas.overlayImage = fabricImg;
@@ -223,16 +207,14 @@ export default function AIImageMasking({
 
         toast({
           title: "Auto-mask skapad! 🎯",
-          description:
-            "AI har automatiskt identifierat huvudobjektet. Du kan justera masken manuellt.",
+          description: "AI har automatiskt identifierat huvudobjektet. Du kan justera masken manuellt.",
         });
       }
     } catch (error) {
-      console.error("Auto-mask error:", error);
+      console.error('Auto-mask error:', error);
       toast({
         title: "Auto-mask misslyckades",
-        description:
-          "Kunde inte skapa automatisk mask. Använd manuella verktyg.",
+        description: "Kunde inte skapa automatisk mask. Använd manuella verktyg.",
         variant: "destructive",
       });
     } finally {
@@ -244,42 +226,42 @@ export default function AIImageMasking({
     if (!fabricCanvas) return;
 
     // Create a clean mask canvas (black background, white mask areas)
-    const maskCanvas = document.createElement("canvas");
+    const maskCanvas = document.createElement('canvas');
     maskCanvas.width = fabricCanvas.width;
     maskCanvas.height = fabricCanvas.height;
-    const maskCtx = maskCanvas.getContext("2d");
-
+    const maskCtx = maskCanvas.getContext('2d');
+    
     if (!maskCtx) return;
 
     // Fill with black background
-    maskCtx.fillStyle = "#000000";
+    maskCtx.fillStyle = '#000000';
     maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     // Render only the mask objects (not the background image)
     const objects = fabricCanvas.getObjects();
-    objects.forEach((obj) => {
-      if (obj.type === "path" || obj.type === "rect" || obj.type === "circle") {
+    objects.forEach(obj => {
+      if (obj.type === 'path' || obj.type === 'rect' || obj.type === 'circle') {
         // Render object to temporary canvas
-        const tempCanvas = document.createElement("canvas");
+        const tempCanvas = document.createElement('canvas');
         tempCanvas.width = maskCanvas.width;
         tempCanvas.height = maskCanvas.height;
-        const tempCtx = tempCanvas.getContext("2d");
-
+        const tempCtx = tempCanvas.getContext('2d');
+        
         if (tempCtx) {
           // This is a simplified approach - in production you'd want more sophisticated rendering
-          if (obj.fill === "#FFFFFF" || obj.stroke === "#FFFFFF") {
-            tempCtx.fillStyle = "#FFFFFF";
+          if (obj.fill === '#FFFFFF' || obj.stroke === '#FFFFFF') {
+            tempCtx.fillStyle = '#FFFFFF';
             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            maskCtx.globalCompositeOperation = "source-over";
+            maskCtx.globalCompositeOperation = 'source-over';
             maskCtx.drawImage(tempCanvas, 0, 0);
           }
         }
       }
     });
 
-    const maskDataUrl = maskCanvas.toDataURL("image/png");
+    const maskDataUrl = maskCanvas.toDataURL('image/png');
     onMaskCreated(maskDataUrl);
-
+    
     toast({
       title: "Mask exporterad! ✅",
       description: "Masken är klar att användas för inpainting.",
@@ -303,29 +285,29 @@ export default function AIImageMasking({
         <div className="flex items-center gap-1">
           <Button
             size="sm"
-            variant={activeTool === "brush" ? "default" : "outline"}
-            onClick={() => setActiveTool("brush")}
+            variant={activeTool === 'brush' ? 'default' : 'outline'}
+            onClick={() => setActiveTool('brush')}
           >
             <Brush className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={activeTool === "eraser" ? "default" : "outline"}
-            onClick={() => setActiveTool("eraser")}
+            variant={activeTool === 'eraser' ? 'default' : 'outline'}
+            onClick={() => setActiveTool('eraser')}
           >
             <Eraser className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={activeTool === "rectangle" ? "default" : "outline"}
-            onClick={() => handleShapeClick("rectangle")}
+            variant={activeTool === 'rectangle' ? 'default' : 'outline'}
+            onClick={() => handleShapeClick('rectangle')}
           >
             <Square className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            variant={activeTool === "circle" ? "default" : "outline"}
-            onClick={() => handleShapeClick("circle")}
+            variant={activeTool === 'circle' ? 'default' : 'outline'}
+            onClick={() => handleShapeClick('circle')}
           >
             <CircleIcon className="h-4 w-4" />
           </Button>
@@ -344,9 +326,7 @@ export default function AIImageMasking({
               step={1}
             />
           </div>
-          <span className="text-sm text-muted-foreground">
-            {brushSize[0]}px
-          </span>
+          <span className="text-sm text-muted-foreground">{brushSize[0]}px</span>
         </div>
 
         <div className="w-px h-6 bg-border mx-2" />
@@ -368,7 +348,11 @@ export default function AIImageMasking({
           >
             <Redo className="h-4 w-4" />
           </Button>
-          <Button size="sm" variant="outline" onClick={handleClear}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClear}
+          >
             <RefreshCw className="h-4 w-4" />
           </Button>
         </div>
@@ -413,17 +397,9 @@ export default function AIImageMasking({
       </div>
 
       <div className="text-sm text-muted-foreground space-y-1">
-        <p>
-          • <strong>Rita med vitt</strong> för att markera områden som ska
-          redigeras
-        </p>
-        <p>
-          • <strong>Använd radergummi</strong> för att ta bort maskområden
-        </p>
-        <p>
-          • <strong>Auto-mask</strong> använder AI för att automatiskt
-          identifiera huvudobjekt
-        </p>
+        <p>• <strong>Rita med vitt</strong> för att markera områden som ska redigeras</p>
+        <p>• <strong>Använd radergummi</strong> för att ta bort maskområden</p>
+        <p>• <strong>Auto-mask</strong> använder AI för att automatiskt identifiera huvudobjekt</p>
       </div>
     </div>
   );

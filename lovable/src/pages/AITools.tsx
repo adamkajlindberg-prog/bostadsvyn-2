@@ -1,68 +1,61 @@
-import {
-  BarChart3,
-  Bot,
-  Brain,
-  Calculator,
-  CheckCircle2,
-  Home,
-  Search,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
-
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import AIImageEditor from '@/components/ai/AIImageEditor';
+import AIPropertyAdvisor from '@/components/ai/AIPropertyAdvisor';
+import AIMarketAnalysis from '@/components/ai/AIMarketAnalysis';
+import AIPropertyValuation from '@/components/ai/AIPropertyValuation';
+import AIHomestyling from '@/components/ai/AIHomestyling';
+import { useAuth } from '@/hooks/useAuth';
+import { Wand2, Bot, BarChart3, Calculator, Sparkles, Crown, Lock, Home, Brain, CheckCircle2, Search } from 'lucide-react';
 const AITools = () => {
-  const { user, userRoles } = useAuth();
+  const {
+    user,
+    userRoles
+  } = useAuth();
   // Brokers don't get access to AI tools - they use their broker portal tools
-  const isBroker = userRoles.includes("broker");
-  const _canAccessTools = user && !isBroker;
-  const _tools = [
-    {
-      id: "advisor",
-      title: "AI Fastighetrådgivare",
-      description: "Få expertråd om fastighetsmarknaden dygnet runt",
-      icon: Bot,
-      available: true,
-      premium: false,
-    },
-    {
-      id: "editor",
-      title: "AI Bildredigering",
-      description:
-        "Redigera fastighetsbilder med AI - ändra färger, möbler och mer",
-      icon: Wand2,
-      available: true,
-      premium: false,
-      comingSoon: false,
-    },
-    {
-      id: "homestyling",
-      title: "AI Homestyling",
-      description: "Visualisera olika inredningsstilar för dina rum med AI",
-      icon: Home,
-      available: true,
-      premium: false,
-      comingSoon: false,
-    },
-    {
-      id: "analysis",
-      title: "Marknadsanalys",
-      description: "AI-drivna marknadsinsikter och prognoser",
-      icon: BarChart3,
-      available: true,
-      premium: false,
-      comingSoon: true,
-    },
-  ];
-  return (
-    <div className="min-h-screen bg-background">
+  const isBroker = userRoles.includes('broker');
+  const canAccessTools = user && !isBroker;
+  const tools = [{
+    id: 'advisor',
+    title: 'AI Fastighetrådgivare',
+    description: 'Få expertråd om fastighetsmarknaden dygnet runt',
+    icon: Bot,
+    available: true,
+    premium: false
+  }, {
+    id: 'editor',
+    title: 'AI Bildredigering',
+    description: 'Redigera fastighetsbilder med AI - ändra färger, möbler och mer',
+    icon: Wand2,
+    available: true,
+    premium: false,
+    comingSoon: false
+  }, {
+    id: 'homestyling',
+    title: 'AI Homestyling',
+    description: 'Visualisera olika inredningsstilar för dina rum med AI',
+    icon: Home,
+    available: true,
+    premium: false,
+    comingSoon: false
+  }, {
+    id: 'analysis',
+    title: 'Marknadsanalys',
+    description: 'AI-drivna marknadsinsikter och prognoser',
+    icon: BarChart3,
+    available: true,
+    premium: false,
+    comingSoon: true
+  }];
+  return <div className="min-h-screen bg-background">
       <Navigation />
       <main className="container mx-auto px-4 pt-20 pb-8">
         {/* Header */}
+        
 
         {/* AI Tools Detailed Section */}
         <div className="mb-12">
@@ -71,13 +64,10 @@ const AITools = () => {
               <Brain className="h-4 w-4 mr-2" />
               Artificiell Intelligens
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Våra AI-verktyg
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Våra AI-verktyg</h2>
             <p className="text-foreground font-medium max-w-3xl mx-auto text-lg">
-              Vi har utvecklat en omfattande svit av AI-verktyg som
-              revolutionerar hur du köper, säljer och hyr fastigheter. Alla
-              verktyg är integrerade för en sömlös upplevelse.
+              Vi har utvecklat en omfattande svit av AI-verktyg som revolutionerar hur du köper, 
+              säljer och hyr fastigheter. Alla verktyg är integrerade för en sömlös upplevelse.
             </p>
           </div>
 
@@ -90,58 +80,39 @@ const AITools = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold">AI-Homestyling</h3>
+                    
                   </div>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  Revolutionera hur du marknadsför och visualiserar fastigheter
-                  med vår AI-drivna homestyling. Transformera tomma eller
-                  daterade rum till fullt inredda, moderna drömhem på sekunder.
-                  Perfekt för både säljare som vill visa en bostads potential
-                  och köpare som vill visualisera olika inredningsalternativ
-                  innan de fattar beslut.
+                  Revolutionera hur du marknadsför och visualiserar fastigheter med vår AI-drivna homestyling. 
+                  Transformera tomma eller daterade rum till fullt inredda, moderna drömhem på sekunder. 
+                  Perfekt för både säljare som vill visa en bostads potential och köpare som vill visualisera 
+                  olika inredningsalternativ innan de fattar beslut.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Renoveringar och tillbyggnader: trappor, garderober,
-                      förråd och förvaring
-                    </span>
+                    <span>Renoveringar och tillbyggnader: trappor, garderober, förråd och förvaring</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Lyxiga tillägg: inomhuspool, spa-avdelning, bastu och
-                      relaxutrymmen
-                    </span>
+                    <span>Lyxiga tillägg: inomhuspool, spa-avdelning, bastu och relaxutrymmen</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Ytskikt och finish: byt golv, tak, väggar och färger
-                      fotorealistiskt
-                    </span>
+                    <span>Ytskikt och finish: byt golv, tak, väggar och färger fotorealistiskt</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Köksrenovering: nya köksluckor, vitvaror, bänkskivor och
-                      känsla
-                    </span>
+                    <span>Köksrenovering: nya köksluckor, vitvaror, bänkskivor och känsla</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Möblering: möblera tomma rum eller ta bort möbler helt
-                      digitalt
-                    </span>
+                    <span>Möblering: möblera tomma rum eller ta bort möbler helt digitalt</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
-                    <span>
-                      Belysning och atmosfär: lägg till och ändra belysning för
-                      perfekt känsla
-                    </span>
+                    <span>Belysning och atmosfär: lägg till och ändra belysning för perfekt känsla</span>
                   </li>
                 </ul>
               </CardContent>
@@ -155,45 +126,32 @@ const AITools = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold">AI Bildredigering</h3>
+                    
                   </div>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  Transformera och förbättra fastighetsbilder med avancerad
-                  AI-teknologi. Visualisera renoveringar, tillbyggnader och
-                  förändringar innan du genomför dem i verkligheten. Skapa
-                  inspirerande bilder som visar en fastighets fulla potential
-                  och hjälper köpare att se möjligheterna. Perfekt för att
-                  planera investeringar och få fastighetsägare att förstå värdet
-                  av förbättringar.
+                  Transformera och förbättra fastighetsbilder med avancerad AI-teknologi. Visualisera 
+                  renoveringar, tillbyggnader och förändringar innan du genomför dem i verkligheten. 
+                  Skapa inspirerande bilder som visar en fastighets fulla potential och hjälper köpare 
+                  att se möjligheterna. Perfekt för att planera investeringar och få fastighetsägare att 
+                  förstå värdet av förbättringar.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>
-                      Lyxiga tillägg: pooler, spa, terrasser, uteplatser,
-                      balkonger och altaner
-                    </span>
+                    <span>Lyxiga tillägg: pooler, spa, terrasser, uteplatser, balkonger och altaner</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>
-                      Utbyggnader: garage, attefallshus, carport, förråd och
-                      våningsplan
-                    </span>
+                    <span>Utbyggnader: garage, attefallshus, carport, förråd och våningsplan</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>
-                      Fasadförändringar: byt tak, fasad, fönster, dörrar, entrè
-                      och färger
-                    </span>
+                    <span>Fasadförändringar: byt tak, fasad, fönster, dörrar, entrè och färger</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>
-                      Landskapsdesign: förbättra trädgårdar, lägg till
-                      vegetation, staket och infarter
-                    </span>
+                    <span>Landskapsdesign: förbättra trädgårdar, lägg till vegetation, staket och infarter</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -213,32 +171,23 @@ const AITools = () => {
                   <div className="bg-premium/10 rounded-lg p-3">
                     <Calculator className="h-6 w-6 text-premium" />
                   </div>
-                  <h3 className="text-xl font-semibold">
-                    AI Fastighetsvärdering
-                  </h3>
+                  <h3 className="text-xl font-semibold">AI Fastighetsvärdering</h3>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  Få exakta och datadrivna värderingar baserade på avancerad
-                  maskinlärning som analyserar miljontals datapunkter. Vår AI
-                  kombinerar realtidsdata från hela Sverige, historiska priser,
-                  områdesutveckling, infrastruktur, och marknadsanalyser för att
-                  ge dig den mest korrekta värderingen. Inklusive
-                  konfidensintervall, prisutvecklingsprognoser och detaljerade
-                  jämförelser med liknande försäljningar.
+                  Få exakta och datadrivna värderingar baserade på avancerad maskinlärning som analyserar 
+                  miljontals datapunkter. Vår AI kombinerar realtidsdata från hela Sverige, historiska 
+                  priser, områdesutveckling, infrastruktur, och marknadsanalyser för att ge dig den mest 
+                  korrekta värderingen. Inklusive konfidensintervall, prisutvecklingsprognoser och 
+                  detaljerade jämförelser med liknande försäljningar.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
-                    <span>
-                      Realtidsvärderingar med 95% noggrannhet baserat på aktuell
-                      marknadsdata
-                    </span>
+                    <span>Realtidsvärderingar med 95% noggrannhet baserat på aktuell marknadsdata</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
-                    <span>
-                      Prisförutsägelser 6-12 månader framåt med trendanalys
-                    </span>
+                    <span>Prisförutsägelser 6-12 månader framåt med trendanalys</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
@@ -246,9 +195,7 @@ const AITools = () => {
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
-                    <span>
-                      Detaljerad områdesanalys och infrastrukturutveckling
-                    </span>
+                    <span>Detaljerad områdesanalys och infrastrukturutveckling</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
@@ -256,9 +203,7 @@ const AITools = () => {
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-premium" />
-                    <span>
-                      Kontinuerlig uppdatering när ny marknadsdata tillkommer
-                    </span>
+                    <span>Kontinuerlig uppdatering när ny marknadsdata tillkommer</span>
                   </li>
                 </ul>
               </CardContent>
@@ -270,38 +215,27 @@ const AITools = () => {
                   <div className="bg-success/10 rounded-lg p-3">
                     <Bot className="h-6 w-6 text-success" />
                   </div>
-                  <h3 className="text-xl font-semibold">
-                    AI Fastighetsrådgivare
-                  </h3>
+                  <h3 className="text-xl font-semibold">AI Fastighetsrådgivare</h3>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  Din personliga AI-assistent med djup kunskap om svensk
-                  fastighetsmarknad, juridik och ekonomi. Få professionell
-                  vägledning genom hela köp-, sälj- eller uthyrningsprocessen
-                  med expertråd och personliga rekommendationer anpassade efter
-                  din unika situation. Rådgivaren lär sig dina preferenser och
-                  blir bättre för varje interaktion, och kan svara på allt från
-                  enkla frågor till komplexa juridiska och ekonomiska scenarier.
+                  Din personliga AI-assistent med djup kunskap om svensk fastighetsmarknad, juridik och 
+                  ekonomi. Få professionell vägledning genom hela köp-, sälj- eller uthyrningsprocessen 
+                  med expertråd och personliga rekommendationer anpassade efter din unika situation. 
+                  Rådgivaren lär sig dina preferenser och blir bättre för varje interaktion, och kan 
+                  svara på allt från enkla frågor till komplexa juridiska och ekonomiska scenarier.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-success" />
-                    <span>
-                      24/7 tillgänglig expertis - få svar när du behöver dem
-                    </span>
+                    <span>24/7 tillgänglig expertis - få svar när du behöver dem</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-success" />
-                    <span>
-                      Personliga rekommendationer baserade på din ekonomi och
-                      behov
-                    </span>
+                    <span>Personliga rekommendationer baserade på din ekonomi och behov</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-success" />
-                    <span>
-                      Hjälp med budgivning, finansiering och juridiska frågor
-                    </span>
+                    <span>Hjälp med budgivning, finansiering och juridiska frågor</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-success" />
@@ -328,31 +262,24 @@ const AITools = () => {
                   <h3 className="text-xl font-semibold">AI Marknadsanalys</h3>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  Avancerad marknadsanalys som ger dig konkurrensfördel i din
-                  fastighetsaffär. Vår AI analyserar miljontals transaktioner,
-                  demografisk data, infrastrukturutveckling och ekonomiska
-                  indikatorer för att ge dig djupgående insikter om marknaden.
-                  Identifiera framtida tillväxtområden, förstå priscykler och få
-                  exakta prognoser för att fatta de bästa investeringsbesluten.
+                  Avancerad marknadsanalys som ger dig konkurrensfördel i din fastighetsaffär. 
+                  Vår AI analyserar miljontals transaktioner, demografisk data, infrastrukturutveckling 
+                  och ekonomiska indikatorer för att ge dig djupgående insikter om marknaden. 
+                  Identifiera framtida tillväxtområden, förstå priscykler och få exakta prognoser 
+                  för att fatta de bästa investeringsbesluten.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
-                    <span>
-                      Detaljerade områdesanalyser med 10 års prishistorik
-                    </span>
+                    <span>Detaljerade områdesanalyser med 10 års prishistorik</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
-                    <span>
-                      Jämför med tusentals liknande försäljningar i realtid
-                    </span>
+                    <span>Jämför med tusentals liknande försäljningar i realtid</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
-                    <span>
-                      Prognoser för framtida prisutveckling per område
-                    </span>
+                    <span>Prognoser för framtida prisutveckling per område</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
@@ -360,10 +287,7 @@ const AITools = () => {
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
-                    <span>
-                      Identifiera undervärderade områden med hög
-                      tillväxtpotential
-                    </span>
+                    <span>Identifiera undervärderade områden med hög tillväxtpotential</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-aurora" />
@@ -382,60 +306,46 @@ const AITools = () => {
                   <h3 className="text-xl font-semibold">AI Sökassistent</h3>
                 </div>
                 <p className="text-foreground font-medium mb-4 leading-relaxed">
-                  En intelligent sökmotor som revolutionerar hur du hittar din
-                  drömbostad. Vår AI lär sig kontinuerligt från ditt beteende,
-                  dina klick, sparade objekt och sökhistorik för att automatiskt
-                  förstå vad som är viktigt för dig. Den upptäcker mönster du
-                  kanske inte ens är medveten om själv och rekommenderar
-                  bostäder som perfekt matchar dina behov innan du ens hinner
-                  söka efter dem.
+                  En intelligent sökmotor som revolutionerar hur du hittar din drömbostad. 
+                  Vår AI lär sig kontinuerligt från ditt beteende, dina klick, sparade objekt 
+                  och sökhistorik för att automatiskt förstå vad som är viktigt för dig. 
+                  Den upptäcker mönster du kanske inte ens är medveten om själv och rekommenderar 
+                  bostäder som perfekt matchar dina behov innan du ens hinner söka efter dem.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Maskinlärning som förstår dolda preferenser från ditt
-                      beteende
-                    </span>
+                    <span>Maskinlärning som förstår dolda preferenser från ditt beteende</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Proaktiva notifikationer när perfekta bostäder läggs ut
-                    </span>
+                    <span>Proaktiva notifikationer när perfekta bostäder läggs ut</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Semantisk sökning - beskriv med egna ord vad du söker
-                    </span>
+                    <span>Semantisk sökning - beskriv med egna ord vad du söker</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Prioritering baserad på sannolikhet att du gillar objektet
-                    </span>
+                    <span>Prioritering baserad på sannolikhet att du gillar objektet</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Hitta dolda pärlor som andra missar i sökresultaten
-                    </span>
+                    <span>Hitta dolda pärlor som andra missar i sökresultaten</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 text-nordic-fjord" />
-                    <span>
-                      Automatiska sparade sökningar med intelligent matchning
-                    </span>
+                    <span>Automatiska sparade sökningar med intelligent matchning</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
           </div>
         </div>
+
+
       </main>
       <LegalFooter />
-    </div>
-  );
+    </div>;
 };
 export default AITools;

@@ -1,36 +1,28 @@
-import { CheckCircle2, Clock, Mail, Send, Target, Users } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Mail, Send, Users, Target, Clock, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const DirectMarketing = () => {
   const [campaign, setCampaign] = useState({
-    subject: "",
-    message: "",
-    targetAudience: "all",
+    subject: '',
+    message: '',
+    targetAudience: 'all'
   });
 
   const handleSendCampaign = () => {
     if (!campaign.subject || !campaign.message) {
-      toast.error("Vänligen fyll i ämne och meddelande");
+      toast.error('Vänligen fyll i ämne och meddelande');
       return;
     }
-
-    toast.success(
-      "Kampanj skickad! Mottagare kommer att få ditt meddelande inom 24 timmar.",
-    );
-    setCampaign({ subject: "", message: "", targetAudience: "all" });
+    
+    toast.success('Kampanj skickad! Mottagare kommer att få ditt meddelande inom 24 timmar.');
+    setCampaign({ subject: '', message: '', targetAudience: 'all' });
   };
 
   return (
@@ -41,30 +33,26 @@ const DirectMarketing = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Totala mottagare
-                </p>
+                <p className="text-sm text-muted-foreground">Totala mottagare</p>
                 <p className="text-2xl font-bold">12,458</p>
               </div>
               <Users className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
-
+        
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Öppningsfrekvens
-                </p>
+                <p className="text-sm text-muted-foreground">Öppningsfrekvens</p>
                 <p className="text-2xl font-bold">68%</p>
               </div>
               <Mail className="h-8 w-8 text-success" />
             </div>
           </CardContent>
         </Card>
-
+        
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -76,14 +64,12 @@ const DirectMarketing = () => {
             </div>
           </CardContent>
         </Card>
-
+        
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">
-                  Aktiva kampanjer
-                </p>
+                <p className="text-sm text-muted-foreground">Aktiva kampanjer</p>
                 <p className="text-2xl font-bold">3</p>
               </div>
               <CheckCircle2 className="h-8 w-8 text-premium" />
@@ -110,9 +96,7 @@ const DirectMarketing = () => {
               id="subject"
               placeholder="Ny fastighet som matchar dina sökkriterier"
               value={campaign.subject}
-              onChange={(e) =>
-                setCampaign({ ...campaign, subject: e.target.value })
-              }
+              onChange={(e) => setCampaign({ ...campaign, subject: e.target.value })}
             />
           </div>
 
@@ -123,45 +107,31 @@ const DirectMarketing = () => {
               placeholder="Hej! Vi har en ny fastighet som vi tror kan passa dig..."
               rows={6}
               value={campaign.message}
-              onChange={(e) =>
-                setCampaign({ ...campaign, message: e.target.value })
-              }
+              onChange={(e) => setCampaign({ ...campaign, message: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
             <Label>Målgrupp</Label>
             <div className="flex gap-2">
-              <Button
-                variant={
-                  campaign.targetAudience === "all" ? "default" : "outline"
-                }
+              <Button 
+                variant={campaign.targetAudience === 'all' ? 'default' : 'outline'} 
                 size="sm"
-                onClick={() =>
-                  setCampaign({ ...campaign, targetAudience: "all" })
-                }
+                onClick={() => setCampaign({ ...campaign, targetAudience: 'all' })}
               >
                 Alla intresserade (12,458)
               </Button>
-              <Button
-                variant={
-                  campaign.targetAudience === "matched" ? "default" : "outline"
-                }
+              <Button 
+                variant={campaign.targetAudience === 'matched' ? 'default' : 'outline'} 
                 size="sm"
-                onClick={() =>
-                  setCampaign({ ...campaign, targetAudience: "matched" })
-                }
+                onClick={() => setCampaign({ ...campaign, targetAudience: 'matched' })}
               >
                 Matchade köpare (3,241)
               </Button>
-              <Button
-                variant={
-                  campaign.targetAudience === "recent" ? "default" : "outline"
-                }
+              <Button 
+                variant={campaign.targetAudience === 'recent' ? 'default' : 'outline'} 
                 size="sm"
-                onClick={() =>
-                  setCampaign({ ...campaign, targetAudience: "recent" })
-                }
+                onClick={() => setCampaign({ ...campaign, targetAudience: 'recent' })}
               >
                 Senaste besökare (892)
               </Button>
@@ -183,32 +153,11 @@ const DirectMarketing = () => {
         <CardContent>
           <div className="space-y-4">
             {[
-              {
-                title: "Nytt pris - Villa i Vasastan",
-                sent: "2 dagar sedan",
-                opened: "72%",
-                clicked: "28%",
-                status: "active",
-              },
-              {
-                title: "Öppet hus i helgen - Lägenhet Södermalm",
-                sent: "5 dagar sedan",
-                opened: "68%",
-                clicked: "22%",
-                status: "completed",
-              },
-              {
-                title: "Exklusiv fastighet nu tillgänglig",
-                sent: "1 vecka sedan",
-                opened: "65%",
-                clicked: "19%",
-                status: "completed",
-              },
+              { title: 'Nytt pris - Villa i Vasastan', sent: '2 dagar sedan', opened: '72%', clicked: '28%', status: 'active' },
+              { title: 'Öppet hus i helgen - Lägenhet Södermalm', sent: '5 dagar sedan', opened: '68%', clicked: '22%', status: 'completed' },
+              { title: 'Exklusiv fastighet nu tillgänglig', sent: '1 vecka sedan', opened: '65%', clicked: '19%', status: 'completed' }
             ].map((campaign, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
+              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex-1">
                   <h4 className="font-medium">{campaign.title}</h4>
                   <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
@@ -220,12 +169,8 @@ const DirectMarketing = () => {
                     <span>Klickad: {campaign.clicked}</span>
                   </div>
                 </div>
-                <Badge
-                  variant={
-                    campaign.status === "active" ? "default" : "secondary"
-                  }
-                >
-                  {campaign.status === "active" ? "Aktiv" : "Avslutad"}
+                <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
+                  {campaign.status === 'active' ? 'Aktiv' : 'Avslutad'}
                 </Badge>
               </div>
             ))}

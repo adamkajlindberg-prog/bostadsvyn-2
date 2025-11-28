@@ -1,5 +1,6 @@
-import { createContext, type ReactNode, useContext, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserPreferences {
   interestedAreas: string[];
@@ -36,14 +37,11 @@ const defaultPreferences: UserPreferences = {
   favoriteQuestionCategories: [],
 };
 
-const UserPreferencesContext = createContext<
-  UserPreferencesContextType | undefined
->(undefined);
+const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
 export function UserPreferencesProvider({ children }: { children: ReactNode }) {
-  const [preferences, setPreferences] =
-    useState<UserPreferences>(defaultPreferences);
-  const [loading, _setLoading] = useState(false);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
   const updatePreferences = async (updates: Partial<UserPreferences>) => {
@@ -67,9 +65,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
 export function useUserPreferences() {
   const context = useContext(UserPreferencesContext);
   if (context === undefined) {
-    throw new Error(
-      "useUserPreferences must be used within a UserPreferencesProvider",
-    );
+    throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
   }
   return context;
 }

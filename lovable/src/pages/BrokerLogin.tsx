@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import BrokerAuthForm from "@/components/BrokerAuthForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import BrokerAuthForm from '@/components/BrokerAuthForm';
 
 export default function BrokerLogin() {
   const { user, loading, userRoles } = useAuth();
@@ -9,8 +9,8 @@ export default function BrokerLogin() {
 
   useEffect(() => {
     // Redirect authenticated brokers to broker portal
-    if (user && !loading && userRoles.includes("broker")) {
-      navigate("/mäklarportal");
+    if (user && !loading && userRoles.includes('broker')) {
+      navigate('/mäklarportal');
     }
   }, [user, loading, userRoles, navigate]);
 
@@ -25,7 +25,7 @@ export default function BrokerLogin() {
     );
   }
 
-  if (user && userRoles.includes("broker")) {
+  if (user && userRoles.includes('broker')) {
     return null; // Will redirect via useEffect
   }
 

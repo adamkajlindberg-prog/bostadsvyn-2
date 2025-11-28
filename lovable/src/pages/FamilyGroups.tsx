@@ -1,30 +1,26 @@
-import {
-  Crown,
-  Heart,
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { GroupManager } from '@/components/group/GroupManager';
+import { GroupProperties } from '@/components/group/GroupProperties';
+import { 
+  Users, 
+  Plus, 
+  Crown, 
+  Vote, 
   Home,
-  Settings,
   UserPlus,
-  Users,
-  Vote,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { GroupManager } from "@/components/group/GroupManager";
-import { GroupProperties } from "@/components/group/GroupProperties";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Settings,
+  Heart,
+  TrendingUp
+} from 'lucide-react';
 
 interface Group {
   id: string;
@@ -47,39 +43,38 @@ const FamilyGroups = () => {
     if (user) {
       fetchUserGroups();
     }
-  }, [user, fetchUserGroups]);
+  }, [user]);
 
   const fetchUserGroups = async () => {
     try {
       const { data: groupsData, error } = await supabase
-        .from("groups")
+        .from('groups')
         .select(`
           *,
           group_members!inner(role),
           group_members(id)
         `)
-        .eq("group_members.user_id", user?.id);
+        .eq('group_members.user_id', user?.id);
 
       if (error) throw error;
 
-      const formattedGroups =
-        groupsData?.map((group) => ({
-          ...group,
-          member_count: group.group_members?.length || 0,
-          role: group.group_members?.[0]?.role || "member",
-        })) || [];
+      const formattedGroups = groupsData?.map(group => ({
+        ...group,
+        member_count: group.group_members?.length || 0,
+        role: group.group_members?.[0]?.role || 'member'
+      })) || [];
 
       setUserGroups(formattedGroups);
-
+      
       if (formattedGroups.length > 0 && !activeGroup) {
         setActiveGroup(formattedGroups[0]);
       }
     } catch (error) {
-      console.error("Error fetching groups:", error);
+      console.error('Error fetching groups:', error);
       toast({
-        title: "Fel vid hämtning av grupper",
-        description: "Kunde inte ladda dina grupper.",
-        variant: "destructive",
+        title: 'Fel vid hämtning av grupper',
+        description: 'Kunde inte ladda dina grupper.',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -87,10 +82,10 @@ const FamilyGroups = () => {
   };
 
   const handleGroupCreated = (newGroup: Group) => {
-    setUserGroups((prev) => [...prev, newGroup]);
+    setUserGroups(prev => [...prev, newGroup]);
     setActiveGroup(newGroup);
     toast({
-      title: "Grupp skapad!",
+      title: 'Grupp skapad!',
       description: `Välkommen till ${newGroup.name}. Dela inbjudningskoden med familjemedlemmar.`,
     });
   };
@@ -105,8 +100,7 @@ const FamilyGroups = () => {
               <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <CardTitle>Logga in för familjekonton</CardTitle>
               <CardDescription>
-                Skapa ett konto för att använda familjekonton och
-                gruppfunktioner.
+                Skapa ett konto för att använda familjekonton och gruppfunktioner.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -131,8 +125,7 @@ const FamilyGroups = () => {
             Gruppkonto
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ett verktyg för vänner och familj att hitta och besluta om bostäder
-            tillsammans - för både köp och hyra
+            Ett verktyg för vänner och familj att hitta och besluta om bostäder tillsammans - för både köp och hyra
           </p>
           <div className="flex justify-center gap-2 mt-4">
             <Badge className="bg-success text-success-foreground">
@@ -169,19 +162,17 @@ const FamilyGroups = () => {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {userGroups.map((group) => (
-                      <Card
+                      <Card 
                         key={group.id}
                         className={`cursor-pointer transition-all hover:shadow-lg ${
-                          activeGroup?.id === group.id
-                            ? "ring-2 ring-primary"
-                            : ""
+                          activeGroup?.id === group.id ? 'ring-2 ring-primary' : ''
                         }`}
                         onClick={() => setActiveGroup(group)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="font-medium">{group.name}</h3>
-                            {group.role === "admin" && (
+                            {group.role === 'admin' && (
                               <Crown className="h-4 w-4 text-yellow-500" />
                             )}
                           </div>
@@ -190,9 +181,7 @@ const FamilyGroups = () => {
                             <span>{group.member_count} medlemmar</span>
                           </div>
                           <Badge variant="outline" className="mt-2 text-xs">
-                            {group.role === "admin"
-                              ? "Administratör"
-                              : "Medlem"}
+                            {group.role === 'admin' ? 'Administratör' : 'Medlem'}
                           </Badge>
                         </CardContent>
                       </Card>
@@ -206,24 +195,15 @@ const FamilyGroups = () => {
             {activeGroup ? (
               <Tabs defaultValue="properties" className="space-y-6">
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger
-                    value="properties"
-                    className="flex items-center gap-2"
-                  >
+                  <TabsTrigger value="properties" className="flex items-center gap-2">
                     <Home className="h-4 w-4" />
                     Sparade bostäder
                   </TabsTrigger>
-                  <TabsTrigger
-                    value="votes"
-                    className="flex items-center gap-2"
-                  >
+                  <TabsTrigger value="votes" className="flex items-center gap-2">
                     <Vote className="h-4 w-4" />
                     Röstningar
                   </TabsTrigger>
-                  <TabsTrigger
-                    value="settings"
-                    className="flex items-center gap-2"
-                  >
+                  <TabsTrigger value="settings" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Inställningar
                   </TabsTrigger>
@@ -241,29 +221,26 @@ const FamilyGroups = () => {
                         Aktiva röstningar
                       </CardTitle>
                       <CardDescription>
-                        Se pågående och avslutade röstningar för gruppens
-                        fastigheter
+                        Se pågående och avslutade röstningar för gruppens fastigheter
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="text-center py-8 text-muted-foreground">
                         <Vote className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Inga aktiva röstningar för tillfället</p>
-                        <p className="text-sm mt-2">
-                          Lägg till fastigheter för att starta röstningar
-                        </p>
+                        <p className="text-sm mt-2">Lägg till fastigheter för att starta röstningar</p>
                       </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
 
                 <TabsContent value="settings">
-                  <GroupManager
+                  <GroupManager 
                     group={activeGroup}
                     onGroupUpdated={(updated) => {
                       setActiveGroup(updated);
-                      setUserGroups((prev) =>
-                        prev.map((g) => (g.id === updated.id ? updated : g)),
+                      setUserGroups(prev => 
+                        prev.map(g => g.id === updated.id ? updated : g)
                       );
                     }}
                   />
@@ -274,12 +251,9 @@ const FamilyGroups = () => {
               <Card className="shadow-card">
                 <CardHeader className="text-center">
                   <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <CardTitle className="text-2xl">
-                    Välkommen till Gruppkonto!
-                  </CardTitle>
+                  <CardTitle className="text-2xl">Välkommen till Gruppkonto!</CardTitle>
                   <CardDescription className="text-lg">
-                    Skapa din första grupp för att hitta bostäder tillsammans -
-                    för både köp och hyra
+                    Skapa din första grupp för att hitta bostäder tillsammans - för både köp och hyra
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -298,8 +272,7 @@ const FamilyGroups = () => {
                         <Home className="h-8 w-8 mx-auto text-primary mb-2" />
                         <h3 className="font-medium mb-1">Spara bostäder</h3>
                         <p className="text-sm text-muted-foreground">
-                          Lägg till bostäder eller hyresobjekt som gruppen kan
-                          rösta om
+                          Lägg till bostäder eller hyresobjekt som gruppen kan rösta om
                         </p>
                       </CardContent>
                     </Card>
@@ -308,15 +281,14 @@ const FamilyGroups = () => {
                         <Vote className="h-8 w-8 mx-auto text-primary mb-2" />
                         <h3 className="font-medium mb-1">Rösta tillsammans</h3>
                         <p className="text-sm text-muted-foreground">
-                          Alla röstar Ja, Kanske eller Nej. Majoriteten
-                          bestämmer vad som händer
+                          Alla röstar Ja, Kanske eller Nej. Majoriteten bestämmer vad som händer
                         </p>
                       </CardContent>
                     </Card>
                   </div>
 
                   <div className="text-center">
-                    <GroupManager
+                    <GroupManager 
                       onGroupCreated={handleGroupCreated}
                       showCreateOnly={true}
                     />

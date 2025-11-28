@@ -1,9 +1,8 @@
-import { Loader2 } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { TEST_FRITIDS_PROPERTIES } from "@/data/testFritidsProperties";
-import { supabase } from "@/integrations/supabase/client";
-import PropertyCard, { type Property } from "./PropertyCard";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import PropertyCard, { Property } from './PropertyCard';
+import { Loader2 } from 'lucide-react';
+import { TEST_FRITIDS_PROPERTIES } from '@/data/testFritidsProperties';
 
 interface FritidsPropertiesProps {
   search?: string;
@@ -26,69 +25,69 @@ const FritidsProperties: React.FC<FritidsPropertiesProps> = ({
   useEffect(() => {
     loadFritidsProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadFritidsProperties]);
+  }, [search, type, environment, minPrice, maxPrice]);
 
   const loadFritidsProperties = async () => {
     try {
       setIsLoading(true);
       let query = supabase
-        .from("properties")
-        .select("*")
-        .in("property_type", ["COTTAGE", "PLOT"])
-        .in("status", ["FOR_SALE", "COMING_SOON"]);
+        .from('properties')
+        .select('*')
+        .in('property_type', ['COTTAGE', 'PLOT'])
+        .in('status', ['FOR_SALE', 'COMING_SOON']);
 
-      if (type && type !== "ALL") {
-        query = query.eq("property_type", type);
+      if (type && type !== 'ALL') {
+        query = query.eq('property_type', type);
       }
-      if (typeof minPrice === "number") {
-        query = query.gte("price", minPrice);
+      if (typeof minPrice === 'number') {
+        query = query.gte('price', minPrice);
       }
-      if (typeof maxPrice === "number") {
-        query = query.lte("price", maxPrice);
+      if (typeof maxPrice === 'number') {
+        query = query.lte('price', maxPrice);
       }
       if (search && search.trim().length > 0) {
         const s = search.trim();
         query = query.or(
-          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`,
+          `title.ilike.%${s}%,address_city.ilike.%${s}%,address_street.ilike.%${s}%`
         );
       }
 
-      query = query.order("created_at", { ascending: false });
+      query = query.order('created_at', { ascending: false });
 
       const { data, error } = await query;
 
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const transformedData = data.map((prop) => ({
+        const transformedData = data.map(prop => ({
           ...prop,
           viewing_times: [],
           images: Array.isArray(prop.images) ? prop.images : [],
-          features: Array.isArray(prop.features) ? prop.features : [],
+          features: Array.isArray(prop.features) ? prop.features : []
         }));
-
+        
         // Sort by ad_tier (premium > plus > free) first
         const tierPriority = {
           premium: 3,
           plus: 2,
-          free: 1,
+          free: 1
         };
         transformedData.sort((a: any, b: any) => {
-          const aTierPriority = tierPriority[a.ad_tier || "free"];
-          const bTierPriority = tierPriority[b.ad_tier || "free"];
+          const aTierPriority = tierPriority[a.ad_tier || 'free'];
+          const bTierPriority = tierPriority[b.ad_tier || 'free'];
           if (aTierPriority !== bTierPriority) {
             return bTierPriority - aTierPriority; // Higher priority first
           }
           return 0;
         });
-
+        
         setProperties(transformedData as any);
       } else {
         // Use test data if no real properties
         setProperties(TEST_FRITIDS_PROPERTIES);
       }
     } catch (error) {
-      console.error("Error loading fritids properties:", error);
+      console.error('Error loading fritids properties:', error);
       // Use test data on error
       setProperties(TEST_FRITIDS_PROPERTIES);
     } finally {
@@ -107,9 +106,7 @@ const FritidsProperties: React.FC<FritidsPropertiesProps> = ({
   if (properties.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          Inga fritidshus eller tomter tillgängliga just nu.
-        </p>
+        <p className="text-muted-foreground">Inga fritidshus eller tomter tillgängliga just nu.</p>
       </div>
     );
   }
@@ -117,7 +114,10 @@ const FritidsProperties: React.FC<FritidsPropertiesProps> = ({
   return (
     <div className="grid grid-cols-1 gap-6">
       {properties.map((property) => (
-        <PropertyCard key={property.id} property={property} />
+        <PropertyCard 
+          key={property.id} 
+          property={property}
+        />
       ))}
     </div>
   );

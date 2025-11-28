@@ -1,17 +1,17 @@
-import { BarChart3, Search, Sparkles, Target } from "lucide-react";
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import PropertyComparison from "@/components/comparison/PropertyComparison";
-import AdvancedSearch from "@/components/search/AdvancedSearch";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/useAuth";
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Search, BarChart3, Sparkles, Target } from 'lucide-react';
+import AdvancedSearch from '@/components/search/AdvancedSearch';
+import PropertyComparison from '@/components/comparison/PropertyComparison';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const EnhancedSearch = () => {
   const { user, loading, userRoles } = useAuth();
-  const [activeTab, setActiveTab] = useState("search");
-  const isBroker = userRoles.includes("broker");
+  const [activeTab, setActiveTab] = useState('search');
+  const isBroker = userRoles.includes('broker');
 
   if (loading) {
     return (
@@ -42,8 +42,7 @@ const EnhancedSearch = () => {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Hitta din perfekta fastighet med avancerad sökning,
-            AI-rekommendationer och detaljerad jämförelse.
+            Hitta din perfekta fastighet med avancerad sökning, AI-rekommendationer och detaljerad jämförelse.
           </p>
         </div>
 
@@ -67,9 +66,7 @@ const EnhancedSearch = () => {
                 <Sparkles className="h-8 w-8 text-green-600" />
                 <div>
                   <p className="text-2xl font-bold">AI</p>
-                  <p className="text-sm text-muted-foreground">
-                    Rekommendationer
-                  </p>
+                  <p className="text-sm text-muted-foreground">Rekommendationer</p>
                 </div>
               </div>
             </CardContent>
@@ -81,9 +78,7 @@ const EnhancedSearch = () => {
                 <BarChart3 className="h-8 w-8 text-purple-600" />
                 <div>
                   <p className="text-2xl font-bold">4</p>
-                  <p className="text-sm text-muted-foreground">
-                    Max jämförelse
-                  </p>
+                  <p className="text-sm text-muted-foreground">Max jämförelse</p>
                 </div>
               </div>
             </CardContent>
@@ -91,11 +86,7 @@ const EnhancedSearch = () => {
         </div>
 
         {/* Main Content */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6"
-        >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="search" className="gap-2">
               <Search className="h-4 w-4" />
@@ -129,34 +120,29 @@ const EnhancedSearch = () => {
               <div className="flex items-start gap-3">
                 <Badge className="bg-primary text-primary-foreground">1</Badge>
                 <div>
-                  <h4 className="font-semibold mb-1">
-                    AI-Powered Rekommendationer
-                  </h4>
+                  <h4 className="font-semibold mb-1">AI-Powered Rekommendationer</h4>
                   <p className="text-sm text-muted-foreground">
-                    Få personliga förslag baserat på din sökhistorik och
-                    preferenser.
+                    Få personliga förslag baserat på din sökhistorik och preferenser.
                   </p>
                 </div>
               </div>
-
+              
               <div className="flex items-start gap-3">
                 <Badge className="bg-primary text-primary-foreground">2</Badge>
                 <div>
                   <h4 className="font-semibold mb-1">Detaljerad Jämförelse</h4>
                   <p className="text-sm text-muted-foreground">
-                    Jämför upp till 4 fastigheter sida vid sida med
-                    marknadsanalys.
+                    Jämför upp till 4 fastigheter sida vid sida med marknadsanalys.
                   </p>
                 </div>
               </div>
-
+              
               <div className="flex items-start gap-3">
                 <Badge className="bg-primary text-primary-foreground">3</Badge>
                 <div>
                   <h4 className="font-semibold mb-1">Sparade Sökningar</h4>
                   <p className="text-sm text-muted-foreground">
-                    Spara dina sökkriterier och få notifieringar om nya
-                    matchningar.
+                    Spara dina sökkriterier och få notifieringar om nya matchningar.
                   </p>
                 </div>
               </div>

@@ -2,12 +2,7 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -19,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -82,7 +77,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-
+        
         /* Enhanced Nordic Design Tokens */
         nordic: {
           ice: "hsl(var(--nordic-ice))",
@@ -110,24 +105,24 @@ export default {
         },
       },
       backgroundImage: {
-        "gradient-nordic": "var(--gradient-nordic)",
-        "gradient-hero": "var(--gradient-hero)",
-        "gradient-card": "var(--gradient-card)",
-        "gradient-premium": "var(--gradient-premium)",
-        "gradient-success": "var(--gradient-success)",
-        "gradient-gold": "var(--gradient-gold)",
-        "gradient-warm": "var(--gradient-warm)",
-        "gradient-ocean": "var(--gradient-ocean)",
+        'gradient-nordic': 'var(--gradient-nordic)',
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-card': 'var(--gradient-card)',
+        'gradient-premium': 'var(--gradient-premium)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-gold': 'var(--gradient-gold)',
+        'gradient-warm': 'var(--gradient-warm)',
+        'gradient-ocean': 'var(--gradient-ocean)',
       },
       boxShadow: {
-        nordic: "var(--shadow-nordic)",
-        card: "var(--shadow-card)",
-        elevated: "var(--shadow-elevated)",
-        premium: "var(--shadow-premium)",
-        success: "var(--shadow-success)",
-        gold: "var(--shadow-gold)",
-        glow: "var(--shadow-glow)",
-        "glow-premium": "var(--shadow-glow-premium)",
+        'nordic': 'var(--shadow-nordic)',
+        'card': 'var(--shadow-card)',
+        'elevated': 'var(--shadow-elevated)',
+        'premium': 'var(--shadow-premium)',
+        'success': 'var(--shadow-success)',
+        'gold': 'var(--shadow-gold)',
+        'glow': 'var(--shadow-glow)',
+        'glow-premium': 'var(--shadow-glow-premium)',
       },
       borderRadius: {
         lg: "var(--radius)",

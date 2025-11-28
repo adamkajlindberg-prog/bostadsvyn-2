@@ -1,81 +1,51 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useToast } from '@/hooks/use-toast';
 import {
-  Bell,
+  Settings,
+  MapPin,
   DollarSign,
   Home,
-  MapPin,
-  Plus,
-  Settings,
   Target,
+  Bell,
+  Plus,
   X,
-} from "lucide-react";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
+} from 'lucide-react';
 
 const swedishAreas = [
-  "Stockholm",
-  "Göteborg",
-  "Malmö",
-  "Uppsala",
-  "Västerås",
-  "Örebro",
-  "Linköping",
-  "Helsingborg",
-  "Jönköping",
-  "Norrköping",
-  "Lund",
-  "Umeå",
-  "Gävle",
-  "Borås",
-  "Sundsvall",
-  "Täby",
-  "Danderyd",
-  "Nacka",
-  "Solna",
-  "Lidingö",
+  'Stockholm', 'Göteborg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro',
+  'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping', 'Lund', 'Umeå',
+  'Gävle', 'Borås', 'Sundsvall', 'Täby', 'Danderyd', 'Nacka', 'Solna', 'Lidingö'
 ];
 
 const propertyTypes = [
-  "Lägenhet",
-  "Villa",
-  "Radhus",
-  "Townhouse",
-  "Fritidshus",
-  "Tomt",
+  'Lägenhet', 'Villa', 'Radhus', 'Townhouse', 'Fritidshus', 'Tomt'
 ];
 
 const investmentGoals = [
-  "Eget boende",
-  "Uthyrning",
-  "Kapitalväxt",
-  "Kortsiktig vinst",
-  "Långsiktig investering",
+  'Eget boende', 'Uthyrning', 'Kapitalväxt', 'Kortsiktig vinst', 'Långsiktig investering'
 ];
 
 export default function PersonalizationPanel() {
   const { preferences, updatePreferences } = useUserPreferences();
   const { toast } = useToast();
-  const [newArea, setNewArea] = useState("");
-  const [budgetMin, setBudgetMin] = useState(
-    preferences.budgetRange.min?.toString() || "",
-  );
-  const [budgetMax, setBudgetMax] = useState(
-    preferences.budgetRange.max?.toString() || "",
-  );
+  const [newArea, setNewArea] = useState('');
+  const [budgetMin, setBudgetMin] = useState(preferences.budgetRange.min?.toString() || '');
+  const [budgetMax, setBudgetMax] = useState(preferences.budgetRange.max?.toString() || '');
 
   const handleAddArea = () => {
     if (newArea && !preferences.interestedAreas.includes(newArea)) {
       updatePreferences({
-        interestedAreas: [...preferences.interestedAreas, newArea],
+        interestedAreas: [...preferences.interestedAreas, newArea]
       });
-      setNewArea("");
+      setNewArea('');
       toast({
         title: "Område tillagt",
         description: `${newArea} har lagts till i dina intresserade områden.`,
@@ -85,7 +55,7 @@ export default function PersonalizationPanel() {
 
   const handleRemoveArea = (area: string) => {
     updatePreferences({
-      interestedAreas: preferences.interestedAreas.filter((a) => a !== area),
+      interestedAreas: preferences.interestedAreas.filter(a => a !== area)
     });
   };
 
@@ -93,8 +63,8 @@ export default function PersonalizationPanel() {
     const isSelected = preferences.preferredPropertyTypes.includes(type);
     updatePreferences({
       preferredPropertyTypes: isSelected
-        ? preferences.preferredPropertyTypes.filter((t) => t !== type)
-        : [...preferences.preferredPropertyTypes, type],
+        ? preferences.preferredPropertyTypes.filter(t => t !== type)
+        : [...preferences.preferredPropertyTypes, type]
     });
   };
 
@@ -102,34 +72,31 @@ export default function PersonalizationPanel() {
     const isSelected = preferences.investmentGoals.includes(goal);
     updatePreferences({
       investmentGoals: isSelected
-        ? preferences.investmentGoals.filter((g) => g !== goal)
-        : [...preferences.investmentGoals, goal],
+        ? preferences.investmentGoals.filter(g => g !== goal)
+        : [...preferences.investmentGoals, goal]
     });
   };
 
   const handleBudgetUpdate = () => {
-    const min = budgetMin ? parseInt(budgetMin, 10) : null;
-    const max = budgetMax ? parseInt(budgetMax, 10) : null;
-
+    const min = budgetMin ? parseInt(budgetMin) : null;
+    const max = budgetMax ? parseInt(budgetMax) : null;
+    
     updatePreferences({
-      budgetRange: { min, max },
+      budgetRange: { min, max }
     });
-
+    
     toast({
       title: "Budget uppdaterad",
       description: "Din budgetram har sparats.",
     });
   };
 
-  const handleNotificationUpdate = (
-    key: keyof typeof preferences.notifications,
-    value: boolean,
-  ) => {
+  const handleNotificationUpdate = (key: keyof typeof preferences.notifications, value: boolean) => {
     updatePreferences({
       notifications: {
         ...preferences.notifications,
-        [key]: value,
-      },
+        [key]: value
+      }
     });
   };
 
@@ -142,6 +109,7 @@ export default function PersonalizationPanel() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        
         {/* Intresserade områden */}
         <div className="space-y-3">
           <Label className="flex items-center gap-2 text-base font-medium">
@@ -153,11 +121,11 @@ export default function PersonalizationPanel() {
               placeholder="Lägg till område..."
               value={newArea}
               onChange={(e) => setNewArea(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleAddArea()}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddArea()}
               list="areas-list"
             />
             <datalist id="areas-list">
-              {swedishAreas.map((area) => (
+              {swedishAreas.map(area => (
                 <option key={area} value={area} />
               ))}
             </datalist>
@@ -166,7 +134,7 @@ export default function PersonalizationPanel() {
             </Button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {preferences.interestedAreas.map((area) => (
+            {preferences.interestedAreas.map(area => (
               <Badge
                 key={area}
                 variant="secondary"
@@ -217,14 +185,10 @@ export default function PersonalizationPanel() {
             Föredragna fastighetstyper
           </Label>
           <div className="flex flex-wrap gap-2">
-            {propertyTypes.map((type) => (
+            {propertyTypes.map(type => (
               <Badge
                 key={type}
-                variant={
-                  preferences.preferredPropertyTypes.includes(type)
-                    ? "default"
-                    : "outline"
-                }
+                variant={preferences.preferredPropertyTypes.includes(type) ? "default" : "outline"}
                 className="cursor-pointer"
                 onClick={() => handlePropertyTypeToggle(type)}
               >
@@ -243,14 +207,10 @@ export default function PersonalizationPanel() {
             Investeringsmål
           </Label>
           <div className="flex flex-wrap gap-2">
-            {investmentGoals.map((goal) => (
+            {investmentGoals.map(goal => (
               <Badge
                 key={goal}
-                variant={
-                  preferences.investmentGoals.includes(goal)
-                    ? "default"
-                    : "outline"
-                }
+                variant={preferences.investmentGoals.includes(goal) ? "default" : "outline"}
                 className="cursor-pointer"
                 onClick={() => handleInvestmentGoalToggle(goal)}
               >
@@ -274,9 +234,7 @@ export default function PersonalizationPanel() {
               <Switch
                 id="price-alerts"
                 checked={preferences.notifications.priceAlerts}
-                onCheckedChange={(checked) =>
-                  handleNotificationUpdate("priceAlerts", checked)
-                }
+                onCheckedChange={(checked) => handleNotificationUpdate('priceAlerts', checked)}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -284,9 +242,7 @@ export default function PersonalizationPanel() {
               <Switch
                 id="market-updates"
                 checked={preferences.notifications.marketUpdates}
-                onCheckedChange={(checked) =>
-                  handleNotificationUpdate("marketUpdates", checked)
-                }
+                onCheckedChange={(checked) => handleNotificationUpdate('marketUpdates', checked)}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -294,9 +250,7 @@ export default function PersonalizationPanel() {
               <Switch
                 id="new-listings"
                 checked={preferences.notifications.newListings}
-                onCheckedChange={(checked) =>
-                  handleNotificationUpdate("newListings", checked)
-                }
+                onCheckedChange={(checked) => handleNotificationUpdate('newListings', checked)}
               />
             </div>
           </div>

@@ -1,6 +1,7 @@
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import { RentalDetails as RentalDetailsComponent } from "@/components/RentalDetails";
+import React from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { RentalDetails as RentalDetailsComponent } from '@/components/RentalDetails';
 
 const RentalDetails = () => {
   return (

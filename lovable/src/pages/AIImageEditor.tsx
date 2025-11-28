@@ -1,29 +1,30 @@
-import {
-  ArrowLeft,
-  Bot,
-  Download,
-  Image as ImageIcon,
-  Send,
-  Share2,
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  Wand2, 
+  Upload, 
+  ArrowLeft, 
+  Send, 
   Sparkles,
+  Bot,
   User,
-  Wand2,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import Navigation from "@/components/Navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Image as ImageIcon,
+  Download,
+  Share2
+} from 'lucide-react';
 
 interface ChatMessage {
   id: string;
-  type: "user" | "ai";
+  type: 'user' | 'ai';
   content: string;
   timestamp: Date;
   images?: string[];
@@ -35,38 +36,35 @@ const AIImageEditor = () => {
   const { toast } = useToast();
   const { user, loading } = useAuth();
   const [propertyImages, setPropertyImages] = useState<string[]>([]);
-  const [selectedImageIndex, _setSelectedImageIndex] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [currentMessage, setCurrentMessage] = useState("");
+  const [currentMessage, setCurrentMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [propertyTitle, setPropertyTitle] = useState("");
+  const [propertyTitle, setPropertyTitle] = useState('');
   const [propertyId, setPropertyId] = useState<string | null>(null);
 
   useEffect(() => {
     // Remove authentication requirement - allow anonymous use
     loadPropertyData();
-  }, [
-    // Remove authentication requirement - allow anonymous use
-    loadPropertyData,
-  ]);
+  }, [searchParams]);
 
   const loadPropertyData = async () => {
-    const propertyIdParam = searchParams.get("property");
-    const images = searchParams.get("images");
-    const title = searchParams.get("title");
-
+    const propertyIdParam = searchParams.get('property');
+    const images = searchParams.get('images');
+    const title = searchParams.get('title');
+    
     setPropertyId(propertyIdParam);
-
+    
     if (images) {
-      const imageList = images.split(",");
+      const imageList = images.split(',');
       setPropertyImages(imageList);
-      setPropertyTitle(title || "Fastighet");
-
+      setPropertyTitle(title || 'Fastighet');
+      
       const welcomeMessage: ChatMessage = {
-        id: "1",
-        type: "ai",
-        content: `Välkommen till AI-bildredigeraren för "${title || "denna fastighet"}"! 🏠✨\n\nJag kan hjälpa dig visualisera hur fastigheten skulle kunna se ut med olika förändringar:\n\n🎨 **Måla om väggar** - "Måla vardagsrummet i ljusblått"\n🪑 **Möblera om** - "Lägg till en stor soffa och ett soffbord"\n💡 **Ändra belysning** - "Lägg till varmare belysning"\n🔧 **Renovera** - "Gör ett öppet kök mot vardagsrummet"\n🌿 **Dekorera** - "Lägg till växter och tavlor"\n\nVälj en bild genom att klicka på den, och berätta sedan vad du vill ändra!\n\n${user ? "💾 **Alla dina redigeringar sparas automatiskt** och kan ses i ditt bildgalleri på din profil!" : "💡 **Tips**: Logga in för att spara och dela dina AI-redigeringar automatiskt!"}`,
-        timestamp: new Date(),
+        id: '1',
+        type: 'ai',
+        content: `Välkommen till AI-bildredigeraren för "${title || 'denna fastighet'}"! 🏠✨\n\nJag kan hjälpa dig visualisera hur fastigheten skulle kunna se ut med olika förändringar:\n\n🎨 **Måla om väggar** - "Måla vardagsrummet i ljusblått"\n🪑 **Möblera om** - "Lägg till en stor soffa och ett soffbord"\n💡 **Ändra belysning** - "Lägg till varmare belysning"\n🔧 **Renovera** - "Gör ett öppet kök mot vardagsrummet"\n🌿 **Dekorera** - "Lägg till växter och tavlor"\n\nVälj en bild genom att klicka på den, och berätta sedan vad du vill ändra!\n\n${user ? '💾 **Alla dina redigeringar sparas automatiskt** och kan ses i ditt bildgalleri på din profil!' : '💡 **Tips**: Logga in för att spara och dela dina AI-redigeringar automatiskt!'}`,
+        timestamp: new Date()
       };
       setMessages([welcomeMessage]);
     } else {
@@ -75,48 +73,41 @@ const AIImageEditor = () => {
         description: "Du måste komma hit från en fastighetsannons.",
         variant: "destructive",
       });
-      navigate("/");
+      navigate('/');
     }
   };
 
-  const saveEditToDatabase = async (
-    originalImageUrl: string,
-    editedImageUrl: string,
-    prompt: string,
-  ) => {
+  const saveEditToDatabase = async (originalImageUrl: string, editedImageUrl: string, prompt: string) => {
     if (!user) return null;
-
+    
     try {
       const { data, error } = await supabase
-        .from("user_ai_edits")
-        .insert([
-          {
-            user_id: user.id,
-            property_id: propertyId,
-            property_title: propertyTitle,
-            original_image_url: originalImageUrl,
-            edited_image_url: editedImageUrl,
-            edit_prompt: prompt,
-            edit_type: "renovation",
-          },
-        ])
+        .from('user_ai_edits')
+        .insert([{
+          user_id: user.id,
+          property_id: propertyId,
+          property_title: propertyTitle,
+          original_image_url: originalImageUrl,
+          edited_image_url: editedImageUrl,
+          edit_prompt: prompt,
+          edit_type: 'renovation'
+        }])
         .select()
         .single();
 
       if (error) throw error;
-
+      
       toast({
         title: "Redigering sparad! 💾",
         description: "Din AI-redigering har sparats till ditt bildgalleri.",
       });
-
+      
       return data;
     } catch (error: any) {
-      console.error("Error saving edit:", error);
+      console.error('Error saving edit:', error);
       toast({
         title: "Kunde inte spara",
-        description:
-          "Redigeringen kunde inte sparas, men du kan fortfarande ladda ner den.",
+        description: "Redigeringen kunde inte sparas, men du kan fortfarande ladda ner den.",
         variant: "destructive",
       });
       return null;
@@ -124,23 +115,23 @@ const AIImageEditor = () => {
   };
 
   const selectImage = (index: number) => {
+    
     const newMessage: ChatMessage = {
       id: Date.now().toString(),
-      type: "user",
+      type: 'user',
       content: `Valt bild ${index + 1}`,
       timestamp: new Date(),
-      images: [propertyImages[index]],
+      images: [propertyImages[index]]
     };
-    setMessages((prev) => [...prev, newMessage]);
-
+    setMessages(prev => [...prev, newMessage]);
+    
     const aiResponse: ChatMessage = {
       id: (Date.now() + 1).toString(),
-      type: "ai",
-      content:
-        'Perfekt! Nu har jag valt den bilden att arbeta med. Berätta vad du vill ändra:\n\n🎨 **Färger**: "Måla väggarna i varmgrå"\n🪑 **Möbler**: "Lägg till en modern soffa"\n💡 **Belysning**: "Byt till varmare ljus"\n🏗️ **Renovering**: "Ta bort väggen till köket"\n✨ **Stil**: "Gör rummet mer skandinaviskt"\n\nVad har du i åtanke?',
-      timestamp: new Date(),
+      type: 'ai',
+      content: 'Perfekt! Nu har jag valt den bilden att arbeta med. Berätta vad du vill ändra:\n\n🎨 **Färger**: "Måla väggarna i varmgrå"\n🪑 **Möbler**: "Lägg till en modern soffa"\n💡 **Belysning**: "Byt till varmare ljus"\n🏗️ **Renovering**: "Ta bort väggen till köket"\n✨ **Stil**: "Gör rummet mer skandinaviskt"\n\nVad har du i åtanke?',
+      timestamp: new Date()
     };
-    setMessages((prev) => [...prev, aiResponse]);
+    setMessages(prev => [...prev, aiResponse]);
   };
 
   const handleSendMessage = async () => {
@@ -148,28 +139,25 @@ const AIImageEditor = () => {
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      type: "user",
+      type: 'user',
       content: currentMessage,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setCurrentMessage("");
+    setMessages(prev => [...prev, userMessage]);
+    setCurrentMessage('');
     setIsProcessing(true);
 
     try {
       // If we have images and the user wants to edit them
       if (propertyImages.length > 0) {
-        const { data, error } = await supabase.functions.invoke(
-          "ai-image-editor",
-          {
-            body: {
-              imageUrl: propertyImages[selectedImageIndex],
-              prompt: `Interior renovation/design: ${currentMessage}. Focus on realistic architectural and interior design changes for a Swedish property.`,
-              editType: "generation",
-            },
-          },
-        );
+        const { data, error } = await supabase.functions.invoke('ai-image-editor', {
+          body: {
+            imageUrl: propertyImages[selectedImageIndex],
+            prompt: `Interior renovation/design: ${currentMessage}. Focus on realistic architectural and interior design changes for a Swedish property.`,
+            editType: 'generation'
+          }
+        });
 
         if (error) throw error;
 
@@ -179,18 +167,18 @@ const AIImageEditor = () => {
             await saveEditToDatabase(
               propertyImages[selectedImageIndex],
               data.images[0].url,
-              currentMessage,
+              currentMessage
             );
           }
-
+          
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
-            type: "ai",
-            content: `Här är din AI-renovering! 🎯✨\n\nJag har skapat nya versioner som visar hur rummet skulle kunna se ut med dina förändringar. Du kan:\n\n📥 **Ladda ner** bilderna genom att hovra över dem\n📤 **Dela** dem med andra\n🔄 **Prova fler ändringar** - beskriv bara vad du vill ändra härnäst!\n\n${user ? "💾 **Automatiskt sparat** till ditt bildgalleri på din profil!" : "💡 **Tips**: Logga in för att automatiskt spara alla dina AI-redigeringar!"}\n\nVad tycker du om resultatet?`,
+            type: 'ai',
+            content: `Här är din AI-renovering! 🎯✨\n\nJag har skapat nya versioner som visar hur rummet skulle kunna se ut med dina förändringar. Du kan:\n\n📥 **Ladda ner** bilderna genom att hovra över dem\n📤 **Dela** dem med andra\n🔄 **Prova fler ändringar** - beskriv bara vad du vill ändra härnäst!\n\n${user ? '💾 **Automatiskt sparat** till ditt bildgalleri på din profil!' : '💡 **Tips**: Logga in för att automatiskt spara alla dina AI-redigeringar!'}\n\nVad tycker du om resultatet?`,
             timestamp: new Date(),
-            images: data.images.map((img: any) => img.url),
+            images: data.images.map((img: any) => img.url)
           };
-          setMessages((prev) => [...prev, aiMessage]);
+          setMessages(prev => [...prev, aiMessage]);
         } else {
           throw new Error(data.error);
         }
@@ -198,28 +186,25 @@ const AIImageEditor = () => {
         // No images selected
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          type: "ai",
-          content:
-            "Du behöver välja en bild från fastighetens bildgalleri först! Klicka på en av bilderna till vänster så kan jag börja arbeta med den.",
-          timestamp: new Date(),
+          type: 'ai',
+          content: 'Du behöver välja en bild från fastighetens bildgalleri först! Klicka på en av bilderna till vänster så kan jag börja arbeta med den.',
+          timestamp: new Date()
         };
-        setMessages((prev) => [...prev, aiMessage]);
+        setMessages(prev => [...prev, aiMessage]);
       }
     } catch (error: any) {
-      console.error("AI processing error:", error);
+      console.error('AI processing error:', error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        type: "ai",
-        content:
-          "Oj, något gick fel när jag försökte bearbeta din begäran. Kan du försöka igen?",
-        timestamp: new Date(),
+        type: 'ai',
+        content: 'Oj, något gick fel när jag försökte bearbeta din begäran. Kan du försöka igen?',
+        timestamp: new Date()
       };
-      setMessages((prev) => [...prev, errorMessage]);
-
+      setMessages(prev => [...prev, errorMessage]);
+      
       toast({
         title: "Fel vid AI-bearbetning",
-        description:
-          error.message || "Kunde inte bearbeta din begäran. Försök igen.",
+        description: error.message || "Kunde inte bearbeta din begäran. Försök igen.",
         variant: "destructive",
       });
     } finally {
@@ -232,14 +217,14 @@ const AIImageEditor = () => {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = `ai-edited-${Date.now()}.jpg`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (_error) {
+    } catch (error) {
       toast({
         title: "Nedladdning misslyckades",
         description: "Kunde inte ladda ner bilden.",
@@ -252,12 +237,12 @@ const AIImageEditor = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "AI-redigerad fastighetsbild",
-          text: "Kolla in den här AI-redigerade fastighetsbilden!",
+          title: 'AI-redigerad fastighetsbild',
+          text: 'Kolla in den här AI-redigerade fastighetsbilden!',
           url: imageUrl,
         });
-      } catch (_error) {
-        console.log("Share cancelled");
+      } catch (error) {
+        console.log('Share cancelled');
       }
     } else {
       navigator.clipboard.writeText(imageUrl);
@@ -271,10 +256,14 @@ const AIImageEditor = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-
+      
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="p-2">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="p-2"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -320,12 +309,12 @@ const AIImageEditor = () => {
                 <ScrollArea className="h-[650px]">
                   <div className="space-y-2">
                     {propertyImages.map((img, index) => (
-                      <div
-                        key={index}
+                      <div 
+                        key={index} 
                         className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          index === selectedImageIndex
-                            ? "border-primary ring-2 ring-primary/20"
-                            : "border-border hover:border-primary/50"
+                          index === selectedImageIndex 
+                            ? 'border-primary ring-2 ring-primary/20' 
+                            : 'border-border hover:border-primary/50'
                         }`}
                         onClick={() => selectImage(index)}
                       >
@@ -364,60 +353,37 @@ const AIImageEditor = () => {
                   AI Renoveringsassistent
                 </CardTitle>
                 <p className="text-base text-muted-foreground">
-                  Beskriv vad du vill ändra på den valda bilden och se
-                  resultatet direkt
+                  Beskriv vad du vill ändra på den valda bilden och se resultatet direkt
                 </p>
               </CardHeader>
-
+              
               <CardContent className="flex-1 flex flex-col">
                 <ScrollArea className="flex-1 pr-4">
                   <div className="space-y-4">
                     {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex gap-3 ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`flex gap-3 max-w-[80%] ${message.type === "user" ? "flex-row-reverse" : "flex-row"}`}
-                        >
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              message.type === "user"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted"
-                            }`}
-                          >
-                            {message.type === "user" ? (
-                              <User className="h-4 w-4" />
-                            ) : (
-                              <Bot className="h-4 w-4" />
-                            )}
+                      <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`flex gap-3 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                          }`}>
+                            {message.type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                           </div>
-
-                          <div
-                            className={`rounded-lg p-4 ${
-                              message.type === "user"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted"
-                            }`}
-                          >
-                            <p className="whitespace-pre-wrap text-base">
-                              {message.content}
-                            </p>
-
+                          
+                         <div className={`rounded-lg p-4 ${
+                            message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                          }`}>
+                            <p className="whitespace-pre-wrap text-base">{message.content}</p>
+                            
                             {message.images && message.images.length > 0 && (
                               <div className="mt-3 space-y-2">
                                 {message.images.map((img, imgIndex) => (
-                                  <div
-                                    key={imgIndex}
-                                    className="relative group"
-                                  >
+                                  <div key={imgIndex} className="relative group">
                                     <img
                                       src={img}
                                       alt={`Generated ${imgIndex + 1}`}
                                       className="max-w-full rounded border"
                                     />
-                                    {message.type === "ai" && (
+                                    {message.type === 'ai' && (
                                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                                         <Button
                                           size="sm"
@@ -441,7 +407,7 @@ const AIImageEditor = () => {
                                 ))}
                               </div>
                             )}
-
+                            
                             <div className="text-xs opacity-70 mt-2">
                               {message.timestamp.toLocaleTimeString()}
                             </div>
@@ -449,7 +415,7 @@ const AIImageEditor = () => {
                         </div>
                       </div>
                     ))}
-
+                    
                     {isProcessing && (
                       <div className="flex gap-3 justify-start">
                         <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
@@ -458,75 +424,53 @@ const AIImageEditor = () => {
                         <div className="bg-muted rounded-lg p-3">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                            <div
-                              className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
-                            ></div>
-                            <div
-                              className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                            <span className="text-sm text-muted-foreground ml-2">
-                              AI arbetar...
-                            </span>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            <span className="text-sm text-muted-foreground ml-2">AI arbetar...</span>
                           </div>
                         </div>
                       </div>
                     )}
                   </div>
                 </ScrollArea>
-
+                
                 <div className="space-y-4 pt-4 border-t">
                   <div className="flex gap-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                     <span>💡 Tips:</span>
-                    <span>
-                      "Måla vardagsrummet ljusblått", "Lägg till en stor soffa",
-                      "Renovera köket"
-                    </span>
+                    <span>"Måla vardagsrummet ljusblått", "Lägg till en stor soffa", "Renovera köket"</span>
                   </div>
-
+                  
                   {!user && (
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                       <div className="flex items-center gap-2 text-amber-800">
                         <User className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                          Logga in för fler funktioner
-                        </span>
+                        <span className="text-sm font-medium">Logga in för fler funktioner</span>
                       </div>
                       <p className="text-xs text-amber-700 mt-1">
-                        Spara dina AI-redigeringar automatiskt och visa dem i
-                        ditt bildgalleri
+                        Spara dina AI-redigeringar automatiskt och visa dem i ditt bildgalleri
                       </p>
-                      <Button
-                        size="sm"
-                        onClick={() => navigate("/login")}
+                      <Button 
+                        size="sm" 
+                        onClick={() => navigate('/login')}
                         className="mt-2 h-7 text-xs"
                       >
                         Logga in
                       </Button>
                     </div>
                   )}
-
+                  
                   <div className="flex gap-3">
                     <Input
                       placeholder="Beskriv vad du vill ändra eller renovera..."
                       value={currentMessage}
                       onChange={(e) => setCurrentMessage(e.target.value)}
-                      onKeyPress={(e) =>
-                        e.key === "Enter" &&
-                        !isProcessing &&
-                        handleSendMessage()
-                      }
+                      onKeyPress={(e) => e.key === 'Enter' && !isProcessing && handleSendMessage()}
                       disabled={isProcessing}
                       className="flex-1 h-12 text-base"
                     />
-                    <Button
+                    <Button 
                       onClick={handleSendMessage}
-                      disabled={
-                        isProcessing ||
-                        !currentMessage.trim() ||
-                        propertyImages.length === 0
-                      }
+                      disabled={isProcessing || !currentMessage.trim() || propertyImages.length === 0}
                       className="px-6 h-12"
                       size="lg"
                     >

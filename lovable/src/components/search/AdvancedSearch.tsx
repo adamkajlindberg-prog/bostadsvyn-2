@@ -1,32 +1,28 @@
-import {
-  Clock,
-  Filter,
-  Heart,
-  Home,
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
   Search,
+  MapPin,
+  Home,
+  Filter,
   Sparkles,
-  Star,
+  Heart,
+  Clock,
   TrendingUp,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  X,
+  Star
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SearchFilters {
   location: string;
@@ -66,88 +62,86 @@ interface AIRecommendation {
 const AdvancedSearch = () => {
   const { user } = useAuth();
   const [filters, setFilters] = useState<SearchFilters>({
-    location: "",
+    location: '',
     propertyType: [],
     priceRange: [0, 20000000],
     areaRange: [0, 500],
-    rooms: "",
+    rooms: '',
     features: [],
     energyClass: [],
     yearBuilt: [1900, 2024],
-    keywords: "",
+    keywords: ''
   });
   const [searchResults, setSearchResults] = useState<Property[]>([]);
-  const [aiRecommendations, setAIRecommendations] = useState<
-    AIRecommendation[]
-  >([]);
+  const [aiRecommendations, setAIRecommendations] = useState<AIRecommendation[]>([]);
   const [loading, setLoading] = useState(false);
   const [savedSearches, setSavedSearches] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("search");
+  const [activeTab, setActiveTab] = useState('search');
 
   const propertyTypes = [
-    { value: "lägenhet", label: "Lägenhet" },
-    { value: "villa", label: "Villa" },
-    { value: "radhus", label: "Radhus" },
-    { value: "kedjehus", label: "Kedjehus" },
-    { value: "fritidshus", label: "Fritidshus" },
+    { value: 'lägenhet', label: 'Lägenhet' },
+    { value: 'villa', label: 'Villa' },
+    { value: 'radhus', label: 'Radhus' },
+    { value: 'kedjehus', label: 'Kedjehus' },
+    { value: 'fritidshus', label: 'Fritidshus' }
   ];
 
   const propertyFeatures = [
-    { value: "balkong", label: "Balkong" },
-    { value: "trädgård", label: "Trädgård" },
-    { value: "garage", label: "Garage" },
-    { value: "hiss", label: "Hiss" },
-    { value: "kamin", label: "Kamin" },
-    { value: "pool", label: "Pool" },
-    { value: "gym", label: "Gym" },
-    { value: "förråd", label: "Förråd" },
+    { value: 'balkong', label: 'Balkong' },
+    { value: 'trädgård', label: 'Trädgård' },
+    { value: 'garage', label: 'Garage' },
+    { value: 'hiss', label: 'Hiss' },
+    { value: 'kamin', label: 'Kamin' },
+    { value: 'pool', label: 'Pool' },
+    { value: 'gym', label: 'Gym' },
+    { value: 'förråd', label: 'Förråd' }
   ];
 
-  const energyClasses = ["A", "B", "C", "D", "E", "F", "G"];
+  const energyClasses = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
   useEffect(() => {
     if (user) {
       loadSavedSearches();
     }
-  }, [user, loadSavedSearches]);
+  }, [user]);
 
   const loadSavedSearches = async () => {
     try {
       const { data, error } = await supabase
-        .from("saved_searches")
-        .select("*")
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
+        .from('saved_searches')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setSavedSearches(data || []);
     } catch (error) {
-      console.error("Error loading saved searches:", error);
+      console.error('Error loading saved searches:', error);
     }
   };
 
   const handleFilterChange = (key: keyof SearchFilters, value: any) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
-      [key]: value,
+      [key]: value
     }));
   };
 
   const handlePropertyTypeChange = (type: string, checked: boolean) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
-      propertyType: checked
+      propertyType: checked 
         ? [...prev.propertyType, type]
-        : prev.propertyType.filter((t) => t !== type),
+        : prev.propertyType.filter(t => t !== type)
     }));
   };
 
   const handleFeatureChange = (feature: string, checked: boolean) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
-      features: checked
+      features: checked 
         ? [...prev.features, feature]
-        : prev.features.filter((f) => f !== feature),
+        : prev.features.filter(f => f !== feature)
     }));
   };
 
@@ -155,35 +149,29 @@ const AdvancedSearch = () => {
     setLoading(true);
     try {
       let query = supabase
-        .from("properties")
-        .select("*")
-        .eq("status", "FOR_SALE");
+        .from('properties')
+        .select('*')
+        .eq('status', 'FOR_SALE');
 
       // Apply filters
       if (filters.location) {
-        query = query.or(
-          `address_city.ilike.%${filters.location}%,address_street.ilike.%${filters.location}%`,
-        );
+        query = query.or(`address_city.ilike.%${filters.location}%,address_street.ilike.%${filters.location}%`);
       }
 
       if (filters.propertyType.length > 0) {
-        query = query.in("property_type", filters.propertyType);
+        query = query.in('property_type', filters.propertyType);
       }
 
       if (filters.priceRange[0] > 0 || filters.priceRange[1] < 20000000) {
-        query = query
-          .gte("price", filters.priceRange[0])
-          .lte("price", filters.priceRange[1]);
+        query = query.gte('price', filters.priceRange[0]).lte('price', filters.priceRange[1]);
       }
 
       if (filters.areaRange[0] > 0 || filters.areaRange[1] < 500) {
-        query = query
-          .gte("living_area", filters.areaRange[0])
-          .lte("living_area", filters.areaRange[1]);
+        query = query.gte('living_area', filters.areaRange[0]).lte('living_area', filters.areaRange[1]);
       }
 
       if (filters.rooms) {
-        query = query.eq("rooms", parseInt(filters.rooms, 10));
+        query = query.eq('rooms', parseInt(filters.rooms));
       }
 
       const { data, error } = await query.limit(50);
@@ -199,8 +187,8 @@ const AdvancedSearch = () => {
 
       toast.success(`Hittade ${data?.length || 0} fastigheter`);
     } catch (error) {
-      console.error("Search error:", error);
-      toast.error("Ett fel uppstod vid sökningen");
+      console.error('Search error:', error);
+      toast.error('Ett fel uppstod vid sökningen');
     } finally {
       setLoading(false);
     }
@@ -208,99 +196,96 @@ const AdvancedSearch = () => {
 
   const getAIRecommendations = async (properties: Property[]) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "ai-property-recommendations",
-        {
-          body: {
-            user_id: user?.id,
-            properties: properties.slice(0, 10), // Limit to first 10 for AI analysis
-            filters: filters,
-          },
-        },
-      );
+      const { data, error } = await supabase.functions.invoke('ai-property-recommendations', {
+        body: { 
+          user_id: user?.id,
+          properties: properties.slice(0, 10), // Limit to first 10 for AI analysis
+          filters: filters
+        }
+      });
 
       if (error) throw error;
 
       // Mock AI recommendations for demo
-      const mockRecommendations: AIRecommendation[] = properties
-        .slice(0, 5)
-        .map((property, index) => ({
-          property,
-          score: 95 - index * 5,
-          reasons: [
-            "Matchar din sökhistorik perfekt",
-            "Utmärkt prisläge för området",
-            "Nära kollektivtrafik och skolor",
-            "Populärt område med stark utveckling",
-          ].slice(0, Math.floor(Math.random() * 3) + 2),
-          match_percentage: 95 - index * 5,
-        }));
+      const mockRecommendations: AIRecommendation[] = properties.slice(0, 5).map((property, index) => ({
+        property,
+        score: 95 - (index * 5),
+        reasons: [
+          'Matchar din sökhistorik perfekt',
+          'Utmärkt prisläge för området',
+          'Nära kollektivtrafik och skolor',
+          'Populärt område med stark utveckling'
+        ].slice(0, Math.floor(Math.random() * 3) + 2),
+        match_percentage: 95 - (index * 5)
+      }));
 
       setAIRecommendations(mockRecommendations);
     } catch (error) {
-      console.error("Error getting AI recommendations:", error);
+      console.error('Error getting AI recommendations:', error);
     }
   };
 
   const saveCurrentSearch = async () => {
     if (!user) {
-      toast.error("Du måste vara inloggad för att spara sökningar");
+      toast.error('Du måste vara inloggad för att spara sökningar');
       return;
     }
 
     try {
-      const searchName = filters.location || "Sparad sökning";
-
-      const { error } = await supabase.from("saved_searches").insert({
-        user_id: user.id,
-        name: searchName,
-        search_params: filters as any,
-      });
+      const searchName = filters.location || 'Sparad sökning';
+      
+      const { error } = await supabase
+        .from('saved_searches')
+        .insert({
+          user_id: user.id,
+          name: searchName,
+          search_params: filters as any
+        });
 
       if (error) throw error;
 
-      toast.success("Sökning sparad!");
+      toast.success('Sökning sparad!');
       loadSavedSearches();
     } catch (error) {
-      console.error("Error saving search:", error);
-      toast.error("Kunde inte spara sökningen");
+      console.error('Error saving search:', error);
+      toast.error('Kunde inte spara sökningen');
     }
   };
 
   const loadSavedSearch = (savedSearch: any) => {
     setFilters(savedSearch.search_params);
-    toast.success("Sökning laddad!");
+    toast.success('Sökning laddad!');
   };
 
   const clearFilters = () => {
     setFilters({
-      location: "",
+      location: '',
       propertyType: [],
       priceRange: [0, 20000000],
       areaRange: [0, 500],
-      rooms: "",
+      rooms: '',
       features: [],
       energyClass: [],
       yearBuilt: [1900, 2024],
-      keywords: "",
+      keywords: ''
     });
   };
 
   const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat("sv-SE", {
-      style: "currency",
-      currency: "SEK",
-      maximumFractionDigits: 0,
+    return new Intl.NumberFormat('sv-SE', {
+      style: 'currency',
+      currency: 'SEK',
+      maximumFractionDigits: 0
     }).format(price);
   };
 
-  const _formatPricePerSqm = (price: number): string => {
-    return `${new Intl.NumberFormat("sv-SE", {
-      maximumFractionDigits: 0,
-    }).format(price)} kr/m²`;
+  const formatPricePerSqm = (price: number): string => {
+    return new Intl.NumberFormat('sv-SE', {
+      maximumFractionDigits: 0
+    }).format(price) + ' kr/m²';
   };
 
-  const _hasFeature = (property: Property, feature: string): boolean => {
+  const hasFeature = (property: Property, feature: string): boolean => {
     return property.features?.includes(feature) || false;
   };
 
@@ -313,16 +298,11 @@ const AdvancedSearch = () => {
           <h2 className="text-3xl font-bold">Avancerad Fastighetssökning</h2>
         </div>
         <p className="text-lg text-muted-foreground">
-          Hitta din drömfastighet med AI-powered sökning och smarta
-          rekommendationer
+          Hitta din drömfastighet med AI-powered sökning och smarta rekommendationer
         </p>
       </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="space-y-6"
-      >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="search" className="gap-2">
             <Search className="h-4 w-4" />
@@ -336,11 +316,7 @@ const AdvancedSearch = () => {
             <Home className="h-4 w-4" />
             Sökresultat ({searchResults.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="recommendations"
-            className="gap-2"
-            disabled={!user}
-          >
+          <TabsTrigger value="recommendations" className="gap-2" disabled={!user}>
             <Sparkles className="h-4 w-4" />
             AI Rekommendationer
           </TabsTrigger>
@@ -359,9 +335,7 @@ const AdvancedSearch = () => {
                   <Input
                     id="location"
                     value={filters.location}
-                    onChange={(e) =>
-                      handleFilterChange("location", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange('location', e.target.value)}
                     placeholder="T.ex. Stockholm, Göteborg..."
                     className="gap-2"
                   />
@@ -372,9 +346,7 @@ const AdvancedSearch = () => {
                   <Input
                     id="keywords"
                     value={filters.keywords}
-                    onChange={(e) =>
-                      handleFilterChange("keywords", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange('keywords', e.target.value)}
                     placeholder="T.ex. nyrenoverad, centralt..."
                   />
                 </div>
@@ -385,18 +357,10 @@ const AdvancedSearch = () => {
                 <Label>Fastighetstyp</Label>
                 <div className="flex flex-wrap gap-2">
                   {propertyTypes.map((type) => (
-                    <label
-                      key={type.value}
-                      className="flex items-center space-x-2 cursor-pointer"
-                    >
+                    <label key={type.value} className="flex items-center space-x-2 cursor-pointer">
                       <Checkbox
                         checked={filters.propertyType.includes(type.value)}
-                        onCheckedChange={(checked) =>
-                          handlePropertyTypeChange(
-                            type.value,
-                            checked as boolean,
-                          )
-                        }
+                        onCheckedChange={(checked) => handlePropertyTypeChange(type.value, checked as boolean)}
                       />
                       <span className="text-sm">{type.label}</span>
                     </label>
@@ -406,15 +370,10 @@ const AdvancedSearch = () => {
 
               {/* Price Range */}
               <div className="space-y-2">
-                <Label>
-                  Prisintervall: {formatPrice(filters.priceRange[0])} -{" "}
-                  {formatPrice(filters.priceRange[1])}
-                </Label>
+                <Label>Prisintervall: {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}</Label>
                 <Slider
                   value={filters.priceRange}
-                  onValueChange={(value) =>
-                    handleFilterChange("priceRange", value)
-                  }
+                  onValueChange={(value) => handleFilterChange('priceRange', value)}
                   max={20000000}
                   min={0}
                   step={100000}
@@ -423,23 +382,15 @@ const AdvancedSearch = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button
-                  onClick={performSearch}
-                  disabled={loading}
-                  className="gap-2"
-                >
-                  {loading ? "Söker..." : "Sök fastigheter"}
+                <Button onClick={performSearch} disabled={loading} className="gap-2">
+                  {loading ? 'Söker...' : 'Sök fastigheter'}
                   <Search className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" onClick={clearFilters}>
                   Rensa filter
                 </Button>
                 {user && (
-                  <Button
-                    variant="outline"
-                    onClick={saveCurrentSearch}
-                    className="gap-2"
-                  >
+                  <Button variant="outline" onClick={saveCurrentSearch} className="gap-2">
                     <Heart className="h-4 w-4" />
                     Spara sökning
                   </Button>
@@ -486,14 +437,10 @@ const AdvancedSearch = () => {
             <CardContent className="space-y-6">
               {/* Area Range */}
               <div className="space-y-2">
-                <Label>
-                  Boarea: {filters.areaRange[0]} - {filters.areaRange[1]} m²
-                </Label>
+                <Label>Boarea: {filters.areaRange[0]} - {filters.areaRange[1]} m²</Label>
                 <Slider
                   value={filters.areaRange}
-                  onValueChange={(value) =>
-                    handleFilterChange("areaRange", value)
-                  }
+                  onValueChange={(value) => handleFilterChange('areaRange', value)}
                   max={500}
                   min={0}
                   step={10}
@@ -504,10 +451,7 @@ const AdvancedSearch = () => {
               {/* Rooms */}
               <div className="space-y-2">
                 <Label htmlFor="rooms">Antal rum</Label>
-                <Select
-                  value={filters.rooms}
-                  onValueChange={(value) => handleFilterChange("rooms", value)}
-                >
+                <Select value={filters.rooms} onValueChange={(value) => handleFilterChange('rooms', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Välj antal rum" />
                   </SelectTrigger>
@@ -527,15 +471,10 @@ const AdvancedSearch = () => {
                 <Label>Fastighetsegenskaper</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {propertyFeatures.map((feature) => (
-                    <label
-                      key={feature.value}
-                      className="flex items-center space-x-2 cursor-pointer"
-                    >
+                    <label key={feature.value} className="flex items-center space-x-2 cursor-pointer">
                       <Checkbox
                         checked={filters.features.includes(feature.value)}
-                        onCheckedChange={(checked) =>
-                          handleFeatureChange(feature.value, checked as boolean)
-                        }
+                        onCheckedChange={(checked) => handleFeatureChange(feature.value, checked as boolean)}
                       />
                       <span className="text-sm">{feature.label}</span>
                     </label>
@@ -550,19 +489,13 @@ const AdvancedSearch = () => {
                   {energyClasses.map((energyClass) => (
                     <Button
                       key={energyClass}
-                      variant={
-                        filters.energyClass.includes(energyClass)
-                          ? "default"
-                          : "outline"
-                      }
+                      variant={filters.energyClass.includes(energyClass) ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => {
-                        const newClasses = filters.energyClass.includes(
-                          energyClass,
-                        )
-                          ? filters.energyClass.filter((c) => c !== energyClass)
+                        const newClasses = filters.energyClass.includes(energyClass)
+                          ? filters.energyClass.filter(c => c !== energyClass)
                           : [...filters.energyClass, energyClass];
-                        handleFilterChange("energyClass", newClasses);
+                        handleFilterChange('energyClass', newClasses);
                       }}
                     >
                       {energyClass}
@@ -573,14 +506,10 @@ const AdvancedSearch = () => {
 
               {/* Year Built */}
               <div className="space-y-2">
-                <Label>
-                  Byggår: {filters.yearBuilt[0]} - {filters.yearBuilt[1]}
-                </Label>
+                <Label>Byggår: {filters.yearBuilt[0]} - {filters.yearBuilt[1]}</Label>
                 <Slider
                   value={filters.yearBuilt}
-                  onValueChange={(value) =>
-                    handleFilterChange("yearBuilt", value)
-                  }
+                  onValueChange={(value) => handleFilterChange('yearBuilt', value)}
                   max={2024}
                   min={1900}
                   step={5}
@@ -596,14 +525,11 @@ const AdvancedSearch = () => {
           {searchResults.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.map((property) => (
-                <Card
-                  key={property.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow"
-                >
+                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="aspect-video bg-muted relative">
                     {property.images && property.images.length > 0 ? (
-                      <img
-                        src={property.images[0]}
+                      <img 
+                        src={property.images[0]} 
                         alt={property.title}
                         className="w-full h-full object-cover"
                       />
@@ -614,9 +540,7 @@ const AdvancedSearch = () => {
                     )}
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg mb-2">
-                      {property.title}
-                    </h3>
+                    <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
                     <p className="text-sm text-muted-foreground mb-2">
                       {property.address_street}, {property.address_city}
                     </p>
@@ -624,9 +548,7 @@ const AdvancedSearch = () => {
                       <span className="text-2xl font-bold text-primary">
                         {formatPrice(property.price)}
                       </span>
-                      <Badge variant="secondary">
-                        {property.property_type}
-                      </Badge>
+                      <Badge variant="secondary">{property.property_type}</Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span>{property.living_area} m²</span>
@@ -642,8 +564,7 @@ const AdvancedSearch = () => {
                 <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Inga sökresultat</h3>
                 <p className="text-muted-foreground">
-                  Prova att ändra dina sökkriterier för att hitta fler
-                  fastigheter.
+                  Prova att ändra dina sökkriterier för att hitta fler fastigheter.
                 </p>
               </CardContent>
             </Card>
@@ -654,37 +575,26 @@ const AdvancedSearch = () => {
         <TabsContent value="recommendations" className="space-y-6">
           {aiRecommendations.length > 0 ? (
             <div className="space-y-4">
-              {aiRecommendations.map((recommendation, _index) => (
-                <Card
-                  key={recommendation.property.id}
-                  className="border-primary/20"
-                >
+              {aiRecommendations.map((recommendation, index) => (
+                <Card key={recommendation.property.id} className="border-primary/20">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="text-lg font-semibold">
-                            {recommendation.property.title}
-                          </h3>
+                          <h3 className="text-lg font-semibold">{recommendation.property.title}</h3>
                           <Badge className="bg-primary text-primary-foreground">
                             <Star className="h-3 w-3 mr-1" />
                             {recommendation.match_percentage}% match
                           </Badge>
                         </div>
                         <p className="text-muted-foreground mb-3">
-                          {recommendation.property.address_street},{" "}
-                          {recommendation.property.address_city}
+                          {recommendation.property.address_street}, {recommendation.property.address_city}
                         </p>
                         <div className="space-y-2 mb-4">
-                          <p className="text-sm font-medium">
-                            Varför denna fastighet rekommenderas:
-                          </p>
+                          <p className="text-sm font-medium">Varför denna fastighet rekommenderas:</p>
                           <ul className="space-y-1">
                             {recommendation.reasons.map((reason, i) => (
-                              <li
-                                key={i}
-                                className="text-sm text-muted-foreground flex items-center gap-2"
-                              >
+                              <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
                                 <TrendingUp className="h-3 w-3 text-green-500" />
                                 {reason}
                               </li>
@@ -697,8 +607,7 @@ const AdvancedSearch = () => {
                           {formatPrice(recommendation.property.price)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {recommendation.property.living_area} m² •{" "}
-                          {recommendation.property.rooms} rum
+                          {recommendation.property.living_area} m² • {recommendation.property.rooms} rum
                         </p>
                       </div>
                     </div>
@@ -710,12 +619,9 @@ const AdvancedSearch = () => {
             <Card>
               <CardContent className="text-center p-8">
                 <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Inga AI-rekommendationer än
-                </h3>
+                <h3 className="text-lg font-semibold mb-2">Inga AI-rekommendationer än</h3>
                 <p className="text-muted-foreground">
-                  Genomför en sökning för att få personliga rekommendationer
-                  baserat på AI-analys.
+                  Genomför en sökning för att få personliga rekommendationer baserat på AI-analys.
                 </p>
               </CardContent>
             </Card>

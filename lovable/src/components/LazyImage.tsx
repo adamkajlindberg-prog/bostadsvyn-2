@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 
 interface LazyImageProps {
   src: string;
@@ -22,8 +22,8 @@ const LazyImage = ({ src, alt, className, placeholder }: LazyImageProps) => {
       },
       {
         threshold: 0.1,
-        rootMargin: "50px",
-      },
+        rootMargin: '50px'
+      }
     );
 
     if (imgRef.current) {
@@ -38,9 +38,7 @@ const LazyImage = ({ src, alt, className, placeholder }: LazyImageProps) => {
       {isInView && (
         <>
           {!isLoaded && placeholder && (
-            <div
-              className={`${className} bg-muted animate-pulse flex items-center justify-center`}
-            >
+            <div className={`${className} bg-muted animate-pulse flex items-center justify-center`}>
               <div className="text-muted-foreground text-sm">Laddar...</div>
             </div>
           )}
@@ -48,7 +46,7 @@ const LazyImage = ({ src, alt, className, placeholder }: LazyImageProps) => {
             src={src}
             alt={alt}
             className={`${className} transition-opacity duration-300 ${
-              isLoaded ? "opacity-100" : "opacity-0"
+              isLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setIsLoaded(true)}
             loading="lazy"

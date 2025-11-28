@@ -1,16 +1,15 @@
-import { ArrowLeft, Loader2, Save } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import Navigation from "@/components/Navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 const EditAd = () => {
   const { adId } = useParams();
@@ -26,7 +25,7 @@ const EditAd = () => {
     if (user && adId) {
       loadAdData();
     }
-  }, [user, adId, loadAdData]);
+  }, [user, adId]);
 
   const loadAdData = async () => {
     try {
@@ -34,7 +33,7 @@ const EditAd = () => {
 
       // Load ad with property details
       const { data: adData, error: adError } = await supabase
-        .from("ads")
+        .from('ads')
         .select(`
           id,
           title,
@@ -65,30 +64,30 @@ const EditAd = () => {
             rental_info
           )
         `)
-        .eq("id", adId)
-        .eq("user_id", user?.id)
+        .eq('id', adId)
+        .eq('user_id', user?.id)
         .single();
 
       if (adError) throw adError;
 
       if (!adData) {
         toast({
-          title: "Fel",
-          description: "Annonsen hittades inte eller du har inte behörighet",
-          variant: "destructive",
+          title: 'Fel',
+          description: 'Annonsen hittades inte eller du har inte behörighet',
+          variant: 'destructive',
         });
-        navigate("/dashboard");
+        navigate('/dashboard');
         return;
       }
 
       setAd(adData);
       setProperty(adData.properties);
     } catch (error: any) {
-      console.error("Error loading ad:", error);
+      console.error('Error loading ad:', error);
       toast({
-        title: "Fel",
-        description: "Kunde inte ladda annons",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte ladda annons',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -97,7 +96,7 @@ const EditAd = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!ad || !property) return;
 
     try {
@@ -105,18 +104,18 @@ const EditAd = () => {
 
       // Update ad
       const { error: adError } = await supabase
-        .from("ads")
+        .from('ads')
         .update({
           title: ad.title,
           description: ad.description,
         })
-        .eq("id", adId);
+        .eq('id', adId);
 
       if (adError) throw adError;
 
       // Update property
       const { error: propertyError } = await supabase
-        .from("properties")
+        .from('properties')
         .update({
           title: property.title,
           description: property.description,
@@ -129,22 +128,22 @@ const EditAd = () => {
           address_postal_code: property.address_postal_code,
           address_city: property.address_city,
         })
-        .eq("id", property.id);
+        .eq('id', property.id);
 
       if (propertyError) throw propertyError;
 
       toast({
-        title: "Sparat!",
-        description: "Annonsen har uppdaterats",
+        title: 'Sparat!',
+        description: 'Annonsen har uppdaterats',
       });
 
-      navigate("/dashboard");
+      navigate('/dashboard');
     } catch (error: any) {
-      console.error("Error saving ad:", error);
+      console.error('Error saving ad:', error);
       toast({
-        title: "Fel",
-        description: "Kunde inte spara ändringar",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte spara ändringar',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -174,7 +173,7 @@ const EditAd = () => {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button
           variant="ghost"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate('/dashboard')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -204,10 +203,8 @@ const EditAd = () => {
                 <Label htmlFor="ad-description">Annonsbeskrivning</Label>
                 <Textarea
                   id="ad-description"
-                  value={ad.description || ""}
-                  onChange={(e) =>
-                    setAd({ ...ad, description: e.target.value })
-                  }
+                  value={ad.description || ''}
+                  onChange={(e) => setAd({ ...ad, description: e.target.value })}
                   placeholder="Beskriv bostaden..."
                   rows={6}
                 />
@@ -227,12 +224,7 @@ const EditAd = () => {
                     id="price"
                     type="number"
                     value={property.price}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        price: parseFloat(e.target.value),
-                      })
-                    }
+                    onChange={(e) => setProperty({ ...property, price: parseFloat(e.target.value) })}
                     required
                   />
                 </div>
@@ -242,13 +234,8 @@ const EditAd = () => {
                   <Input
                     id="living-area"
                     type="number"
-                    value={property.living_area || ""}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        living_area: parseFloat(e.target.value),
-                      })
-                    }
+                    value={property.living_area || ''}
+                    onChange={(e) => setProperty({ ...property, living_area: parseFloat(e.target.value) })}
                   />
                 </div>
 
@@ -257,13 +244,8 @@ const EditAd = () => {
                   <Input
                     id="rooms"
                     type="number"
-                    value={property.rooms || ""}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        rooms: parseFloat(e.target.value),
-                      })
-                    }
+                    value={property.rooms || ''}
+                    onChange={(e) => setProperty({ ...property, rooms: parseFloat(e.target.value) })}
                   />
                 </div>
 
@@ -272,13 +254,8 @@ const EditAd = () => {
                   <Input
                     id="bedrooms"
                     type="number"
-                    value={property.bedrooms || ""}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        bedrooms: parseInt(e.target.value, 10),
-                      })
-                    }
+                    value={property.bedrooms || ''}
+                    onChange={(e) => setProperty({ ...property, bedrooms: parseInt(e.target.value) })}
                   />
                 </div>
 
@@ -287,13 +264,8 @@ const EditAd = () => {
                   <Input
                     id="bathrooms"
                     type="number"
-                    value={property.bathrooms || ""}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        bathrooms: parseInt(e.target.value, 10),
-                      })
-                    }
+                    value={property.bathrooms || ''}
+                    onChange={(e) => setProperty({ ...property, bathrooms: parseInt(e.target.value) })}
                   />
                 </div>
               </div>
@@ -304,12 +276,7 @@ const EditAd = () => {
                   <Input
                     id="address-street"
                     value={property.address_street}
-                    onChange={(e) =>
-                      setProperty({
-                        ...property,
-                        address_street: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setProperty({ ...property, address_street: e.target.value })}
                     required
                   />
                 </div>
@@ -320,12 +287,7 @@ const EditAd = () => {
                     <Input
                       id="postal-code"
                       value={property.address_postal_code}
-                      onChange={(e) =>
-                        setProperty({
-                          ...property,
-                          address_postal_code: e.target.value,
-                        })
-                      }
+                      onChange={(e) => setProperty({ ...property, address_postal_code: e.target.value })}
                       required
                     />
                   </div>
@@ -335,12 +297,7 @@ const EditAd = () => {
                     <Input
                       id="city"
                       value={property.address_city}
-                      onChange={(e) =>
-                        setProperty({
-                          ...property,
-                          address_city: e.target.value,
-                        })
-                      }
+                      onChange={(e) => setProperty({ ...property, address_city: e.target.value })}
                       required
                     />
                   </div>
@@ -353,7 +310,7 @@ const EditAd = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate('/dashboard')}
             >
               Avbryt
             </Button>

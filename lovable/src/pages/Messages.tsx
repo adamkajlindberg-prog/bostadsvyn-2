@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
-import LegalFooter from "@/components/LegalFooter";
-import { MessagingCenter } from "@/components/MessagingCenter";
-import Navigation from "@/components/Navigation";
-import { useAuth } from "@/hooks/useAuth";
+import React from 'react';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import { MessagingCenter } from '@/components/MessagingCenter';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const Messages = () => {
   const { user, loading } = useAuth();

@@ -1,127 +1,114 @@
-import { AlertTriangle, CheckCircle, FileText, Info } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import RentalIncomeForm from "@/components/dac7/RentalIncomeForm";
-import RentalIncomeList from "@/components/dac7/RentalIncomeList";
-import ReportGenerator from "@/components/dac7/ReportGenerator";
-import LegalFooter from "@/components/LegalFooter";
-import Navigation from "@/components/Navigation";
-import SEOOptimization from "@/components/seo/SEOOptimization";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import LegalFooter from '@/components/LegalFooter';
+import SEOOptimization from '@/components/seo/SEOOptimization';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { FileText, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import RentalIncomeForm from '@/components/dac7/RentalIncomeForm';
+import RentalIncomeList from '@/components/dac7/RentalIncomeList';
+import ReportGenerator from '@/components/dac7/ReportGenerator';
 
 const DAC7Compliance = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, userRoles } = useAuth();
-  const isBroker = userRoles.includes("broker");
+  const isBroker = userRoles.includes('broker');
   const [loading, setLoading] = useState(false);
   const [hasExistingInfo, setHasExistingInfo] = useState(false);
   const [landlordInfoId, setLandlordInfoId] = useState<string | null>(null);
   const [rentalIncomes, setRentalIncomes] = useState<any[]>([]);
-
+  
   const [formData, setFormData] = useState({
-    legalName: "",
-    businessName: "",
-    organizationNumber: "",
-    personalNumber: "",
-    streetAddress: "",
-    postalCode: "",
-    city: "",
-    country: "SE",
-    tin: "",
-    vatNumber: "",
-    entityType: "individual",
-    email: "",
-    phone: "",
+    legalName: '',
+    businessName: '',
+    organizationNumber: '',
+    personalNumber: '',
+    streetAddress: '',
+    postalCode: '',
+    city: '',
+    country: 'SE',
+    tin: '',
+    vatNumber: '',
+    entityType: 'individual',
+    email: '',
+    phone: '',
     consentGiven: false,
   });
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
 
     // Brokers should not have access to DAC7 reporting
     if (isBroker) {
-      navigate("/mäklarportal");
+      navigate('/mäklarportal');
       return;
     }
-
+    
     checkExistingInfo();
-  }, [user, isBroker, checkExistingInfo, navigate]);
+  }, [user, isBroker]);
 
   const checkExistingInfo = async () => {
     try {
       const { data, error } = await supabase
-        .from("dac7_landlord_info")
-        .select("*")
-        .eq("user_id", user?.id)
+        .from('dac7_landlord_info')
+        .select('*')
+        .eq('user_id', user?.id)
         .maybeSingle();
 
       if (data && !error) {
         setHasExistingInfo(true);
         setLandlordInfoId(data.id);
         setFormData({
-          legalName: data.legal_name || "",
-          businessName: data.business_name || "",
-          organizationNumber: data.organization_number || "",
-          personalNumber: "", // Never pre-fill sensitive data
-          streetAddress: data.street_address || "",
-          postalCode: data.postal_code || "",
-          city: data.city || "",
-          country: data.country || "SE",
-          tin: data.tin || "",
-          vatNumber: data.vat_number || "",
-          entityType: data.entity_type || "individual",
-          email: data.email || "",
-          phone: data.phone || "",
+          legalName: data.legal_name || '',
+          businessName: data.business_name || '',
+          organizationNumber: data.organization_number || '',
+          personalNumber: '', // Never pre-fill sensitive data
+          streetAddress: data.street_address || '',
+          postalCode: data.postal_code || '',
+          city: data.city || '',
+          country: data.country || 'SE',
+          tin: data.tin || '',
+          vatNumber: data.vat_number || '',
+          entityType: data.entity_type || 'individual',
+          email: data.email || '',
+          phone: data.phone || '',
           consentGiven: data.consent_given || false,
         });
-
+        
         // Load rental incomes
         await loadRentalIncomes(data.id);
       }
     } catch (error) {
-      console.error("Error checking existing DAC7 info:", error);
+      console.error('Error checking existing DAC7 info:', error);
     }
   };
 
   const loadRentalIncomes = async (landlordId: string) => {
     try {
       const { data, error } = await supabase
-        .from("dac7_rental_income")
-        .select("*")
-        .eq("landlord_info_id", landlordId)
-        .order("reporting_period_start", { ascending: false });
+        .from('dac7_rental_income')
+        .select('*')
+        .eq('landlord_info_id', landlordId)
+        .order('reporting_period_start', { ascending: false });
 
       if (data && !error) {
         setRentalIncomes(data);
       }
     } catch (error) {
-      console.error("Error loading rental incomes:", error);
+      console.error('Error loading rental incomes:', error);
     }
   };
 
@@ -131,9 +118,9 @@ const DAC7Compliance = () => {
 
     if (!formData.consentGiven) {
       toast({
-        title: "Samtycke krävs",
-        description: "Du måste ge ditt samtycke för att fortsätta.",
-        variant: "destructive",
+        title: 'Samtycke krävs',
+        description: 'Du måste ge ditt samtycke för att fortsätta.',
+        variant: 'destructive',
       });
       setLoading(false);
       return;
@@ -161,13 +148,13 @@ const DAC7Compliance = () => {
 
       if (hasExistingInfo) {
         const { error } = await supabase
-          .from("dac7_landlord_info")
+          .from('dac7_landlord_info')
           .update(dataToSubmit)
-          .eq("user_id", user?.id);
+          .eq('user_id', user?.id);
         if (error) throw error;
       } else {
         const { data, error } = await supabase
-          .from("dac7_landlord_info")
+          .from('dac7_landlord_info')
           .insert([dataToSubmit])
           .select()
           .single();
@@ -179,19 +166,19 @@ const DAC7Compliance = () => {
       }
 
       toast({
-        title: "Sparat!",
-        description: "Din DAC 7-information har sparats.",
+        title: 'Sparat!',
+        description: 'Din DAC 7-information har sparats.',
       });
 
       if (landlordInfoId) {
         await loadRentalIncomes(landlordInfoId);
       }
     } catch (error) {
-      console.error("Error saving DAC7 info:", error);
+      console.error('Error saving DAC7 info:', error);
       toast({
-        title: "Fel",
-        description: "Kunde inte spara din information. Försök igen.",
-        variant: "destructive",
+        title: 'Fel',
+        description: 'Kunde inte spara din information. Försök igen.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -208,20 +195,14 @@ const DAC7Compliance = () => {
         noIndex={true}
       />
       <Navigation />
-      <main
-        id="main-content"
-        className="container mx-auto px-4 py-12 max-w-4xl"
-      >
+      <main id="main-content" className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <FileText className="h-8 w-8 text-primary" aria-hidden="true" />
-            <h1 className="text-4xl font-bold text-foreground">
-              DAC 7 Skatteregistrering
-            </h1>
+            <h1 className="text-4xl font-bold text-foreground">DAC 7 Skatteregistrering</h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Information som krävs för rapportering till Skatteverket enligt EU:s
-            DAC 7-direktiv
+            Information som krävs för rapportering till Skatteverket enligt EU:s DAC 7-direktiv
           </p>
         </div>
 
@@ -230,11 +211,10 @@ const DAC7Compliance = () => {
           <Info className="h-4 w-4" aria-hidden="true" />
           <AlertTitle>Varför behöver vi denna information?</AlertTitle>
           <AlertDescription>
-            Enligt EU:s direktiv 2021/514 (DAC 7) måste digitala plattformar som
-            förmedlar uthyrning rapportera viss information till Skatteverket.
-            Detta gäller för hyresvärdar vars årliga hyresintäkter överstiger
-            vissa gränsvärden. Informationen behandlas konfidentiellt och lagras
-            säkert enligt GDPR.
+            Enligt EU:s direktiv 2021/514 (DAC 7) måste digitala plattformar som förmedlar uthyrning 
+            rapportera viss information till Skatteverket. Detta gäller för hyresvärdar vars årliga 
+            hyresintäkter överstiger vissa gränsvärden. Informationen behandlas konfidentiellt och 
+            lagras säkert enligt GDPR.
           </AlertDescription>
         </Alert>
 
@@ -242,27 +222,21 @@ const DAC7Compliance = () => {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Typ av uthyrare</CardTitle>
-              <CardDescription>
-                Välj om du hyr ut som privatperson eller företag
-              </CardDescription>
+              <CardDescription>Välj om du hyr ut som privatperson eller företag</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="entityType">Jag hyr ut som</Label>
                 <Select
                   value={formData.entityType}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, entityType: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, entityType: value })}
                 >
                   <SelectTrigger id="entityType">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="individual">Privatperson</SelectItem>
-                    <SelectItem value="company">
-                      Företag (AB, HB, etc.)
-                    </SelectItem>
+                    <SelectItem value="company">Företag (AB, HB, etc.)</SelectItem>
                     <SelectItem value="partnership">Handelsbolag</SelectItem>
                   </SelectContent>
                 </Select>
@@ -273,78 +247,55 @@ const DAC7Compliance = () => {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Personuppgifter / Företagsuppgifter</CardTitle>
-              <CardDescription>
-                Fyll i dina uppgifter som de står i officiella dokument
-              </CardDescription>
+              <CardDescription>Fyll i dina uppgifter som de står i officiella dokument</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="legalName">
-                  {formData.entityType === "individual"
-                    ? "Fullständigt namn"
-                    : "Företagsnamn"}{" "}
-                  *
+                  {formData.entityType === 'individual' ? 'Fullständigt namn' : 'Företagsnamn'} *
                 </Label>
                 <Input
                   id="legalName"
                   value={formData.legalName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, legalName: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, legalName: e.target.value })}
                   required
                   placeholder="För- och efternamn eller företagsnamn"
                 />
               </div>
 
-              {formData.entityType !== "individual" && (
+              {formData.entityType !== 'individual' && (
                 <>
                   <div>
-                    <Label htmlFor="organizationNumber">
-                      Organisationsnummer *
-                    </Label>
+                    <Label htmlFor="organizationNumber">Organisationsnummer *</Label>
                     <Input
                       id="organizationNumber"
                       value={formData.organizationNumber}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          organizationNumber: e.target.value,
-                        })
-                      }
-                      required={formData.entityType !== "individual"}
+                      onChange={(e) => setFormData({ ...formData, organizationNumber: e.target.value })}
+                      required={formData.entityType !== 'individual'}
                       placeholder="XXXXXX-XXXX"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="vatNumber">
-                      VAT-nummer (om tillämpligt)
-                    </Label>
+                    <Label htmlFor="vatNumber">VAT-nummer (om tillämpligt)</Label>
                     <Input
                       id="vatNumber"
                       value={formData.vatNumber}
-                      onChange={(e) =>
-                        setFormData({ ...formData, vatNumber: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, vatNumber: e.target.value })}
                       placeholder="SEXXXXXXXXXXXX01"
                     />
                   </div>
                 </>
               )}
 
-              {formData.entityType === "individual" && (
+              {formData.entityType === 'individual' && (
                 <div>
                   <Label htmlFor="personalNumber">Personnummer *</Label>
                   <Input
                     id="personalNumber"
                     type="password"
                     value={formData.personalNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        personalNumber: e.target.value,
-                      })
-                    }
-                    required={formData.entityType === "individual"}
+                    onChange={(e) => setFormData({ ...formData, personalNumber: e.target.value })}
+                    required={formData.entityType === 'individual'}
                     placeholder="ÅÅÅÅMMDD-XXXX"
                     autoComplete="off"
                   />
@@ -359,9 +310,7 @@ const DAC7Compliance = () => {
                 <Input
                   id="tin"
                   value={formData.tin}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tin: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, tin: e.target.value })}
                   placeholder="Ditt skatte-ID"
                 />
                 <p className="text-sm text-muted-foreground mt-1">
@@ -374,9 +323,7 @@ const DAC7Compliance = () => {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Adressuppgifter</CardTitle>
-              <CardDescription>
-                Din folkbokföringsadress eller företagets säte
-              </CardDescription>
+              <CardDescription>Din folkbokföringsadress eller företagets säte</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -384,9 +331,7 @@ const DAC7Compliance = () => {
                 <Input
                   id="streetAddress"
                   value={formData.streetAddress}
-                  onChange={(e) =>
-                    setFormData({ ...formData, streetAddress: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
                   required
                   placeholder="Gatunamn och nummer"
                 />
@@ -397,9 +342,7 @@ const DAC7Compliance = () => {
                   <Input
                     id="postalCode"
                     value={formData.postalCode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, postalCode: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                     required
                     placeholder="XXX XX"
                   />
@@ -409,9 +352,7 @@ const DAC7Compliance = () => {
                   <Input
                     id="city"
                     value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     required
                     placeholder="Stad"
                   />
@@ -421,9 +362,7 @@ const DAC7Compliance = () => {
                 <Label htmlFor="country">Land</Label>
                 <Select
                   value={formData.country}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, country: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, country: value })}
                 >
                   <SelectTrigger id="country">
                     <SelectValue />
@@ -450,9 +389,7 @@ const DAC7Compliance = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   placeholder="din@email.se"
                 />
@@ -463,9 +400,7 @@ const DAC7Compliance = () => {
                   id="phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="+46 XX XXX XX XX"
                 />
               </div>
@@ -475,10 +410,7 @@ const DAC7Compliance = () => {
           <Card className="mb-6 border-primary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle
-                  className="h-5 w-5 text-amber-600"
-                  aria-hidden="true"
-                />
+                <AlertTriangle className="h-5 w-5 text-amber-600" aria-hidden="true" />
                 Samtycke och bekräftelse
               </CardTitle>
             </CardHeader>
@@ -488,10 +420,7 @@ const DAC7Compliance = () => {
                   id="consent"
                   checked={formData.consentGiven}
                   onCheckedChange={(checked) =>
-                    setFormData({
-                      ...formData,
-                      consentGiven: checked as boolean,
-                    })
+                    setFormData({ ...formData, consentGiven: checked as boolean })
                   }
                 />
                 <div className="grid gap-1.5 leading-none">
@@ -499,12 +428,10 @@ const DAC7Compliance = () => {
                     htmlFor="consent"
                     className="text-sm font-medium leading-relaxed cursor-pointer"
                   >
-                    Jag bekräftar att informationen ovan är korrekt och ger mitt
-                    samtycke till att Bostadsvyn lagrar och rapporterar denna
-                    information till Skatteverket enligt DAC 7-direktivet (EU
-                    2021/514). Jag förstår att detta är ett lagkrav för
-                    plattformar som förmedlar uthyrning och att informationen
-                    behandlas enligt GDPR.
+                    Jag bekräftar att informationen ovan är korrekt och ger mitt samtycke till att 
+                    Bostadsvyn lagrar och rapporterar denna information till Skatteverket enligt 
+                    DAC 7-direktivet (EU 2021/514). Jag förstår att detta är ett lagkrav för 
+                    plattformar som förmedlar uthyrning och att informationen behandlas enligt GDPR.
                   </Label>
                 </div>
               </div>
@@ -515,34 +442,23 @@ const DAC7Compliance = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate('/dashboard')}
               className="flex-1"
             >
               Avbryt
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-primary hover:bg-primary/90"
-            >
-              {loading
-                ? "Sparar..."
-                : hasExistingInfo
-                  ? "Uppdatera information"
-                  : "Spara information"}
+            <Button type="submit" disabled={loading} className="flex-1 bg-primary hover:bg-primary/90">
+              {loading ? 'Sparar...' : hasExistingInfo ? 'Uppdatera information' : 'Spara information'}
             </Button>
           </div>
 
           {formData.consentGiven && (
             <Alert className="mt-6 bg-green-50 dark:bg-green-950 border-green-200">
-              <CheckCircle
-                className="h-4 w-4 text-green-600"
-                aria-hidden="true"
-              />
+              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
               <AlertTitle>Tack för ditt samtycke</AlertTitle>
               <AlertDescription>
-                Din information kommer att behandlas konfidentiellt och endast
-                användas för DAC 7-rapportering till Skatteverket.
+                Din information kommer att behandlas konfidentiellt och endast användas för 
+                DAC 7-rapportering till Skatteverket.
               </AlertDescription>
             </Alert>
           )}
@@ -553,12 +469,10 @@ const DAC7Compliance = () => {
           <div className="mt-12 space-y-6">
             <RentalIncomeForm
               landlordInfoId={landlordInfoId}
-              onSuccess={() =>
-                landlordInfoId && loadRentalIncomes(landlordInfoId)
-              }
+              onSuccess={() => landlordInfoId && loadRentalIncomes(landlordInfoId)}
             />
             <RentalIncomeList incomes={rentalIncomes} />
-
+            
             {/* Report Generator */}
             {rentalIncomes.length > 0 && <ReportGenerator />}
           </div>

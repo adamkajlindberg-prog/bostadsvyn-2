@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { useIntersectionObserver } from "./LazyLoadWrapper";
+import React, { useState, useRef, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useIntersectionObserver } from './LazyLoadWrapper';
 
 interface OptimizedImageProps {
   src: string;
@@ -11,7 +11,7 @@ interface OptimizedImageProps {
   className?: string;
   priority?: boolean;
   quality?: number;
-  placeholder?: "blur" | "empty";
+  placeholder?: 'blur' | 'empty';
   blurDataURL?: string;
   onLoad?: () => void;
   onError?: () => void;
@@ -24,15 +24,15 @@ export default function OptimizedImage({
   alt,
   width,
   height,
-  className = "",
+  className = '',
   priority = false,
   quality = 75,
-  placeholder = "empty",
+  placeholder = 'empty',
   blurDataURL,
   onLoad,
   onError,
-  fallbackSrc = "/placeholder-property.jpg",
-  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  fallbackSrc = '/placeholder-property.jpg',
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
 }: OptimizedImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -40,7 +40,7 @@ export default function OptimizedImage({
   const imgRef = useRef<HTMLImageElement>(null);
   const { isIntersecting, hasIntersected } = useIntersectionObserver(imgRef, {
     threshold: 0.1,
-    rootMargin: "50px",
+    rootMargin: '50px',
   });
 
   const shouldLoad = priority || hasIntersected;
@@ -64,25 +64,25 @@ export default function OptimizedImage({
 
   // Generate responsive image URLs (in a real app, you'd use a service like Cloudinary)
   const generateSrcSet = (baseSrc: string) => {
-    if (!baseSrc || hasError) return "";
-
+    if (!baseSrc || hasError) return '';
+    
     // For demo purposes, assuming we have different sizes
     // In production, you'd integrate with an image optimization service
     const sizes = [480, 768, 1024, 1280, 1600];
     return sizes
-      .map((size) => `${baseSrc}?w=${size}&q=${quality} ${size}w`)
-      .join(", ");
+      .map(size => `${baseSrc}?w=${size}&q=${quality} ${size}w`)
+      .join(', ');
   };
 
   const imageClasses = cn(
-    "transition-opacity duration-300",
-    isLoaded ? "opacity-100" : "opacity-0",
-    className,
+    'transition-opacity duration-300',
+    isLoaded ? 'opacity-100' : 'opacity-0',
+    className
   );
 
   const containerClasses = cn(
-    "relative overflow-hidden",
-    !isLoaded && placeholder === "blur" && "bg-muted",
+    'relative overflow-hidden',
+    !isLoaded && placeholder === 'blur' && 'bg-muted'
   );
 
   return (
@@ -90,7 +90,7 @@ export default function OptimizedImage({
       {/* Placeholder */}
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center">
-          {placeholder === "blur" && blurDataURL ? (
+          {placeholder === 'blur' && blurDataURL ? (
             <img
               src={blurDataURL}
               alt=""
@@ -115,7 +115,7 @@ export default function OptimizedImage({
           className={imageClasses}
           onLoad={handleLoad}
           onError={handleError}
-          loading={priority ? "eager" : "lazy"}
+          loading={priority ? 'eager' : 'lazy'}
           decoding="async"
         />
       )}
@@ -131,25 +131,20 @@ export default function OptimizedImage({
 }
 
 // Component for property image galleries with progressive loading
-export function PropertyImageGallery({
-  images,
-  alt,
-  className = "",
-}: {
-  images: string[];
-  alt: string;
-  className?: string;
+export function PropertyImageGallery({ 
+  images, 
+  alt, 
+  className = '' 
+}: { 
+  images: string[]; 
+  alt: string; 
+  className?: string; 
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!images || images.length === 0) {
     return (
-      <div
-        className={cn(
-          "aspect-video bg-muted flex items-center justify-center",
-          className,
-        )}
-      >
+      <div className={cn('aspect-video bg-muted flex items-center justify-center', className)}>
         <div className="text-center text-muted-foreground">
           <div className="text-4xl mb-2">🏠</div>
           <p>Ingen bild tillgänglig</p>
@@ -159,7 +154,7 @@ export function PropertyImageGallery({
   }
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {/* Main Image */}
       <OptimizedImage
         src={images[currentIndex]}
@@ -180,50 +175,22 @@ export function PropertyImageGallery({
       {images.length > 1 && (
         <>
           <button
-            onClick={() =>
-              setCurrentIndex((prev) =>
-                prev === 0 ? images.length - 1 : prev - 1,
-              )
-            }
+            onClick={() => setCurrentIndex(prev => prev === 0 ? images.length - 1 : prev - 1)}
             className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/70 text-white p-2 rounded-full hover:bg-black/90 transition-colors"
             aria-label="Föregående bild"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-
+          
           <button
-            onClick={() =>
-              setCurrentIndex((prev) =>
-                prev === images.length - 1 ? 0 : prev + 1,
-              )
-            }
+            onClick={() => setCurrentIndex(prev => prev === images.length - 1 ? 0 : prev + 1)}
             className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/70 text-white p-2 rounded-full hover:bg-black/90 transition-colors"
             aria-label="Nästa bild"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </>
@@ -237,10 +204,8 @@ export function PropertyImageGallery({
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={cn(
-                "flex-shrink-0 w-20 h-16 rounded overflow-hidden border-2 transition-colors",
-                index === currentIndex
-                  ? "border-primary"
-                  : "border-transparent",
+                'flex-shrink-0 w-20 h-16 rounded overflow-hidden border-2 transition-colors',
+                index === currentIndex ? 'border-primary' : 'border-transparent'
               )}
             >
               <OptimizedImage

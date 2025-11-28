@@ -1,44 +1,28 @@
-import { Plus } from "lucide-react";
-import type React from "react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Plus } from 'lucide-react';
 
 interface RentalIncomeFormProps {
   landlordInfoId: string;
   onSuccess: () => void;
 }
 
-const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
-  landlordInfoId,
-  onSuccess,
-}) => {
+const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({ landlordInfoId, onSuccess }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    propertyAddress: "",
-    propertyType: "apartment",
-    rentalIncome: "",
-    reportingPeriodStart: "",
-    reportingPeriodEnd: "",
-    rentalDays: "",
+    propertyAddress: '',
+    propertyType: 'apartment',
+    rentalIncome: '',
+    reportingPeriodStart: '',
+    reportingPeriodEnd: '',
+    rentalDays: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,39 +30,41 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("dac7_rental_income").insert({
-        landlord_info_id: landlordInfoId,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        property_address: formData.propertyAddress,
-        property_type: formData.propertyType,
-        rental_income: parseFloat(formData.rentalIncome),
-        reporting_period_start: formData.reportingPeriodStart,
-        reporting_period_end: formData.reportingPeriodEnd,
-        rental_days: parseInt(formData.rentalDays, 10),
-      });
+      const { error } = await supabase
+        .from('dac7_rental_income')
+        .insert({
+          landlord_info_id: landlordInfoId,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          property_address: formData.propertyAddress,
+          property_type: formData.propertyType,
+          rental_income: parseFloat(formData.rentalIncome),
+          reporting_period_start: formData.reportingPeriodStart,
+          reporting_period_end: formData.reportingPeriodEnd,
+          rental_days: parseInt(formData.rentalDays),
+        });
 
       if (error) throw error;
 
       toast({
-        title: "Hyresintäkt tillagd",
-        description: "Din hyresintäkt har sparats",
+        title: 'Hyresintäkt tillagd',
+        description: 'Din hyresintäkt har sparats',
       });
 
       setFormData({
-        propertyAddress: "",
-        propertyType: "apartment",
-        rentalIncome: "",
-        reportingPeriodStart: "",
-        reportingPeriodEnd: "",
-        rentalDays: "",
+        propertyAddress: '',
+        propertyType: 'apartment',
+        rentalIncome: '',
+        reportingPeriodStart: '',
+        reportingPeriodEnd: '',
+        rentalDays: '',
       });
 
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Fel",
+        title: 'Fel',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -104,9 +90,7 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
               <Input
                 id="propertyAddress"
                 value={formData.propertyAddress}
-                onChange={(e) =>
-                  setFormData({ ...formData, propertyAddress: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, propertyAddress: e.target.value })}
                 required
               />
             </div>
@@ -115,9 +99,7 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
               <Label htmlFor="propertyType">Fastighetstyp *</Label>
               <Select
                 value={formData.propertyType}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, propertyType: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
               >
                 <SelectTrigger id="propertyType">
                   <SelectValue />
@@ -138,9 +120,7 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
                 type="number"
                 step="0.01"
                 value={formData.rentalIncome}
-                onChange={(e) =>
-                  setFormData({ ...formData, rentalIncome: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, rentalIncome: e.target.value })}
                 required
               />
             </div>
@@ -151,9 +131,7 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
                 id="rentalDays"
                 type="number"
                 value={formData.rentalDays}
-                onChange={(e) =>
-                  setFormData({ ...formData, rentalDays: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, rentalDays: e.target.value })}
                 required
               />
             </div>
@@ -164,12 +142,7 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
                 id="reportingPeriodStart"
                 type="date"
                 value={formData.reportingPeriodStart}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    reportingPeriodStart: e.target.value,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, reportingPeriodStart: e.target.value })}
                 required
               />
             </div>
@@ -180,19 +153,14 @@ const RentalIncomeForm: React.FC<RentalIncomeFormProps> = ({
                 id="reportingPeriodEnd"
                 type="date"
                 value={formData.reportingPeriodEnd}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    reportingPeriodEnd: e.target.value,
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, reportingPeriodEnd: e.target.value })}
                 required
               />
             </div>
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Sparar..." : "Lägg till hyresintäkt"}
+            {loading ? 'Sparar...' : 'Lägg till hyresintäkt'}
           </Button>
         </form>
       </CardContent>

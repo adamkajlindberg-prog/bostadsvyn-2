@@ -1,4 +1,4 @@
-import type React from "react";
+import React from 'react';
 
 interface LogoProps {
   className?: string;
@@ -6,11 +6,8 @@ interface LogoProps {
 }
 
 // Integrated B - B är inbyggt i husets struktur
-const LogoVariant7: React.FC<LogoProps> = ({
-  className = "h-10 w-10",
-  title = "Bostadsvyn logotyp",
-}) => {
-  const titleId = "logoTitle7";
+const LogoVariant7: React.FC<LogoProps> = ({ className = 'h-10 w-10', title = 'Bostadsvyn logotyp' }) => {
+  const titleId = 'logoTitle7';
   return (
     <svg
       viewBox="0 0 64 64"
@@ -20,13 +17,7 @@ const LogoVariant7: React.FC<LogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <title id={titleId}>{title}</title>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
+      <g fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M10 30 L32 14 L54 30" />
         <path d="M15 30 V54 H49 V30" />
       </g>

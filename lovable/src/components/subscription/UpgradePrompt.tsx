@@ -1,22 +1,14 @@
-import { Crown, Lock, Sparkles } from "lucide-react";
-import type React from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Crown, Sparkles, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface UpgradePromptProps {
   feature?: string;
 }
 
-export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
-  feature = "denna funktion",
-}) => {
+export const UpgradePrompt: React.FC<UpgradePromptProps> = ({ feature = 'denna funktion' }) => {
   const navigate = useNavigate();
 
   return (
@@ -36,40 +28,32 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
             <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium">Obegränsad tillgång till AI-verktyg</p>
-              <p className="text-sm text-muted-foreground">
-                Använd homestyling, bildredigering och alla AI-funktioner
-              </p>
+              <p className="text-sm text-muted-foreground">Använd homestyling, bildredigering och alla AI-funktioner</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium">Prioriterad support</p>
-              <p className="text-sm text-muted-foreground">
-                Få snabbare hjälp när du behöver det
-              </p>
+              <p className="text-sm text-muted-foreground">Få snabbare hjälp när du behöver det</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium">Avancerade funktioner</p>
-              <p className="text-sm text-muted-foreground">
-                Få tillgång till nya funktioner först
-              </p>
+              <p className="text-sm text-muted-foreground">Få tillgång till nya funktioner först</p>
             </div>
           </div>
         </div>
 
         <div className="text-center">
           <p className="text-3xl font-bold mb-2">299 kr/mån</p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Avsluta när som helst
-          </p>
-          <Button
-            size="lg"
+          <p className="text-sm text-muted-foreground mb-4">Avsluta när som helst</p>
+          <Button 
+            size="lg" 
             className="w-full"
-            onClick={() => navigate("/upgrade")}
+            onClick={() => navigate('/upgrade')}
           >
             <Crown className="h-4 w-4 mr-2" />
             Uppgradera nu
@@ -80,9 +64,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
   );
 };
 
-export const LockedFeatureBanner: React.FC<{ feature: string }> = ({
-  feature,
-}) => {
+export const LockedFeatureBanner: React.FC<{ feature: string }> = ({ feature }) => {
   const navigate = useNavigate();
 
   return (
@@ -94,12 +76,10 @@ export const LockedFeatureBanner: React.FC<{ feature: string }> = ({
           </div>
           <div>
             <h3 className="font-semibold text-lg">{feature} är låst</h3>
-            <p className="text-sm text-muted-foreground">
-              Uppgradera till Pro för att använda denna funktion
-            </p>
+            <p className="text-sm text-muted-foreground">Uppgradera till Pro för att använda denna funktion</p>
           </div>
         </div>
-        <Button onClick={() => navigate("/upgrade")}>
+        <Button onClick={() => navigate('/upgrade')}>
           <Crown className="h-4 w-4 mr-2" />
           Uppgradera
         </Button>

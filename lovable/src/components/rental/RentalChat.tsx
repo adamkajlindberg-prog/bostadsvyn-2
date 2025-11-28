@@ -1,14 +1,14 @@
-import { Send, User } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Send, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Conversation {
   id: string;
@@ -35,47 +35,45 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<
-    string | null
-  >(null);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadConversations();
-  }, [loadConversations]);
+  }, [propertyId]);
 
   useEffect(() => {
     if (selectedConversation) {
       loadMessages(selectedConversation);
     }
-  }, [selectedConversation, loadMessages]);
+  }, [selectedConversation]);
 
   const loadConversations = async () => {
     try {
       const { data, error } = await supabase
-        .from("conversations")
-        .select("*")
-        .eq("property_id", propertyId)
-        .eq("seller_id", user?.id)
-        .order("last_message_at", { ascending: false });
+        .from('conversations')
+        .select('*')
+        .eq('property_id', propertyId)
+        .eq('seller_id', user?.id)
+        .order('last_message_at', { ascending: false });
 
       if (error) throw error;
-
+      
       // Mock buyer names for demo
       const conversationsWithNames = (data || []).map((conv, idx) => ({
         ...conv,
-        buyer_name: `Intressent ${idx + 1}`,
+        buyer_name: `Intressent ${idx + 1}`
       }));
-
+      
       setConversations(conversationsWithNames);
-
+      
       if (conversationsWithNames.length > 0) {
         setSelectedConversation(conversationsWithNames[0].id);
       }
     } catch (error) {
-      console.error("Error loading conversations:", error);
+      console.error('Error loading conversations:', error);
     } finally {
       setLoading(false);
     }
@@ -84,22 +82,22 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
   const loadMessages = async (conversationId: string) => {
     try {
       const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
-
+      
       // Mock sender names for demo
-      const messagesWithNames = (data || []).map((msg) => ({
+      const messagesWithNames = (data || []).map(msg => ({
         ...msg,
-        sender_name: msg.sender_id === user?.id ? "Du" : "Intressent",
+        sender_name: msg.sender_id === user?.id ? 'Du' : 'Intressent'
       }));
-
+      
       setMessages(messagesWithNames);
     } catch (error) {
-      console.error("Error loading messages:", error);
+      console.error('Error loading messages:', error);
     }
   };
 
@@ -107,30 +105,32 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
-      const { error } = await supabase.from("messages").insert({
-        conversation_id: selectedConversation,
-        sender_id: user?.id,
-        content: newMessage,
-        message_type: "text",
-      });
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: selectedConversation,
+          sender_id: user?.id,
+          content: newMessage,
+          message_type: 'text'
+        });
 
       if (error) throw error;
 
       // Update conversation last message time
       await supabase
-        .from("conversations")
+        .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
-        .eq("id", selectedConversation);
+        .eq('id', selectedConversation);
 
-      setNewMessage("");
+      setNewMessage('');
       loadMessages(selectedConversation);
       loadConversations();
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
       toast({
         title: "Fel",
         description: "Kunde inte skicka meddelandet",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
@@ -154,15 +154,14 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
         <CardContent className="py-12 text-center">
           <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-muted-foreground">
-            Inga chattkonversationer ännu. När någon kontaktar dig via annonsen
-            visas det här.
+            Inga chattkonversationer ännu. När någon kontaktar dig via annonsen visas det här.
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  const selectedConv = conversations.find((c) => c.id === selectedConversation);
+  const selectedConv = conversations.find(c => c.id === selectedConversation);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -180,32 +179,26 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
                   onClick={() => setSelectedConversation(conv.id)}
                   className={`p-3 rounded-lg cursor-pointer transition-colors ${
                     selectedConversation === conv.id
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback>
-                          {conv.buyer_name?.[0] || "I"}
+                          {conv.buyer_name?.[0] || 'I'}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-sm">
-                          {conv.buyer_name}
-                        </p>
+                        <p className="font-semibold text-sm">{conv.buyer_name}</p>
                         <p className="text-xs opacity-70">
-                          {new Date(conv.last_message_at).toLocaleDateString(
-                            "sv-SE",
-                          )}
+                          {new Date(conv.last_message_at).toLocaleDateString('sv-SE')}
                         </p>
                       </div>
                     </div>
-                    {conv.status === "active" && (
-                      <Badge variant="secondary" className="text-xs">
-                        Aktiv
-                      </Badge>
+                    {conv.status === 'active' && (
+                      <Badge variant="secondary" className="text-xs">Aktiv</Badge>
                     )}
                   </div>
                 </div>
@@ -220,9 +213,7 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarFallback>
-                {selectedConv?.buyer_name?.[0] || "I"}
-              </AvatarFallback>
+              <AvatarFallback>{selectedConv?.buyer_name?.[0] || 'I'}</AvatarFallback>
             </Avatar>
             {selectedConv?.buyer_name}
           </CardTitle>
@@ -239,23 +230,21 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
                   <div
                     key={msg.id}
                     className={`flex ${
-                      msg.sender_id === user?.id
-                        ? "justify-end"
-                        : "justify-start"
+                      msg.sender_id === user?.id ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     <div
                       className={`max-w-[70%] rounded-lg p-3 ${
                         msg.sender_id === user?.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
                       }`}
                     >
                       <p className="text-sm">{msg.content}</p>
                       <p className="text-xs opacity-70 mt-1">
-                        {new Date(msg.created_at).toLocaleTimeString("sv-SE", {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                        {new Date(msg.created_at).toLocaleTimeString('sv-SE', {
+                          hour: '2-digit',
+                          minute: '2-digit'
                         })}
                       </p>
                     </div>
@@ -271,7 +260,7 @@ export default function RentalChat({ adId, propertyId }: RentalChatProps) {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Skriv ett meddelande..."
               onKeyPress={(e) => {
-                if (e.key === "Enter") {
+                if (e.key === 'Enter') {
                   sendMessage();
                 }
               }}

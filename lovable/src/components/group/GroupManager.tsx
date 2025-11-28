@@ -1,19 +1,13 @@
-import { Copy, UserPlus, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Users, UserPlus, Copy, CheckCircle2, XCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Group {
   id: string;
@@ -34,12 +28,7 @@ interface GroupMember {
   };
 }
 
-export function GroupManager({
-  group: props,
-  onGroupUpdated,
-  onGroupCreated,
-  showCreateOnly,
-}: {
+export function GroupManager({ group: props, onGroupUpdated, onGroupCreated, showCreateOnly }: {
   group?: Group;
   onGroupUpdated?: (group: Group) => void;
   onGroupCreated?: (group: Group) => void;
@@ -49,8 +38,8 @@ export function GroupManager({
   const { toast } = useToast();
   const [group, setGroup] = useState<Group | null>(props || null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
-  const [groupName, setGroupName] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
+  const [groupName, setGroupName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
@@ -58,18 +47,18 @@ export function GroupManager({
     if (user) {
       loadUserGroup();
     }
-  }, [user, loadUserGroup]);
+  }, [user]);
 
   useEffect(() => {
     if (group) {
       loadGroupMembers();
     }
-  }, [group, loadGroupMembers]);
+  }, [group]);
 
   const loadUserGroup = async () => {
     try {
       const { data: groupMember, error } = await supabase
-        .from("group_members")
+        .from('group_members')
         .select(`
           *,
           groups (
@@ -80,29 +69,29 @@ export function GroupManager({
             created_at
           )
         `)
-        .eq("user_id", user?.id)
+        .eq('user_id', user?.id)
         .single();
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading group:", error);
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading group:', error);
         return;
       }
 
-      if (groupMember?.groups) {
+      if (groupMember && groupMember.groups) {
         setGroup(groupMember.groups as any);
       }
     } catch (error) {
-      console.error("Error loading group:", error);
+      console.error('Error loading group:', error);
     }
   };
 
   const loadGroupMembers = async () => {
     if (!group) return;
-
+    
     setLoadingMembers(true);
     try {
       const { data: members, error } = await supabase
-        .from("group_members")
+        .from('group_members')
         .select(`
           *,
           profiles!group_members_user_id_fkey(
@@ -110,16 +99,16 @@ export function GroupManager({
             email
           )
         `)
-        .eq("group_id", group.id);
+        .eq('group_id', group.id);
 
       if (error) {
-        console.error("Error loading group members:", error);
+        console.error('Error loading group members:', error);
         return;
       }
 
-      setGroupMembers(members || ([] as any));
+      setGroupMembers(members || [] as any);
     } catch (error) {
-      console.error("Error loading group members:", error);
+      console.error('Error loading group members:', error);
     } finally {
       setLoadingMembers(false);
     }
@@ -132,10 +121,10 @@ export function GroupManager({
     try {
       // Create group
       const { data: newGroup, error: groupError } = await supabase
-        .from("groups")
+        .from('groups')
         .insert({
           name: groupName.trim(),
-          created_by: user.id,
+          created_by: user.id
         })
         .select()
         .single();
@@ -151,11 +140,11 @@ export function GroupManager({
 
       // Add creator as group member
       const { error: memberError } = await supabase
-        .from("group_members")
+        .from('group_members')
         .insert({
           group_id: newGroup.id,
           user_id: user.id,
-          role: "admin",
+          role: 'admin'
         });
 
       if (memberError) {
@@ -168,7 +157,7 @@ export function GroupManager({
       }
 
       setGroup(newGroup);
-      setGroupName("");
+      setGroupName('');
       if (onGroupCreated) {
         onGroupCreated(newGroup);
       }
@@ -177,7 +166,7 @@ export function GroupManager({
         description: `Välkommen till "${newGroup.name}"! Dela inbjudningskoden med vänner och familj så ni kan börja leta efter bostäder tillsammans.`,
       });
     } catch (error) {
-      console.error("Error creating group:", error);
+      console.error('Error creating group:', error);
       toast({
         title: "Fel",
         description: "Kunde inte skapa grupp",
@@ -195,9 +184,9 @@ export function GroupManager({
     try {
       // Find group by invite code
       const { data: foundGroup, error: findError } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("invite_code", inviteCode.trim())
+        .from('groups')
+        .select('*')
+        .eq('invite_code', inviteCode.trim())
         .single();
 
       if (findError || !foundGroup) {
@@ -211,10 +200,10 @@ export function GroupManager({
 
       // Check if already a member
       const { data: existingMember } = await supabase
-        .from("group_members")
-        .select("*")
-        .eq("group_id", foundGroup.id)
-        .eq("user_id", user.id)
+        .from('group_members')
+        .select('*')
+        .eq('group_id', foundGroup.id)
+        .eq('user_id', user.id)
         .single();
 
       if (existingMember) {
@@ -227,11 +216,13 @@ export function GroupManager({
       }
 
       // Join group
-      const { error: joinError } = await supabase.from("group_members").insert({
-        group_id: foundGroup.id,
-        user_id: user.id,
-        role: "member",
-      });
+      const { error: joinError } = await supabase
+        .from('group_members')
+        .insert({
+          group_id: foundGroup.id,
+          user_id: user.id,
+          role: 'member'
+        });
 
       if (joinError) {
         toast({
@@ -243,13 +234,13 @@ export function GroupManager({
       }
 
       setGroup(foundGroup);
-      setInviteCode("");
+      setInviteCode('');
       toast({
         title: "🎉 Välkommen till gruppen!",
         description: `Nu är du med i "${foundGroup.name}". Börja rösta på bostäder tillsammans!`,
       });
     } catch (error) {
-      console.error("Error joining group:", error);
+      console.error('Error joining group:', error);
       toast({
         title: "Fel",
         description: "Kunde inte ansluta till grupp",
@@ -275,10 +266,10 @@ export function GroupManager({
 
     try {
       const { error } = await supabase
-        .from("group_members")
+        .from('group_members')
         .delete()
-        .eq("group_id", group.id)
-        .eq("user_id", user.id);
+        .eq('group_id', group.id)
+        .eq('user_id', user.id);
 
       if (error) {
         toast({
@@ -296,7 +287,7 @@ export function GroupManager({
         description: "Du har lämnat gruppen",
       });
     } catch (error) {
-      console.error("Error leaving group:", error);
+      console.error('Error leaving group:', error);
       toast({
         title: "Fel",
         description: "Kunde inte lämna gruppen",
@@ -315,7 +306,7 @@ export function GroupManager({
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && groupName.trim() && !isLoading) {
+              if (e.key === 'Enter' && groupName.trim() && !isLoading) {
                 createGroup();
               }
             }}
@@ -325,12 +316,12 @@ export function GroupManager({
             Välj ett namn som alla känner igen
           </p>
         </div>
-        <Button
-          onClick={createGroup}
+        <Button 
+          onClick={createGroup} 
           disabled={isLoading || !groupName.trim()}
           className="w-full"
         >
-          {isLoading ? "Skapar grupp..." : "Skapa din första grupp"}
+          {isLoading ? 'Skapar grupp...' : 'Skapa din första grupp'}
         </Button>
       </div>
     );
@@ -359,7 +350,7 @@ export function GroupManager({
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && groupName.trim() && !isLoading) {
+                    if (e.key === 'Enter' && groupName.trim() && !isLoading) {
                       createGroup();
                     }
                   }}
@@ -369,12 +360,12 @@ export function GroupManager({
                   Välj ett namn som alla känner igen
                 </p>
               </div>
-              <Button
-                onClick={createGroup}
+              <Button 
+                onClick={createGroup} 
                 disabled={isLoading || !groupName.trim()}
                 className="w-full"
               >
-                {isLoading ? "Skapar grupp..." : "Skapa grupp"}
+                {isLoading ? 'Skapar grupp...' : 'Skapa grupp'}
               </Button>
             </CardContent>
           </Card>
@@ -398,7 +389,7 @@ export function GroupManager({
                   value={inviteCode}
                   onChange={(e) => setInviteCode(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && inviteCode.trim() && !isLoading) {
+                    if (e.key === 'Enter' && inviteCode.trim() && !isLoading) {
                       joinGroup();
                     }
                   }}
@@ -408,12 +399,12 @@ export function GroupManager({
                   Fråga gruppägaren efter koden
                 </p>
               </div>
-              <Button
-                onClick={joinGroup}
+              <Button 
+                onClick={joinGroup} 
                 disabled={isLoading || !inviteCode.trim()}
                 className="w-full"
               >
-                {isLoading ? "Ansluter till grupp..." : "Gå med i grupp"}
+                {isLoading ? 'Ansluter till grupp...' : 'Gå med i grupp'}
               </Button>
             </CardContent>
           </Card>
@@ -434,9 +425,7 @@ export function GroupManager({
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
                 <Label>Inbjudningskod:</Label>
-                <code className="bg-muted px-2 py-1 rounded text-sm">
-                  {group.invite_code}
-                </code>
+                <code className="bg-muted px-2 py-1 rounded text-sm">{group.invite_code}</code>
                 <Button size="sm" variant="outline" onClick={copyInviteCode}>
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -461,24 +450,13 @@ export function GroupManager({
               ) : (
                 <div className="space-y-2">
                   {groupMembers.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
+                    <div key={member.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                       <div>
-                        <p className="font-medium">
-                          {member.profiles?.full_name || "Okänd användare"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {member.profiles?.email}
-                        </p>
+                        <p className="font-medium">{member.profiles?.full_name || 'Okänd användare'}</p>
+                        <p className="text-sm text-muted-foreground">{member.profiles?.email}</p>
                       </div>
-                      <Badge
-                        variant={
-                          member.role === "admin" ? "default" : "secondary"
-                        }
-                      >
-                        {member.role === "admin" ? "Admin" : "Medlem"}
+                      <Badge variant={member.role === 'admin' ? 'default' : 'secondary'}>
+                        {member.role === 'admin' ? 'Admin' : 'Medlem'}
                       </Badge>
                     </div>
                   ))}

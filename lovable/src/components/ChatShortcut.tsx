@@ -1,7 +1,7 @@
-import { MessageSquare } from "lucide-react";
-import type React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MessageSquare } from 'lucide-react';
 
 interface ChatShortcutProps {
   onClick: () => void;
@@ -10,14 +10,14 @@ interface ChatShortcutProps {
   unreadCount?: number;
 }
 
-export const ChatShortcut: React.FC<ChatShortcutProps> = ({
-  onClick,
+export const ChatShortcut: React.FC<ChatShortcutProps> = ({ 
+  onClick, 
   variant = "outline",
   className = "",
-  unreadCount = 0,
+  unreadCount = 0
 }) => {
   return (
-    <Button
+    <Button 
       variant={variant}
       className={`relative w-full justify-start ${className}`}
       onClick={onClick}
@@ -25,8 +25,8 @@ export const ChatShortcut: React.FC<ChatShortcutProps> = ({
       <MessageSquare className="h-4 w-4 mr-2" />
       Meddelanden
       {unreadCount > 0 && (
-        <Badge
-          variant="destructive"
+        <Badge 
+          variant="destructive" 
           className="ml-auto h-5 px-2 text-xs font-semibold"
         >
           {unreadCount}

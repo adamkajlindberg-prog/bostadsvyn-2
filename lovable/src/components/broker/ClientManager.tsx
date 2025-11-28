@@ -1,36 +1,33 @@
-import {
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  Users, 
+  Phone, 
+  Mail, 
+  MessageSquare, 
   Calendar,
-  Mail,
-  MessageSquare,
-  Phone,
-  Plus,
-  Search,
   User,
-  Users,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+  Star,
+  Heart,
+  Search,
+  Plus,
+  Filter
+} from 'lucide-react';
 
 interface Client {
   id: string;
   name: string;
   email: string;
   phone?: string;
-  status: "active" | "prospect" | "closed";
+  status: 'active' | 'prospect' | 'closed';
   preferences: {
     budget_max?: number;
     preferred_areas?: string[];
@@ -55,73 +52,71 @@ export function ClientManager() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientInquiries, setClientInquiries] = useState<ClientInquiry[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
-  const [newNote, setNewNote] = useState("");
+  const [newNote, setNewNote] = useState('');
 
-  const isBroker = userRoles.includes("broker") || userRoles.includes("admin");
+  const isBroker = userRoles.includes('broker') || userRoles.includes('admin');
 
   useEffect(() => {
     if (user && isBroker) {
       loadClients();
     }
-  }, [user, isBroker, loadClients]);
+  }, [user, isBroker]);
 
   useEffect(() => {
     if (selectedClient) {
       loadClientInquiries(selectedClient.id);
     }
-  }, [selectedClient, loadClientInquiries]);
+  }, [selectedClient]);
 
   const loadClients = async () => {
     try {
       setIsLoading(true);
-
+      
       // Get broker's properties
       const { data: properties, error: propError } = await supabase
-        .from("properties")
-        .select("id")
-        .eq("user_id", user?.id);
+        .from('properties')
+        .select('id')
+        .eq('user_id', user?.id);
 
       if (propError) throw propError;
 
-      const propertyIds = properties?.map((p) => p.id) || [];
+      const propertyIds = properties?.map(p => p.id) || [];
 
       // Get inquiries for broker's properties
       const { data: inquiries, error: inquiriesError } = await supabase
-        .from("property_inquiries")
-        .select("*")
-        .in("property_id", propertyIds)
-        .order("created_at", { ascending: false });
+        .from('property_inquiries')
+        .select('*')
+        .in('property_id', propertyIds)
+        .order('created_at', { ascending: false });
 
       if (inquiriesError) throw inquiriesError;
 
       // Group inquiries by client email and create client objects
       const clientMap = new Map<string, Client>();
-
-      inquiries?.forEach((inquiry) => {
+      
+      inquiries?.forEach(inquiry => {
         const clientKey = inquiry.email;
-
+        
         if (!clientMap.has(clientKey)) {
           clientMap.set(clientKey, {
             id: inquiry.inquirer_id || inquiry.email,
             name: inquiry.name,
             email: inquiry.email,
             phone: inquiry.phone,
-            status: inquiry.status === "responded" ? "active" : "prospect",
+            status: inquiry.status === 'responded' ? 'active' : 'prospect',
             preferences: {
               property_type: inquiry.inquiry_type,
             },
             last_contact: inquiry.created_at,
-            notes: "",
+            notes: ''
           });
         } else {
           // Update last contact if this inquiry is more recent
           const existingClient = clientMap.get(clientKey)!;
-          if (
-            new Date(inquiry.created_at) > new Date(existingClient.last_contact)
-          ) {
+          if (new Date(inquiry.created_at) > new Date(existingClient.last_contact)) {
             existingClient.last_contact = inquiry.created_at;
           }
         }
@@ -129,11 +124,11 @@ export function ClientManager() {
 
       setClients(Array.from(clientMap.values()));
     } catch (error) {
-      console.error("Error loading clients:", error);
+      console.error('Error loading clients:', error);
       toast({
-        title: "Fel vid laddning",
-        description: "Kunde inte ladda klientdata",
-        variant: "destructive",
+        title: 'Fel vid laddning',
+        description: 'Kunde inte ladda klientdata',
+        variant: 'destructive'
       });
     } finally {
       setIsLoading(false);
@@ -143,58 +138,52 @@ export function ClientManager() {
   const loadClientInquiries = async (clientId: string) => {
     try {
       const { data: inquiries, error } = await supabase
-        .from("property_inquiries")
+        .from('property_inquiries')
         .select(`
           *,
           properties!property_inquiries_property_id_fkey(title)
         `)
-        .eq("inquirer_id", clientId)
-        .order("created_at", { ascending: false });
+        .eq('inquirer_id', clientId)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const formattedInquiries: ClientInquiry[] =
-        inquiries?.map((inquiry) => ({
-          id: inquiry.id,
-          property_title: inquiry.properties?.title || "Okänt objekt",
-          inquiry_type: inquiry.inquiry_type,
-          message: inquiry.message,
-          created_at: inquiry.created_at,
-          status: inquiry.status,
-        })) || [];
+      const formattedInquiries: ClientInquiry[] = inquiries?.map(inquiry => ({
+        id: inquiry.id,
+        property_title: inquiry.properties?.title || 'Okänt objekt',
+        inquiry_type: inquiry.inquiry_type,
+        message: inquiry.message,
+        created_at: inquiry.created_at,
+        status: inquiry.status
+      })) || [];
 
       setClientInquiries(formattedInquiries);
     } catch (error) {
-      console.error("Error loading client inquiries:", error);
+      console.error('Error loading client inquiries:', error);
     }
   };
 
-  const updateClientStatus = async (
-    clientId: string,
-    status: "active" | "prospect" | "closed",
-  ) => {
+  const updateClientStatus = async (clientId: string, status: 'active' | 'prospect' | 'closed') => {
     try {
       // Update client status in local state
-      setClients((prev) =>
-        prev.map((client) =>
-          client.id === clientId ? { ...client, status } : client,
-        ),
-      );
+      setClients(prev => prev.map(client => 
+        client.id === clientId ? { ...client, status } : client
+      ));
 
       if (selectedClient?.id === clientId) {
-        setSelectedClient((prev) => (prev ? { ...prev, status } : null));
+        setSelectedClient(prev => prev ? { ...prev, status } : null);
       }
 
       toast({
-        title: "Status uppdaterad",
-        description: `Klientstatus ändrad till ${status === "active" ? "aktiv" : status === "prospect" ? "prospekt" : "avslutad"}`,
+        title: 'Status uppdaterad',
+        description: `Klientstatus ändrad till ${status === 'active' ? 'aktiv' : status === 'prospect' ? 'prospekt' : 'avslutad'}`,
       });
     } catch (error) {
-      console.error("Error updating client status:", error);
+      console.error('Error updating client status:', error);
       toast({
-        title: "Fel vid uppdatering",
-        description: "Kunde inte uppdatera klientstatus",
-        variant: "destructive",
+        title: 'Fel vid uppdatering',
+        description: 'Kunde inte uppdatera klientstatus',
+        variant: 'destructive'
       });
     }
   };
@@ -204,48 +193,40 @@ export function ClientManager() {
 
     try {
       // In a real implementation, you'd save this to a notes table
-      setSelectedClient((prev) =>
-        prev
-          ? {
-              ...prev,
-              notes: prev.notes
-                ? `${prev.notes}\n\n${new Date().toLocaleDateString("sv-SE")}: ${newNote}`
-                : `${new Date().toLocaleDateString("sv-SE")}: ${newNote}`,
-            }
-          : null,
-      );
+      setSelectedClient(prev => prev ? {
+        ...prev,
+        notes: prev.notes ? `${prev.notes}\n\n${new Date().toLocaleDateString('sv-SE')}: ${newNote}` : `${new Date().toLocaleDateString('sv-SE')}: ${newNote}`
+      } : null);
 
-      setNewNote("");
+      setNewNote('');
       toast({
-        title: "Anteckning tillagd",
-        description: "Din anteckning har sparats",
+        title: 'Anteckning tillagd',
+        description: 'Din anteckning har sparats',
       });
     } catch (error) {
-      console.error("Error adding note:", error);
+      console.error('Error adding note:', error);
       toast({
-        title: "Fel vid sparande",
-        description: "Kunde inte spara anteckningen",
-        variant: "destructive",
+        title: 'Fel vid sparande',
+        description: 'Kunde inte spara anteckningen',
+        variant: 'destructive'
       });
     }
   };
 
-  const filteredClients = clients.filter((client) => {
-    const matchesSearch =
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || client.status === statusFilter;
+  const filteredClients = clients.filter(client => {
+    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         client.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      active: { label: "Aktiv", variant: "default" as const },
-      prospect: { label: "Prospekt", variant: "secondary" as const },
-      closed: { label: "Avslutad", variant: "outline" as const },
+      active: { label: 'Aktiv', variant: 'default' as const },
+      prospect: { label: 'Prospekt', variant: 'secondary' as const },
+      closed: { label: 'Avslutad', variant: 'outline' as const }
     };
-
+    
     const config = statusConfig[status as keyof typeof statusConfig];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
@@ -310,9 +291,7 @@ export function ClientManager() {
           {/* Client List */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="text-lg">
-                Klienter ({filteredClients.length})
-              </CardTitle>
+              <CardTitle className="text-lg">Klienter ({filteredClients.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {isLoading ? (
@@ -326,23 +305,16 @@ export function ClientManager() {
                       key={client.id}
                       onClick={() => setSelectedClient(client)}
                       className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted ${
-                        selectedClient?.id === client.id
-                          ? "bg-primary/10 border border-primary/20"
-                          : ""
+                        selectedClient?.id === client.id ? 'bg-primary/10 border border-primary/20' : ''
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="font-medium">{client.name}</h4>
                         {getStatusBadge(client.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {client.email}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{client.email}</p>
                       <p className="text-xs text-muted-foreground">
-                        Senast kontakt:{" "}
-                        {new Date(client.last_contact).toLocaleDateString(
-                          "sv-SE",
-                        )}
+                        Senast kontakt: {new Date(client.last_contact).toLocaleDateString('sv-SE')}
                       </p>
                     </div>
                   ))}
@@ -390,9 +362,7 @@ export function ClientManager() {
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
-                        {new Date(
-                          selectedClient.last_contact,
-                        ).toLocaleDateString("sv-SE")}
+                        {new Date(selectedClient.last_contact).toLocaleDateString('sv-SE')}
                       </span>
                     </div>
                   </div>
@@ -401,40 +371,22 @@ export function ClientManager() {
                   <div className="flex gap-2 pt-4 border-t">
                     <Button
                       size="sm"
-                      variant={
-                        selectedClient.status === "prospect"
-                          ? "default"
-                          : "outline"
-                      }
-                      onClick={() =>
-                        updateClientStatus(selectedClient.id, "prospect")
-                      }
+                      variant={selectedClient.status === 'prospect' ? 'default' : 'outline'}
+                      onClick={() => updateClientStatus(selectedClient.id, 'prospect')}
                     >
                       Prospekt
                     </Button>
                     <Button
                       size="sm"
-                      variant={
-                        selectedClient.status === "active"
-                          ? "default"
-                          : "outline"
-                      }
-                      onClick={() =>
-                        updateClientStatus(selectedClient.id, "active")
-                      }
+                      variant={selectedClient.status === 'active' ? 'default' : 'outline'}
+                      onClick={() => updateClientStatus(selectedClient.id, 'active')}
                     >
                       Aktiv
                     </Button>
                     <Button
                       size="sm"
-                      variant={
-                        selectedClient.status === "closed"
-                          ? "default"
-                          : "outline"
-                      }
-                      onClick={() =>
-                        updateClientStatus(selectedClient.id, "closed")
-                      }
+                      variant={selectedClient.status === 'closed' ? 'default' : 'outline'}
+                      onClick={() => updateClientStatus(selectedClient.id, 'closed')}
                     >
                       Avslutad
                     </Button>
@@ -454,33 +406,20 @@ export function ClientManager() {
                   {clientInquiries.length > 0 ? (
                     <div className="space-y-3">
                       {clientInquiries.map((inquiry) => (
-                        <div
-                          key={inquiry.id}
-                          className="p-3 bg-muted rounded-lg"
-                        >
+                        <div key={inquiry.id} className="p-3 bg-muted rounded-lg">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium">
-                              {inquiry.property_title}
-                            </h4>
-                            <Badge variant="outline">
-                              {inquiry.inquiry_type}
-                            </Badge>
+                            <h4 className="font-medium">{inquiry.property_title}</h4>
+                            <Badge variant="outline">{inquiry.inquiry_type}</Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {inquiry.message}
-                          </p>
+                          <p className="text-sm text-muted-foreground mb-2">{inquiry.message}</p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(inquiry.created_at).toLocaleString(
-                              "sv-SE",
-                            )}
+                            {new Date(inquiry.created_at).toLocaleString('sv-SE')}
                           </p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-center py-4">
-                      Inga förfrågningar
-                    </p>
+                    <p className="text-muted-foreground text-center py-4">Inga förfrågningar</p>
                   )}
                 </CardContent>
               </Card>
@@ -496,12 +435,10 @@ export function ClientManager() {
                 <CardContent className="space-y-4">
                   {selectedClient.notes && (
                     <div className="p-3 bg-muted rounded-lg">
-                      <pre className="text-sm whitespace-pre-wrap">
-                        {selectedClient.notes}
-                      </pre>
+                      <pre className="text-sm whitespace-pre-wrap">{selectedClient.notes}</pre>
                     </div>
                   )}
-
+                  
                   <div className="space-y-2">
                     <Label htmlFor="new-note">Ny anteckning</Label>
                     <Textarea
@@ -524,8 +461,7 @@ export function ClientManager() {
                 <User className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <CardTitle className="mb-2">Välj en klient</CardTitle>
                 <CardDescription>
-                  Välj en klient från listan för att se detaljer och hantera
-                  kommunikation
+                  Välj en klient från listan för att se detaljer och hantera kommunikation
                 </CardDescription>
               </CardContent>
             </Card>
