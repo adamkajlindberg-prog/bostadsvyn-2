@@ -47,6 +47,23 @@
   --color-nordic-snow: var(--nordic-snow);
   --color-nordic-mist: var(--nordic-mist);
   --color-nordic-sage: var(--nordic-sage);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-light: var(--success-light);
+  --color-rental: var(--rental);
+  --color-rental-foreground: var(--rental-foreground);
+  --color-rental-light: var(--rental-light);
+  --color-premium: var(--premium);
+  --color-premium-foreground: var(--premium-foreground);
+  --color-premium-dark: var(--premium-dark);
+  --color-critical: var(--critical);
+  --color-critical-foreground: var(--critical-foreground);
+  --color-accent-warm: var(--accent-warm);
+  --color-accent-warm-foreground: var(--accent-warm-foreground);
+  --color-accent-sage: var(--accent-sage);
+  --color-accent-sage-foreground: var(--accent-sage-foreground);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-gold-foreground: var(--accent-gold-foreground);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -60,26 +77,44 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: hsl(215 75% 45%);
-  --primary-foreground: oklch(0.985 0 0);
-  --primary-light: hsl(215 70% 55%);
-  --primary-deep: hsl(215 80% 35%);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(216 30% 8%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(216 30% 8%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(216 30% 8%);
+  --primary: hsl(215 95% 42%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-light: hsl(215 90% 55%);
+  --primary-deep: hsl(215 100% 28%);
+  --secondary: hsl(215 45% 92%);
+  --secondary-foreground: hsl(215 75% 35%);
   --muted: hsl(215 40% 94%);
-  --muted-foreground: hsl(215 20% 50%);
+  --muted-foreground: hsl(215 30% 28%);
   --accent: hsl(215 65% 55%);
   --accent-foreground: oklch(0.205 0 0);
+  --accent-warm: hsl(215 85% 48%);
+  --accent-warm-foreground: hsl(0 0% 100%);
+  --accent-sage: hsl(215 80% 52%);
+  --accent-sage-foreground: hsl(0 0% 100%);
+  --accent-gold: hsl(215 90% 45%);
+  --accent-gold-foreground: hsl(0 0% 100%);
+  --success: hsl(215 85% 48%);
+  --success-foreground: hsl(0 0% 100%);
+  --success-light: hsl(215 80% 58%);
+  --rental: hsl(142 85% 34%);
+  --rental-foreground: hsl(0 0% 100%);
+  --rental-light: hsl(142 80% 42%);
+  --premium: hsl(215 90% 38%);
+  --premium-foreground: hsl(0 0% 100%);
+  --premium-dark: hsl(215 95% 28%);
+  --critical: hsl(215 85% 42%);
+  --critical-foreground: hsl(0 0% 100%);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: hsl(215 35% 85);
-  --input: hsl(215 35% 85);
-  --ring: oklch(0.708 0 0);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(215 35% 85%);
+  --input: hsl(215 40% 94%);
+  --ring: hsl(215 75% 45%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -105,27 +140,71 @@
   --nordic-snow: hsl(215 35% 96%);
   --nordic-mist: hsl(215 55% 65%);
   --nordic-sage: hsl(215 60% 58%);
+  
+  /* Enhanced neutral gradients */
+  --gradient-nordic: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  --gradient-hero: linear-gradient(135deg, hsl(var(--primary-deep)) 0%, hsl(var(--accent-warm)) 100%);
+  --gradient-card: linear-gradient(145deg, hsl(var(--background)), hsl(var(--nordic-ice)));
+  --gradient-premium: linear-gradient(135deg, hsl(var(--premium)), hsl(var(--premium-dark)));
+  --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
+  --gradient-gold: linear-gradient(135deg, hsl(var(--accent-gold)), hsl(var(--premium)));
+  --gradient-warm: linear-gradient(135deg, hsl(var(--accent-warm)), hsl(var(--primary-light)));
+  --gradient-ocean: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--nordic-aurora)));
+  
+  /* Enhanced shadows with color variations */
+  --shadow-nordic: 0 8px 32px -8px hsl(var(--primary) / 0.1);
+  --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
+  --shadow-elevated: 0 16px 64px -12px hsl(var(--primary) / 0.15);
+  --shadow-premium: 0 8px 32px -8px hsl(var(--premium) / 0.2);
+  --shadow-success: 0 8px 32px -8px hsl(var(--success) / 0.15);
+  --shadow-gold: 0 8px 32px -8px hsl(var(--accent-gold) / 0.25);
+  --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
+  --shadow-glow-premium: 0 0 40px hsl(var(--premium) / 0.3);
+  
+  /* Animations */
+  --transition-nordic: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --bounce-nordic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: hsl(216 30% 10%);
+  --foreground: hsl(210 25% 98%);
+  --card: hsl(216 25% 12%);
+  --card-foreground: hsl(210 20% 98%);
+  --popover: hsl(216 25% 12%);
+  --popover-foreground: hsl(210 20% 98%);
+  --primary: hsl(215 50% 65%);
+  --primary-foreground: hsl(215 85% 15%);
+  --primary-light: hsl(215 45% 75%);
+  --primary-deep: hsl(215 55% 55%);
+  --secondary: hsl(215 35% 20%);
+  --secondary-foreground: hsl(215 40% 90%);
+  --muted: hsl(215 35% 20%);
+  --muted-foreground: hsl(215 25% 65%);
+  --accent: hsl(215 45% 58%);
+  --accent-foreground: hsl(215 85% 15%);
+  --accent-warm: hsl(215 50% 62%);
+  --accent-warm-foreground: hsl(215 85% 15%);
+  --accent-sage: hsl(215 45% 58%);
+  --accent-sage-foreground: hsl(215 85% 15%);
+  --accent-gold: hsl(215 55% 65%);
+  --accent-gold-foreground: hsl(215 85% 15%);
+  --success: hsl(215 50% 60%);
+  --success-foreground: hsl(215 85% 15%);
+  --success-light: hsl(215 45% 70%);
+  --rental: hsl(142 70% 45%);
+  --rental-foreground: hsl(0 0% 100%);
+  --rental-light: hsl(142 65% 55%);
+  --premium: hsl(215 55% 70%);
+  --premium-foreground: hsl(215 85% 15%);
+  --premium-dark: hsl(215 50% 60%);
+  --critical: hsl(215 50% 58%);
+  --critical-foreground: hsl(215 85% 15%);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --destructive-foreground: hsl(215 85% 15%);
+  --border: hsl(215 30% 22%);
+  --input: hsl(215 35% 20%);
+  --ring: hsl(215 50% 65%);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -139,6 +218,26 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  
+  /* Dark mode neutral gradients */
+  --gradient-nordic: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  --gradient-hero: linear-gradient(135deg, hsl(var(--primary-deep)) 0%, hsl(var(--accent-warm)) 100%);
+  --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--nordic-ice)));
+  --gradient-premium: linear-gradient(135deg, hsl(var(--premium)), hsl(var(--premium-dark)));
+  --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--success-light)));
+  --gradient-gold: linear-gradient(135deg, hsl(var(--accent-gold)), hsl(var(--premium)));
+  --gradient-warm: linear-gradient(135deg, hsl(var(--accent-warm)), hsl(var(--primary-light)));
+  --gradient-ocean: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--nordic-aurora)));
+  
+  /* Dark mode shadows */
+  --shadow-nordic: 0 8px 32px -8px hsl(var(--primary) / 0.1);
+  --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
+  --shadow-elevated: 0 16px 64px -12px hsl(var(--primary) / 0.15);
+  --shadow-premium: 0 8px 32px -8px hsl(var(--premium) / 0.2);
+  --shadow-success: 0 8px 32px -8px hsl(var(--success) / 0.15);
+  --shadow-gold: 0 8px 32px -8px hsl(var(--accent-gold) / 0.25);
+  --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
+  --shadow-glow-premium: 0 0 40px hsl(var(--premium) / 0.3);
 }
 
 @layer base {

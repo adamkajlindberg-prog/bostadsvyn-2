@@ -1,4 +1,13 @@
-import { Building2Icon, MenuIcon, UserIcon } from "lucide-react";
+import {
+  BriefcaseIcon,
+  Building2Icon,
+  HomeIcon,
+  MenuIcon,
+  PalmTreeIcon,
+  PlusIcon,
+  SparklesIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,32 +22,34 @@ import Logo from "./logo";
 
 const navMenu = [
   {
-    title: "Köp",
-    url: "/kop",
-  },
-  {
     title: "Sälj",
     url: "/salj",
+    icon: PlusIcon,
   },
   {
     title: "Hyra",
     url: "/hyra",
+    icon: HomeIcon,
   },
   {
     title: "Nyproduktion",
     url: "/nyproduktion",
+    icon: Building2Icon,
   },
   {
     title: "Fritid & Tomter",
     url: "/fritid-tomter",
+    icon: PalmTreeIcon,
   },
   {
     title: "Kommersiellt",
     url: "/kommersiellt",
+    icon: BriefcaseIcon,
   },
   {
     title: "AI-verktyg",
     url: "/ai-tools",
+    icon: SparklesIcon,
   },
   {
     title: "Om oss",
@@ -48,84 +59,140 @@ const navMenu = [
 
 const Header = () => {
   return (
-    <header className="@container sticky top-0 bg-background w-full z-50 shadow-sm">
-      <div className="flex items-center justify-between container mx-auto py-3 @lg:py-4 px-6 @lg:px-8">
-        {/* Logo */}
-        <Link href="/">
-          <div className="flex items-center gap-x-3">
+    <nav
+      className="sticky top-0 z-30 bg-background border-b border-border transition-all duration-300"
+      aria-label="Huvudnavigering"
+    >
+      <div className="pl-4 pr-0 max-w-full">
+        <div className="flex items-center h-10 flex-nowrap">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center space-x-2 flex-shrink-0"
+            aria-label="Bostadsvyn startsida"
+          >
             <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
               <Logo
-                className="h-6 w-6 @lg:h-7 @lg:w-7 text-primary-foreground"
+                className="h-7 w-7 text-primary-foreground"
                 aria-hidden="true"
               />
             </div>
-
-            <h2 className="font-semibold text-lg @lg:text-xl">Bostadsvyn.se</h2>
-          </div>
-        </Link>
-
-        {/* Navigation menu for extra large screens */}
-        <div className="hidden @7xl:flex items-center gap-x-6 2xl:gap-x-8">
-          {navMenu.map((item) => (
-            <Link
-              key={item.title}
-              href={item.url}
-              className="text-sm font-medium hover:underline underline-offset-2 hover:opacity-80"
-            >
-              {item.title}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-x-4">
-          <Link href="/maklare-login">
-            <Button variant="outline" className="hidden @xl:flex">
-              <Building2Icon /> Mäklare
-            </Button>
-          </Link>
-          <Link href="/login">
-            <Button className="hidden @xl:flex">
-              <UserIcon /> Logga in
-            </Button>
+            <span className="text-lg font-bold text-foreground whitespace-nowrap">
+              Bostadsvyn.se
+            </span>
           </Link>
 
-          {/* Navigation menu for small - large screens */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <button type="button" className="@7xl:hidden">
-                <MenuIcon />
-              </button>
-            </SheetTrigger>
-            <SheetContent className="w-3/4 lg:w-xs">
-              <SheetHeader>
-                <SheetTitle className="hidden" />
-                <SheetDescription className="hidden" />
-              </SheetHeader>
-
-              <div className="px-4">
-                {navMenu.map((item) => (
-                  <div key={item.title} className="border-b p-3">
-                    <Link href={item.url} className="text-sm">
-                      {item.title}
-                    </Link>
-                  </div>
-                ))}
-
+          {/* Navigation Links */}
+          <div
+            className="hidden lg:flex items-center space-x-1 ml-3"
+            role="menubar"
+            aria-label="Huvudmeny"
+          >
+            {navMenu.map((item) => {
+              const Icon = item.icon;
+              return (
                 <Button
-                  variant="outline"
-                  className="flex lg:hidden w-full mt-4"
+                  key={item.title}
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground hover:text-primary text-sm"
+                  asChild
                 >
-                  <Building2Icon /> Mäklare
+                  <Link href={item.url} role="menuitem">
+                    {Icon && (
+                      <Icon className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+                    )}
+                    {item.title}
+                  </Link>
                 </Button>
-                <Button className="flex lg:hidden w-full mt-3">
-                  <UserIcon /> Logga in
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+              );
+            })}
+          </div>
+
+          {/* User Menu */}
+          <div className="flex items-center space-x-2 ml-auto mr-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden sm:flex text-sm"
+              asChild
+            >
+              <Link
+                href="/maklare-login"
+                aria-label="Logga in som fastighetsmäklare"
+              >
+                <Building2Icon
+                  className="h-3.5 w-3.5 mr-1.5"
+                  aria-hidden="true"
+                />
+                Mäklare
+              </Link>
+            </Button>
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary-deep text-sm"
+              asChild
+            >
+              <Link href="/login" aria-label="Logga in på ditt konto">
+                <UserIcon className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                Logga in
+              </Link>
+            </Button>
+
+            {/* Mobile menu */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className="lg:hidden"
+                  aria-label="Öppna meny"
+                >
+                  <MenuIcon />
+                </button>
+              </SheetTrigger>
+              <SheetContent className="w-3/4 lg:w-xs">
+                <SheetHeader>
+                  <SheetTitle className="hidden" />
+                  <SheetDescription className="hidden" />
+                </SheetHeader>
+
+                <div className="px-4">
+                  {navMenu.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={item.title} className="border-b p-3">
+                        <Link
+                          href={item.url}
+                          className="text-sm flex items-center gap-2"
+                        >
+                          {Icon && <Icon className="h-4 w-4" />}
+                          {item.title}
+                        </Link>
+                      </div>
+                    );
+                  })}
+
+                  <Button
+                    variant="outline"
+                    className="flex lg:hidden w-full mt-4"
+                    asChild
+                  >
+                    <Link href="/maklare-login">
+                      <Building2Icon /> Mäklare
+                    </Link>
+                  </Button>
+                  <Button className="flex lg:hidden w-full mt-3" asChild>
+                    <Link href="/login">
+                      <UserIcon /> Logga in
+                    </Link>
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
-    </header>
+    </nav>
   );
 };
 
