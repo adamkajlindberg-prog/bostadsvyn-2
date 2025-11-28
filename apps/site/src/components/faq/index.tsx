@@ -404,14 +404,15 @@ const Faq = () => {
               support.
             </p>
             <div className="flex flex-col @lg:flex-row flex-wrap gap-4 justify-center">
-              <Button className="text-sm @lg:text-base py-6 w-full @lg:w-52 rounded-full">
+              <Button size="lg" className="w-full @lg:w-52 rounded-full">
                 <MessageCircleIcon />
                 AI-Support (24/7)
               </Button>
               <Link href="mailto:support@bostadsvyn.se" className="max-w-96">
                 <Button
                   variant="outline"
-                  className="text-sm @lg:text-base py-6 hover:border-transparent w-full @lg:w-64 rounded-full"
+                  size="lg"
+                  className="w-full @lg:w-64 rounded-full"
                 >
                   <MailIcon />
                   support@bostadsvyn.se

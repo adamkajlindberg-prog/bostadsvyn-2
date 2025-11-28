@@ -38,7 +38,7 @@ const Rent = () => {
         </p>
 
         <div className="flex justify-center mb-12">
-          <Button size="lg" className="text-base py-6 w-56">
+          <Button size="lg" className="w-56">
             <PlusIcon /> Skapa hyresannons
           </Button>
         </div>

@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import bgImage from "@/images/bg-image.webp";
 
 const features = [
   {
@@ -50,13 +51,15 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-nordic-fjord to-accent">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
-        <Image
-          src="/images/bg-image.webp"
-          alt="High quality aerial drone view of Stockholm city with historic districts and archipelago"
-          fill
-          className="object-cover opacity-70"
-          priority
-        />
+        <div className="relative w-full h-full">
+          <Image
+            src={bgImage}
+            alt="High quality aerial drone view of Stockholm city with historic districts and archipelago"
+            fill
+            className="object-cover opacity-70"
+            priority
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
       </div>
 
@@ -123,10 +126,7 @@ const Hero = () => {
 
                     {/* Filter Button */}
                     <Link href="/search">
-                      <Button
-                        variant="outline"
-                        className="bg-background/80 border-accent/30 hover:bg-accent/10 h-12 w-32 text-sm"
-                      >
+                      <Button variant="outline" size="lg" className="w-32">
                         <SlidersHorizontalIcon className="h-4 w-4 mr-1" />
                         Filter
                       </Button>
@@ -136,10 +136,7 @@ const Hero = () => {
                   {/* Search Button */}
                   <div className="text-center">
                     <Link href="/search">
-                      <Button
-                        size="lg"
-                        className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 h-12"
-                      >
+                      <Button size="lg">
                         <SearchIcon className="h-5 w-5 mr-2" />
                         Sök bostäder
                       </Button>
@@ -154,11 +151,7 @@ const Hero = () => {
                     <div className="flex flex-wrap gap-2">
                       {popularSearches.map((search, index) => (
                         <Link key={`popular-search-${index}`} href="/search">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 text-xs bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
-                          >
+                          <Button variant="ghost" size="sm">
                             {search}
                           </Button>
                         </Link>

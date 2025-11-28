@@ -207,8 +207,9 @@ const Navigation = () => {
               <>
                 {user.role === "broker" && (
                   <Button
+                    variant="success"
                     size="sm"
-                    className="bg-success hover:bg-success-light hidden sm:flex text-sm"
+                    className="hidden sm:flex"
                     onClick={() => router.push("/mäklarportal")}
                     aria-label="Öppna mäklarportalen"
                   >
@@ -223,7 +224,7 @@ const Navigation = () => {
                 {user.role !== "broker" && (
                   <Button
                     size="sm"
-                    className="hidden sm:flex text-sm bg-primary hover:bg-primary-deep text-primary-foreground"
+                    className="hidden sm:flex"
                     onClick={() => router.push("/dashboard")}
                     aria-label="Gå till mina sidor"
                   >
