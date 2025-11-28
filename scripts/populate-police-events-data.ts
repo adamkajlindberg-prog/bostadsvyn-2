@@ -20,6 +20,14 @@ const BATCH_SIZE = 100
 
 const db = getDbClient()
 
+// Simple argument parser for --date
+const getArg = (flag: string) => {
+    const arg = process.argv.find(a => a.startsWith(flag + "="))
+    return arg ? arg.split("=")[1] : undefined
+}
+
+const date = getArg("--date") || ""
+
 // Retrieve existing police events from DB
 const getExistingData = async () => {
     const data = await db.select({ policeEventId: policeEvents.policeEventId }).from(policeEvents)
@@ -27,13 +35,27 @@ const getExistingData = async () => {
     return data.map(row => row.policeEventId)
 }
 
-// Retrieve all police events
-const getAllPoliceEvents = async () => {
-    const response = await fetch("https://polisen.se/api/events")
-    if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+// Retrieve police events
+const getPoliceEvents = async () => {
+    let apiUrl = "https://polisen.se/api/events"
 
-    const data = await response.json()
-    return data
+    if (date && date !== "all") {
+        let dateString = date;
+
+        if (date === "latest") {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            dateString = yesterday.toISOString().slice(0, 10);
+        }
+
+        apiUrl = `https://polisen.se/api/events?DateTime=${dateString}`;
+    }
+
+    const response = await fetch(apiUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    return data;
 }
 
 // Insert batch of police events through transaction into DB
@@ -65,9 +87,14 @@ const insertBatch = async (batch: T_Police_Event[]) => {
 // Main function to populate police events data
 const populatePoliceEventsData = async () => {
     try {
+        if (!date) {
+            console.error(`Error: You must provide date options (--date="YYYY-MM-DD" || --date="latest" || --date="all") in the script.`)
+            process.exit(1)
+        }
+
         console.log("Retrieving data from Police Events API...")
         const existingData = await getExistingData()
-        const policeEvents = await getAllPoliceEvents()
+        const policeEvents = await getPoliceEvents()
 
         const freshEvents = policeEvents.filter(
             (event: T_Police_Event) => !existingData.includes(event.id)
@@ -92,4 +119,13 @@ const populatePoliceEventsData = async () => {
     }
 }
 
+/** 
+Example command to run the script:
+bun scripts/populate-police-events-data --date="2025-11-28"
+
+Date options:
+- YYYY-MM-DD
+- latest
+- all
+*/
 populatePoliceEventsData()
