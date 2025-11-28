@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { generateText } from "ai";
 import { env } from "@/env";
-import { GEMINI_CHAT_MODEL, google, OPENAI_CHAT_MODEL, openai } from "./utils";
+import { google, openai, GEMINI_CHAT_MODEL, OPENAI_CHAT_MODEL } from "./utils";
 
 export const generateChunks = async () => {
   const prompt = `You are given a plain text file containing information for a website.

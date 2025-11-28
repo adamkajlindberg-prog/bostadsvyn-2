@@ -1,87 +1,54 @@
-import { generateText } from "ai";
-import { env } from "@/env";
-import {
-  GEMINI_CHAT_MODEL,
-  google,
-  OPENAI_CHAT_MODEL,
-  openai,
-} from "@/lib/ai/utils";
+import { generateEmbedding } from "@/lib/ai/embedding";
+import { getDbClient, riksbankSwea, riksbankSweaObservations} from "../../../../../../packages/db";
+import { cosineDistance, desc, eq, gt, sql } from "drizzle-orm";
 
-const getSweaObservation = async (question: string) => {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
+const getSweaObservation = async (userQuery: string) => {
+    const db = getDbClient();
 
-    // Get series data
-    const series = await fetch(
-      `https://api.riksbank.se/swea/v1/Series?language=sv`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    );
+    const userQueryEmbedded = await generateEmbedding(userQuery);
 
-    const seriesData = await series.json();
+    const similarity = sql<number>`1 - (${cosineDistance(
+        riksbankSwea.embedding,
+        userQueryEmbedded,
+    )})`;
 
-    // Intialize prompt for AI to extract relevant series ID
-    const prompt = `Given the following list:
+    const similarData = await db
+        .select({
+            id: riksbankSwea.id,
+            seriesId: riksbankSwea.seriesId,
+            shortDescription: riksbankSwea.shortDescription,
+            midDescription: riksbankSwea.midDescription,
+            longDescription: riksbankSwea.longDescription,
+            source: riksbankSwea.source,
+            observationMaxDate: riksbankSwea.observationMaxDate,
+            observationMinDate: riksbankSwea.observationMinDate,
+            seriesClosed: riksbankSwea.seriesClosed,
+            similarity,
+        })
+        .from(riksbankSwea)
+        .where(gt(similarity, 0.5))
+        .orderBy((t) => desc(t.similarity))
+        .limit(4);
 
-        **Series:**
-        ${JSON.stringify(seriesData)}
+    // For each series, get related observations
+    const data = [];
+    for (const series of similarData) {
+        const vintages = await db
+            .select({
+                date: riksbankSweaObservations.date,
+                value: riksbankSweaObservations.value,
+            })
+            .from(riksbankSweaObservations)
+            .where(eq(riksbankSweaObservations.sweaId, series.id))
+            .orderBy(desc(riksbankSweaObservations.date));
 
-        User question: "${question}"
-
-        For the user question above:
-        1. Extract the most relevant series (series_id) by finding the nearest match in each list based on context and similarity (not by manual mapping).
-        2. Extract the desired date from the question if provided. If the question mentions a relative date (e.g., "yesterday", "last week"), convert it to an explicit date in YYYY-MM-DD format using "${today}" as the base date. If no date is mentioned or the question relates to today's date, use "${today}" as the date.
-
-        Return the result in this format:
-
-        {
-            seriesId: <nearest matching series_id>,
-            date: <desired date or today's date in YYYY-MM-DD format>
-        }
-
-        Only output the JSON object as shown above.`;
-
-    const initialPrompt = await generateText({
-      prompt: prompt,
-      model:
-        env.AI_CHAT_AGENT === "GEMINI"
-          ? google(GEMINI_CHAT_MODEL)
-          : openai(OPENAI_CHAT_MODEL),
-    });
-
-    // Parse the JSON from the AI response
-    let extracted: { seriesId: string; date: string };
-    try {
-      const text = initialPrompt.text.replace(/```json|```/g, "").trim();
-      extracted = JSON.parse(text) as { seriesId: string; date: string };
-    } catch (_e) {
-      throw new Error("Failed to parse AI response");
+        data.push({
+            ...series,
+            vintages,
+        });
     }
 
-    const { seriesId, date } = extracted;
-
-    // Fetch observation data
-    const response = await fetch(
-      `https://api.riksbank.se/swea/v1/Observations/${seriesId}/${date}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    );
-
-    const data = await response.json();
-
-    return JSON.stringify(data);
-  } catch (error) {
-    console.error("Fetch failed (SWEA API). Error:", error);
-    return "Could not retrieve information from the SWEA API at this time.";
-  }
+    return data;
 };
 
 export default getSweaObservation;
