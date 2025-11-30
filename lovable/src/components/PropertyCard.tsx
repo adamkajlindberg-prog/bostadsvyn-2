@@ -410,7 +410,7 @@ export default function PropertyCard({
   
   // Rental properties always use the compact unified style with unique rental branding
   if (isRental) {
-    return <Card className={cn("w-full max-w-5xl mx-auto overflow-hidden hover:shadow-xl transition-all duration-300 group border-l-4 border-l-rental", !disableClick && "cursor-pointer")} onClick={handleCardClick}>
+    return <Card className={cn("w-full overflow-hidden hover:shadow-xl transition-all duration-300 group border-l-4 border-l-rental", !disableClick && "cursor-pointer")} onClick={handleCardClick}>
         <div className="flex flex-col sm:flex-row h-full bg-gradient-to-r from-rental/5 to-transparent">
           {/* Image Section - 50% width, 16:9 aspect */}
           <div className="relative sm:w-[50%] flex-shrink-0">

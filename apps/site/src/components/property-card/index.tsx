@@ -160,7 +160,7 @@ export default function PropertyCard({
   return (
     <Card
       className={cn(
-        "w-full max-w-5xl mx-auto overflow-hidden hover:shadow-xl transition-all duration-300 group",
+        "w-full overflow-hidden hover:shadow-xl transition-all duration-300 group py-0",
         !disableClick && "cursor-pointer",
         isRental && "border-l-4 border-l-rental",
       )}
@@ -193,9 +193,9 @@ export default function PropertyCard({
                 className={cn(
                   "px-2 py-0.5 text-xs font-semibold shadow-md",
                   property.adTier === "premium" &&
-                    "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white",
+                    "bg-linear-to-r from-amber-500 via-orange-500 to-amber-600 text-white",
                   property.adTier === "plus" &&
-                    "bg-gradient-to-r from-blue-500 to-cyan-500 text-white",
+                    "bg-linear-to-r from-blue-500 to-cyan-500 text-white",
                   property.adTier === "free" &&
                     "bg-muted text-muted-foreground",
                 )}
@@ -226,7 +226,7 @@ export default function PropertyCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 rounded-full text-white bg-black/30 hover:bg-black/50 hover:text-white"
                 onClick={previousImage}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -234,7 +234,7 @@ export default function PropertyCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full text-white bg-black/30 hover:bg-black/50 hover:text-white"
                 onClick={nextImage}
               >
                 <ChevronRight className="h-4 w-4" />

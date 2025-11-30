@@ -496,7 +496,7 @@ export default function PropertySearch() {
                 }
                 className="w-full max-w-md"
               >
-                <TabsList className="grid grid-cols-2 w-full">
+                <TabsList className="w-full">
                   <TabsTrigger
                     value="SVERIGE"
                     className="text-base font-semibold"
