@@ -1,4 +1,9 @@
-import { ArrowDownUpIcon } from "lucide-react";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { Property } from "db";
+import { ArrowDownUpIcon, Loader2 } from "lucide-react";
+import PropertyMap from "@/components/property-map";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -6,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import propertyImageOne from "@/images/property-image-1.webp";
 import propertyImageTwo from "@/images/property-image-2.webp";
 import propertyImageThree from "@/images/property-image-3.webp";
+import { useTRPC } from "@/trpc/client";
 import PropertyCard from "./property-card";
 
 const filters = [
@@ -46,25 +52,28 @@ const exclusiveProperties = [
 ];
 
 const Properties = () => {
+  const trpc = useTRPC();
+
+  const { data, isLoading } = useQuery(trpc.property.search.queryOptions({}));
+
+  const properties: Property[] = data?.properties ?? [];
+
   return (
     <div className="@4xl:col-span-8 @5xl:col-span-9">
       <Card className="py-0 shadow-xs mb-6 overflow-hidden">
         <CardContent className="px-0">
-          {/* <div>
-                        <AlertCircleIcon className="h-16 w-16 mx-auto mb-4 text-destructive" />
-                        <h3 className="text-base @lg:text-lg text-center font-semibold mb-2">Google Maps API-nyckel saknas</h3>
-                        <p className="text-sm text-muted-foreground text-center">
-                        Kontakta administratören för att konfigurera Google Maps.
-                        </p>
-                    </div> */}
-
-          <iframe
-            className="w-full"
-            height="400"
-            id="gmap_canvas"
-            title="Google Maps showing Östersund"
-            src="https://maps.google.com/maps?width=520&amp;height=400&amp;hl=en&amp;q=%20%C3%96stersund+(bostadsvyn-map)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-          />
+          {isLoading && !data ? (
+            <div className="flex items-center justify-center h-[400px]">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+                <p className="text-sm text-muted-foreground">Laddar karta...</p>
+              </div>
+            </div>
+          ) : (
+            <div className="h-[400px] w-full">
+              <PropertyMap properties={properties} />
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -1,6 +1,8 @@
 import { embeddings, getDbClient, resources } from "db";
-import { generateEmbeddings } from "../apps/site/src/lib/ai/embedding";
-import { generateChunks } from "../apps/site/src/lib/ai/generate-chunk";
+import { generateEmbeddings } from "../site/src/lib/ai/embedding";
+import { generateChunks } from "../site/src/lib/ai/generate-chunk";
+
+type EmbeddingRow = Awaited<ReturnType<typeof generateEmbeddings>>[number];
 
 const generateChunkEmbeddings = async (chunks: string[]) => {
   const db = getDbClient();
@@ -16,7 +18,7 @@ const generateChunkEmbeddings = async (chunks: string[]) => {
     const embeddingQuery = await generateEmbeddings(content);
     // Save embeddings to embedding table
     await db.insert(embeddings).values(
-      embeddingQuery.map((embedding) => ({
+      embeddingQuery.map((embedding: EmbeddingRow) => ({
         resourceId: resource?.id,
         ...embedding,
       })),

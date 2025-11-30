@@ -12,12 +12,13 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getPropertyImageUrl } from "@/image";
 import { checkFavoriteStatus, toggleFavorite } from "@/lib/actions/property";
 import { cn } from "@/lib/utils";
 
@@ -77,9 +78,10 @@ export default function PropertyCard({
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  const images = (property.images as string[]) || [];
-  const hasMultipleImages = images.length > 1;
-  const currentImage = images[currentImageIndex] || "/api/placeholder/400/300";
+  const images = useMemo(() => {
+    return (property.images || []).filter(Boolean).map(getPropertyImageUrl);
+  }, [property.images]);
+  const currentImage = images[currentImageIndex];
 
   const checkIfFavorite = useCallback(async () => {
     if (!user) return;
@@ -166,19 +168,22 @@ export default function PropertyCard({
     >
       <div className="flex flex-col sm:flex-row h-full">
         {/* Image Section */}
-        <div className="relative sm:w-[50%] flex-shrink-0">
-          <div className="aspect-[16/9] overflow-hidden bg-muted">
-            <Image
-              src={currentImage}
-              alt={property.title}
-              width={400}
-              height={225}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
-              unoptimized
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/api/placeholder/400/400";
-              }}
-            />
+        <div className="relative sm:w-[50%] shrink-0">
+          <div className="aspect-video overflow-hidden bg-muted">
+            {currentImage ? (
+              <Image
+                src={currentImage}
+                alt={property.title}
+                width={400}
+                height={225}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
+                unoptimized
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                Ingen bild tillgänglig
+              </div>
+            )}
           </div>
 
           {/* Badges */}
@@ -216,7 +221,7 @@ export default function PropertyCard({
           </div>
 
           {/* Image Navigation */}
-          {hasMultipleImages && (
+          {images.length > 1 && (
             <>
               <Button
                 variant="ghost"

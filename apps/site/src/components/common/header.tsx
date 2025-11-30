@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BriefcaseIcon,
   Building2Icon,
@@ -68,7 +70,7 @@ const Header = () => {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 flex-shrink-0"
+            className="flex items-center space-x-2 shrink-0"
             aria-label="Bostadsvyn startsida"
           >
             <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">

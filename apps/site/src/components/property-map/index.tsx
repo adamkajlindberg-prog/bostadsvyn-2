@@ -7,9 +7,11 @@ import {
   InfoWindow,
 } from "@vis.gl/react-google-maps";
 import type { Property } from "db";
+import { AlertCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { env } from "@/env";
 
 interface PropertyMapProps {
   selectedLocation?: {
@@ -23,9 +25,15 @@ interface PropertyMapProps {
 }
 
 const SWEDEN_CENTER = { lat: 62.0, lng: 15.0 };
-const GOOGLE_MAPS_API_KEY =
-  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-  "AIzaSyBnetE0gWPmS8Wxrzi_U3KOiXOBRz3MJKc";
+const GOOGLE_MAPS_API_KEY = env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+const hasValidApiKey = () => {
+  return (
+    GOOGLE_MAPS_API_KEY &&
+    typeof GOOGLE_MAPS_API_KEY === "string" &&
+    GOOGLE_MAPS_API_KEY.trim().length > 0
+  );
+};
 
 const getMarkerColor = (status: string) => {
   switch (status) {
@@ -77,6 +85,26 @@ export default function PropertyMap({
       router.push(`/annons/${property.id}`);
     }
   };
+
+  if (!hasValidApiKey()) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <div className="text-center p-8">
+          <AlertCircleIcon className="h-16 w-16 mx-auto mb-4 text-destructive" />
+          <h3 className="text-base @lg:text-lg text-center font-semibold mb-2">
+            Google Maps API-nyckel saknas eller är ogiltig
+          </h3>
+          <p className="text-sm text-muted-foreground text-center">
+            Kontakta administratören för att konfigurera Google Maps
+            API-nyckeln.
+            <br />
+            Se till att API-nyckeln är korrekt och att Maps JavaScript API är
+            aktiverat.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>

@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { getPropertyImageUrl } from "@/image";
 import {
   checkFavoriteStatus,
   toggleFavorite,
@@ -130,30 +131,34 @@ export default function PropertyDetails({
 
   const getFloorPlanImages = () => {
     if (!property.images) return [];
-    return property.images.filter((img) => {
-      const fileName = img.toLowerCase();
-      return (
-        fileName.includes("planritning") ||
-        fileName.includes("floorplan") ||
-        fileName.includes("floor-plan") ||
-        fileName.includes("floor_plan") ||
-        fileName.includes("plan")
-      );
-    });
+    return property.images
+      .filter((img) => {
+        const fileName = img.toLowerCase();
+        return (
+          fileName.includes("planritning") ||
+          fileName.includes("floorplan") ||
+          fileName.includes("floor-plan") ||
+          fileName.includes("floor_plan") ||
+          fileName.includes("plan")
+        );
+      })
+      .map(getPropertyImageUrl);
   };
 
   const getPropertyMapImages = () => {
     if (!property.images) return [];
-    return property.images.filter((img) => {
-      const fileName = img.toLowerCase();
-      return (
-        fileName.includes("fastighetskarta") ||
-        fileName.includes("fastighets-karta") ||
-        fileName.includes("property-map") ||
-        fileName.includes("propertymap") ||
-        fileName.includes("tomtkarta")
-      );
-    });
+    return property.images
+      .filter((img) => {
+        const fileName = img.toLowerCase();
+        return (
+          fileName.includes("fastighetskarta") ||
+          fileName.includes("fastighets-karta") ||
+          fileName.includes("property-map") ||
+          fileName.includes("propertymap") ||
+          fileName.includes("tomtkarta")
+        );
+      })
+      .map(getPropertyImageUrl);
   };
 
   const floorPlanImages = getFloorPlanImages();
@@ -212,7 +217,7 @@ export default function PropertyDetails({
               <div className="relative aspect-video bg-gray-200">
                 {property.images && property.images.length > 0 ? (
                   <Image
-                    src={property.images[0]}
+                    src={getPropertyImageUrl(property.images[0])}
                     alt={property.title}
                     fill
                     className="object-cover"

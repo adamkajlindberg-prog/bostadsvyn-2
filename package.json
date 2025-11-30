@@ -5,6 +5,7 @@
   "module": "index.ts",
   "workspaces": [
     "apps/site",
+    "apps/scripts",
     "packages/*"
   ],
   "scripts": {
@@ -19,7 +20,8 @@
     "lint-fix": "biome check --write --unsafe . && manypkg fix && sort-package-json",
     "test": "turbo test",
     "type-check": "turbo type-check",
-    "up": "bunx npm-check-updates -ws --root --format group -u"
+    "up": "bunx npm-check-updates -ws --root --format group -u",
+    "generate-mock-listings": "bun run --filter='@bostadsvyn/scripts' generate-mock-listings"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.7",
