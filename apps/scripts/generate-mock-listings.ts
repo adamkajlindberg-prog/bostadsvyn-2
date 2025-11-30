@@ -124,11 +124,15 @@ function generateDeterministicId(index: number): string {
 
   // Format as UUID v4-like string (but deterministic)
   const hex = hash.toString("hex");
+  const hexChar16 = hex[16];
+  if (!hexChar16) {
+    throw new Error("Hash too short for UUID generation");
+  }
   return [
     hex.slice(0, 8),
     hex.slice(8, 12),
-    "4" + hex.slice(13, 16), // Version 4
-    ((parseInt(hex[16]!, 16) & 0x3) | 0x8).toString(16) + hex.slice(17, 20), // Variant bits
+    `4${hex.slice(13, 16)}`, // Version 4
+    ((parseInt(hexChar16, 16) & 0x3) | 0x8).toString(16) + hex.slice(17, 20), // Variant bits
     hex.slice(20, 32),
   ].join("-");
 }
@@ -338,14 +342,27 @@ function generatePropertyData(
   description: string;
   title: string;
 } {
-  const config = PROPERTY_CONFIGS[index % PROPERTY_CONFIGS.length]!;
+  const configIndex = index % PROPERTY_CONFIGS.length;
+  const config = PROPERTY_CONFIGS[configIndex];
+  if (!config) {
+    throw new Error(`Invalid property config index: ${configIndex}`);
+  }
   const propertyType = config.type;
-  const status =
-    config.statuses[Math.floor(Math.random() * config.statuses.length)]!;
-  const city =
-    SWEDISH_CITIES[Math.floor(Math.random() * SWEDISH_CITIES.length)]!;
-  const streetName =
-    STREET_NAMES[Math.floor(Math.random() * STREET_NAMES.length)]!;
+  const statusIndex = Math.floor(Math.random() * config.statuses.length);
+  const status = config.statuses[statusIndex];
+  if (!status) {
+    throw new Error(`Invalid status index: ${statusIndex}`);
+  }
+  const cityIndex = Math.floor(Math.random() * SWEDISH_CITIES.length);
+  const city = SWEDISH_CITIES[cityIndex];
+  if (!city) {
+    throw new Error(`Invalid city index: ${cityIndex}`);
+  }
+  const streetNameIndex = Math.floor(Math.random() * STREET_NAMES.length);
+  const streetName = STREET_NAMES[streetNameIndex];
+  if (!streetName) {
+    throw new Error(`Invalid street name index: ${streetNameIndex}`);
+  }
   const streetNumber = Math.floor(Math.random() * 100) + 1;
 
   // Generate realistic data based on property type
@@ -433,10 +450,9 @@ function generatePropertyData(
       break;
   }
 
+  const energyClassIndex = Math.floor(Math.random() * ENERGY_CLASSES.length);
   const energyClass =
-    Math.random() > 0.3
-      ? ENERGY_CLASSES[Math.floor(Math.random() * ENERGY_CLASSES.length)]!
-      : null;
+    Math.random() > 0.3 ? (ENERGY_CLASSES[energyClassIndex] ?? null) : null;
 
   return {
     propertyType,

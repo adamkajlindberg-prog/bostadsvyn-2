@@ -15,13 +15,13 @@
     "db:push": "bun -F db push",
     "dev": "turbo dev",
     "dev-site": "bunx turbo dev --filter=bostadsvyn",
+    "generate-mock-listings": "bun run --filter='@bostadsvyn/scripts' generate-mock-listings",
     "knip": "with-env knip --config knip.config.ts",
     "lint": "biome check . && manypkg check ",
     "lint-fix": "biome check --write --unsafe . && manypkg fix && sort-package-json",
     "test": "turbo test",
     "type-check": "turbo type-check",
-    "up": "bunx npm-check-updates -ws --root --format group -u",
-    "generate-mock-listings": "bun run --filter='@bostadsvyn/scripts' generate-mock-listings"
+    "up": "bunx npm-check-updates -ws --root --format group -u"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
