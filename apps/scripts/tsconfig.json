@@ -1,0 +1,9 @@
+{
+  "extends": "@cjkihl/tsconfig/base",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["site/src/*"]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import type { Property } from "db";
 import {
   ArrowUpDown,
@@ -12,7 +13,7 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import PropertyCard from "@/components/property-card";
@@ -31,10 +32,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  type PropertySearchFilters,
-  searchProperties,
-} from "@/lib/actions/property-search";
+import { useTRPC } from "@/trpc/client";
+import type { PropertySearchInput } from "@/trpc/routes/property";
 
 type ViewMode = "grid" | "map";
 
@@ -63,10 +62,38 @@ const commonFeatures = [
 
 const energyClasses = ["A", "B", "C", "D", "E", "F", "G"];
 
+const propertyTypeLabels: Record<string, string> = {
+  APARTMENT: "Lägenheter",
+  HOUSE: "Villor",
+  TOWNHOUSE: "Radhus/Parhus/Kedjehus",
+  COTTAGE: "Fritidshus",
+  PLOT: "Tomter",
+  COMMERCIAL: "Kommersiellt",
+};
+
+const defaultFilters: PropertySearchInput = {
+  query: "",
+  propertyType: "",
+  listingType: "",
+  minPrice: 0,
+  maxPrice: 20000000,
+  minArea: 0,
+  maxArea: 1000,
+  minRooms: 0,
+  maxRooms: 10,
+  city: "",
+  features: [],
+  energyClass: [],
+  sortBy: "created_desc",
+  minRent: 0,
+  maxRent: 50000,
+  minMonthlyFee: 0,
+  maxMonthlyFee: 10000,
+  minPlotArea: 0,
+  maxPlotArea: 10000,
+};
+
 export default function PropertySearch() {
-  const [_properties, setProperties] = useState<Property[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [activeTab, setActiveTab] = useState<
     | "ALL"
@@ -81,8 +108,6 @@ export default function PropertySearch() {
     "SVERIGE",
   );
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [totalResults, setTotalResults] = useState(0);
-  const [_hasSearched, setHasSearched] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<
     | {
         center_lat?: number;
@@ -93,139 +118,33 @@ export default function PropertySearch() {
     | undefined
   >(undefined);
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
-  const [isAISearching, setIsAISearching] = useState(false);
-  const [_isSearchInputExpanded, _setIsSearchInputExpanded] = useState(false);
 
-  const [filters, setFilters] = useState<PropertySearchFilters>({
-    query: "",
-    propertyType: "",
-    listingType: "",
-    minPrice: 0,
-    maxPrice: 20000000,
-    minArea: 0,
-    maxArea: 1000,
-    minRooms: 0,
-    maxRooms: 10,
-    city: "",
-    features: [],
-    energyClass: [],
-    sortBy: "created_desc",
-    minRent: 0,
-    maxRent: 50000,
-    minMonthlyFee: 0,
-    maxMonthlyFee: 10000,
-    minPlotArea: 0,
-    maxPlotArea: 10000,
-  });
-
-  const loadProperties = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await searchProperties({});
-      setProperties(result.properties);
-      setFilteredProperties(result.properties);
-      setTotalResults(result.total);
-    } catch (error) {
-      toast.error("Kunde inte ladda fastigheter");
-      console.error("Error loading properties:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const applyFilters = useCallback(async () => {
-    try {
-      const searchFilters: PropertySearchFilters = {
-        ...filters,
-        listingType: activeTab === "ALL" ? undefined : activeTab,
-      };
-
-      const result = await searchProperties(searchFilters);
-      setFilteredProperties(result.properties);
-      setTotalResults(result.total);
-      setHasSearched(true);
-    } catch (error) {
-      toast.error("Kunde inte söka fastigheter");
-      console.error("Error applying filters:", error);
-    }
-  }, [filters, activeTab]);
-
-  useEffect(() => {
-    loadProperties();
-  }, [loadProperties]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
-
-  const updateFilter = (
-    key: keyof PropertySearchFilters,
-    // biome-ignore lint/suspicious/noExplicitAny: Value can be various types depending on the filter key
-    value: any,
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const toggleFeature = (feature: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      features: prev.features?.includes(feature)
-        ? prev.features.filter((f) => f !== feature)
-        : [...(prev.features || []), feature],
-    }));
-  };
-
-  const toggleEnergyClass = (energyClass: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      energyClass: prev.energyClass?.includes(energyClass)
-        ? prev.energyClass.filter((e) => e !== energyClass)
-        : [...(prev.energyClass || []), energyClass],
-    }));
-  };
+  const [filters, setFilters] = useState<PropertySearchInput>(defaultFilters);
 
   const clearFilters = () => {
-    setFilters({
-      query: "",
-      propertyType: "",
-      listingType: "",
-      minPrice: 0,
-      maxPrice: 20000000,
-      minArea: 0,
-      maxArea: 1000,
-      minRooms: 0,
-      maxRooms: 10,
-      city: "",
-      features: [],
-      energyClass: [],
-      sortBy: "created_desc",
-      minRent: 0,
-      maxRent: 50000,
-      minMonthlyFee: 0,
-      maxMonthlyFee: 10000,
-      minPlotArea: 0,
-      maxPlotArea: 10000,
-    });
+    setFilters(defaultFilters);
     setSelectedLocation(undefined);
   };
 
-  const handleNaturalSearch = async () => {
+  const trpc = useTRPC();
+
+  const { data, isLoading, isFetching } = useQuery(
+    trpc.property.search.queryOptions(filters),
+  );
+
+  const properties: Property[] = data?.properties ?? [];
+  const totalResults = data?.total ?? 0;
+
+  const handleNaturalSearch = () => {
     if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
       toast.error("Ange en sökfras eller plats");
       return;
     }
 
-    // For now, just update the query filter
-    // In production, this would call an AI search API
-    updateFilter("query", naturalSearchQuery);
-    setIsAISearching(false);
-    setHasSearched(true);
+    setFilters((prev) => ({ ...prev, query: naturalSearchQuery }));
   };
 
-  if (loading) {
+  if (isLoading && !data) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-12">
@@ -245,7 +164,9 @@ export default function PropertySearch() {
         <div>
           <h1 className="text-3xl font-bold">Sök alla fastigheter</h1>
           <p className="text-muted-foreground">
-            {totalResults} fastigheter hittades
+            {isFetching
+              ? "Söker fastigheter..."
+              : `${totalResults} fastigheter hittades`}
           </p>
         </div>
 
@@ -305,19 +226,10 @@ export default function PropertySearch() {
                         handleNaturalSearch();
                       }
                     }}
-                    disabled={isAISearching}
                     className="text-sm"
                   />
-                  <Button
-                    onClick={handleNaturalSearch}
-                    disabled={isAISearching}
-                    size="sm"
-                  >
-                    {isAISearching ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
+                  <Button onClick={handleNaturalSearch} size="sm">
+                    <Sparkles className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -330,9 +242,14 @@ export default function PropertySearch() {
                 <LocationAutocomplete
                   placeholder="Ange stad, kommun eller område"
                   value={filters.query}
-                  onChange={(value) => updateFilter("query", value)}
+                  onChange={(value) =>
+                    setFilters((prev) => ({ ...prev, query: value }))
+                  }
                   onSelect={(location) => {
-                    updateFilter("query", location.fullName);
+                    setFilters((prev) => ({
+                      ...prev,
+                      query: location.fullName,
+                    }));
                     setSelectedLocation({
                       center_lat: location.center_lat,
                       center_lng: location.center_lng,
@@ -345,7 +262,9 @@ export default function PropertySearch() {
                 <Input
                   placeholder="T.ex. Stockholm"
                   value={filters.city}
-                  onChange={(e) => updateFilter("city", e.target.value)}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, city: e.target.value }))
+                  }
                   className="mt-2"
                 />
               </div>
@@ -363,36 +282,24 @@ export default function PropertySearch() {
                     "COTTAGE",
                     "PLOT",
                     "COMMERCIAL",
-                  ].map((type) => {
-                    const labels: Record<string, string> = {
-                      APARTMENT: "Lägenheter",
-                      HOUSE: "Villor",
-                      TOWNHOUSE: "Radhus/Parhus/Kedjehus",
-                      COTTAGE: "Fritidshus",
-                      PLOT: "Tomter",
-                      COMMERCIAL: "Kommersiellt",
-                    };
-                    return (
-                      <div key={type} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={type}
-                          checked={filters.propertyType === type}
-                          onCheckedChange={() =>
-                            updateFilter(
-                              "propertyType",
-                              filters.propertyType === type ? "" : type,
-                            )
-                          }
-                        />
-                        <Label
-                          htmlFor={type}
-                          className="text-sm cursor-pointer"
-                        >
-                          {labels[type]}
-                        </Label>
-                      </div>
-                    );
-                  })}
+                  ].map((type) => (
+                    <div key={type} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={type}
+                        checked={filters.propertyType === type}
+                        onCheckedChange={() =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            propertyType:
+                              prev.propertyType === type ? "" : type,
+                          }))
+                        }
+                      />
+                      <Label htmlFor={type} className="text-sm cursor-pointer">
+                        {propertyTypeLabels[type]}
+                      </Label>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -406,7 +313,10 @@ export default function PropertySearch() {
                       placeholder="Från"
                       value={filters.minPrice || ""}
                       onChange={(e) =>
-                        updateFilter("minPrice", Number(e.target.value) || 0)
+                        setFilters((prev) => ({
+                          ...prev,
+                          minPrice: Number(e.target.value) || 0,
+                        }))
                       }
                     />
                     <Input
@@ -416,10 +326,10 @@ export default function PropertySearch() {
                         filters.maxPrice === 20000000 ? "" : filters.maxPrice
                       }
                       onChange={(e) =>
-                        updateFilter(
-                          "maxPrice",
-                          Number(e.target.value) || 20000000,
-                        )
+                        setFilters((prev) => ({
+                          ...prev,
+                          maxPrice: Number(e.target.value) || 20000000,
+                        }))
                       }
                     />
                   </div>
@@ -433,8 +343,11 @@ export default function PropertySearch() {
                   <Slider
                     value={[filters.minArea || 0, filters.maxArea || 1000]}
                     onValueChange={([min, max]) => {
-                      updateFilter("minArea", min);
-                      updateFilter("maxArea", max);
+                      setFilters((prev) => ({
+                        ...prev,
+                        minArea: min,
+                        maxArea: max,
+                      }));
                     }}
                     max={1000}
                     step={10}
@@ -454,8 +367,11 @@ export default function PropertySearch() {
                   <Slider
                     value={[filters.minRooms || 0, filters.maxRooms || 10]}
                     onValueChange={([min, max]) => {
-                      updateFilter("minRooms", min);
-                      updateFilter("maxRooms", max);
+                      setFilters((prev) => ({
+                        ...prev,
+                        minRooms: min,
+                        maxRooms: max,
+                      }));
                     }}
                     max={10}
                     step={1}
@@ -496,7 +412,14 @@ export default function PropertySearch() {
                           <Checkbox
                             id={feature}
                             checked={filters.features?.includes(feature)}
-                            onCheckedChange={() => toggleFeature(feature)}
+                            onCheckedChange={() =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                features: prev.features?.includes(feature)
+                                  ? prev.features.filter((f) => f !== feature)
+                                  : [...(prev.features || []), feature],
+                              }))
+                            }
                           />
                           <Label htmlFor={feature} className="text-sm">
                             {feature}
@@ -519,7 +442,18 @@ export default function PropertySearch() {
                               : "outline"
                           }
                           size="sm"
-                          onClick={() => toggleEnergyClass(energyClass)}
+                          onClick={() =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              energyClass: prev.energyClass?.includes(
+                                energyClass,
+                              )
+                                ? prev.energyClass.filter(
+                                    (e) => e !== energyClass,
+                                  )
+                                : [...(prev.energyClass || []), energyClass],
+                            }))
+                          }
                         >
                           {energyClass}
                         </Button>
@@ -538,14 +472,14 @@ export default function PropertySearch() {
           {viewMode === "map" ? (
             <div className="h-[600px] mb-8">
               <PropertyMap
-                properties={filteredProperties}
+                properties={properties}
                 selectedLocation={selectedLocation}
               />
             </div>
           ) : (
             <div className="mb-8 h-[400px]">
               <PropertyMap
-                properties={filteredProperties}
+                properties={properties}
                 selectedLocation={selectedLocation}
               />
             </div>
@@ -562,7 +496,7 @@ export default function PropertySearch() {
                 }
                 className="w-full max-w-md"
               >
-                <TabsList className="grid grid-cols-2 w-full">
+                <TabsList className="w-full">
                   <TabsTrigger
                     value="SVERIGE"
                     className="text-base font-semibold"
@@ -618,7 +552,12 @@ export default function PropertySearch() {
                   {sortOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
-                      onClick={() => updateFilter("sortBy", option.value)}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          sortBy: option.value,
+                        }))
+                      }
                       className={
                         filters.sortBy === option.value ? "bg-accent" : ""
                       }
@@ -633,7 +572,7 @@ export default function PropertySearch() {
 
           {/* Grid/List View */}
           {viewMode !== "map" &&
-            (filteredProperties.length === 0 ? (
+            (properties.length === 0 ? (
               <Card>
                 <CardContent className="text-center py-12">
                   <Home className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -649,7 +588,7 @@ export default function PropertySearch() {
               </Card>
             ) : (
               <div className="space-y-6">
-                {filteredProperties.map((property) => (
+                {properties.map((property) => (
                   <PropertyCard key={property.id} property={property} />
                 ))}
               </div>

@@ -15,3 +15,11 @@ export function getImageClient(): ImageClient {
   }
   return _client;
 }
+
+export function getImageUrl(path: string): string {
+  return `${env.NEXT_PUBLIC_BUCKET_URL}/${path}`;
+}
+
+export function getPropertyImageUrl(imageId: string): string {
+  return getImageUrl(`properties/${imageId}`);
+}

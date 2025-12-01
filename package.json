@@ -5,6 +5,7 @@
   "module": "index.ts",
   "workspaces": [
     "apps/site",
+    "apps/scripts",
     "packages/*"
   ],
   "scripts": {
@@ -14,6 +15,7 @@
     "db:push": "bun -F db push",
     "dev": "turbo dev",
     "dev-site": "bunx turbo dev --filter=bostadsvyn",
+    "generate-mock-listings": "bun run --filter='@bostadsvyn/scripts' generate-mock-listings",
     "knip": "with-env knip --config knip.config.ts",
     "lint": "biome check . && manypkg check ",
     "lint-fix": "biome check --write --unsafe . && manypkg fix && sort-package-json",
@@ -22,15 +24,15 @@
     "up": "bunx npm-check-updates -ws --root --format group -u"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.7",
+    "@biomejs/biome": "2.3.8",
     "@manypkg/cli": "0.25.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/bun": "latest",
     "@types/node": "24.10.1",
-    "knip": "5.70.1",
-    "next-intl": "^4.5.5",
-    "react-hook-form": "^7.66.1",
-    "sort-package-json": "^3.4.0",
+    "knip": "5.70.2",
+    "next-intl": "^4.5.6",
+    "react-hook-form": "^7.67.0",
+    "sort-package-json": "^3.5.0",
     "turbo": "2.6.1",
     "typescript": "5.9.3"
   },

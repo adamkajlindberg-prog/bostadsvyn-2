@@ -21,6 +21,9 @@ next-env.d.ts
 # search
 data.ms
 
+# Scripts generated images
+apps/scripts/images/
+
 # whitelist
 !.drizzle
 

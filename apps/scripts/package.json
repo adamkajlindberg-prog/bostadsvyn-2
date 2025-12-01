@@ -1,0 +1,25 @@
+{
+  "name": "@bostadsvyn/scripts",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./index.pub.ts",
+      "types": "./index.pub.ts"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "generate-mock-listings": "with-env 'bun generate-mock-listings.ts'"
+  },
+  "dependencies": {
+    "@bostadsvyn/images": "workspace:*",
+    "@t3-oss/env-nextjs": "^0.13.8",
+    "db": "workspace:*",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "@cjkihl/tsconfig": "^1.0.10",
+    "@cjkihl/with-env": "^1.0.11"
+  }
+}

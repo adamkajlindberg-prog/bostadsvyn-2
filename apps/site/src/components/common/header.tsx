@@ -1,9 +1,11 @@
+"use client";
+
 import {
   BriefcaseIcon,
   Building2Icon,
   HomeIcon,
   MenuIcon,
-  PalmTreeIcon,
+  PalmtreeIcon,
   PlusIcon,
   SparklesIcon,
   UserIcon,
@@ -39,7 +41,7 @@ const navMenu = [
   {
     title: "Fritid & Tomter",
     url: "/fritid-tomter",
-    icon: PalmTreeIcon,
+    icon: PalmtreeIcon,
   },
   {
     title: "Kommersiellt",
@@ -68,7 +70,7 @@ const Header = () => {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 flex-shrink-0"
+            className="flex items-center space-x-2 shrink-0"
             aria-label="Bostadsvyn startsida"
           >
             <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
@@ -128,11 +130,7 @@ const Header = () => {
                 Mäklare
               </Link>
             </Button>
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary-deep text-sm"
-              asChild
-            >
+            <Button size="sm" asChild>
               <Link href="/login" aria-label="Logga in på ditt konto">
                 <UserIcon className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
                 Logga in

@@ -27,7 +27,7 @@
   "dependencies": {
     "nanoid": "5.1.6",
     "remeda": "2.32.0",
-    "zod": "4.1.12"
+    "zod": "4.1.13"
   },
   "devDependencies": {
     "@cjkihl/create-exports": "^1.0.9",

@@ -68,11 +68,11 @@ const Navigation = () => {
       aria-label="Huvudnavigering"
     >
       <div className="pl-4 pr-0 max-w-full">
-        <div className="flex items-center h-10 flex-nowrap">
+        <div className="flex items-center py-2 flex-nowrap">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 flex-shrink-0"
+            className="flex items-center space-x-2 shrink-0"
             aria-label="Bostadsvyn startsida"
           >
             <div className="bg-primary ring-2 ring-primary-light rounded-lg p-1 shadow-lg">
@@ -207,8 +207,9 @@ const Navigation = () => {
               <>
                 {user.role === "broker" && (
                   <Button
+                    variant="success"
                     size="sm"
-                    className="bg-success hover:bg-success-light hidden sm:flex text-sm"
+                    className="hidden sm:flex"
                     onClick={() => router.push("/mäklarportal")}
                     aria-label="Öppna mäklarportalen"
                   >
@@ -223,7 +224,7 @@ const Navigation = () => {
                 {user.role !== "broker" && (
                   <Button
                     size="sm"
-                    className="hidden sm:flex text-sm bg-primary hover:bg-primary-deep text-primary-foreground"
+                    className="hidden sm:flex"
                     onClick={() => router.push("/dashboard")}
                     aria-label="Gå till mina sidor"
                   >

@@ -12,12 +12,13 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getPropertyImageUrl } from "@/image";
 import { checkFavoriteStatus, toggleFavorite } from "@/lib/actions/property";
 import { cn } from "@/lib/utils";
 
@@ -77,9 +78,10 @@ export default function PropertyCard({
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  const images = (property.images as string[]) || [];
-  const hasMultipleImages = images.length > 1;
-  const currentImage = images[currentImageIndex] || "/api/placeholder/400/300";
+  const images = useMemo(() => {
+    return (property.images || []).filter(Boolean).map(getPropertyImageUrl);
+  }, [property.images]);
+  const currentImage = images[currentImageIndex];
 
   const checkIfFavorite = useCallback(async () => {
     if (!user) return;
@@ -158,7 +160,7 @@ export default function PropertyCard({
   return (
     <Card
       className={cn(
-        "w-full max-w-5xl mx-auto overflow-hidden hover:shadow-xl transition-all duration-300 group",
+        "w-full overflow-hidden hover:shadow-xl transition-all duration-300 group py-0",
         !disableClick && "cursor-pointer",
         isRental && "border-l-4 border-l-rental",
       )}
@@ -166,19 +168,22 @@ export default function PropertyCard({
     >
       <div className="flex flex-col sm:flex-row h-full">
         {/* Image Section */}
-        <div className="relative sm:w-[50%] flex-shrink-0">
-          <div className="aspect-[16/9] overflow-hidden bg-muted">
-            <Image
-              src={currentImage}
-              alt={property.title}
-              width={400}
-              height={225}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
-              unoptimized
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/api/placeholder/400/400";
-              }}
-            />
+        <div className="relative sm:w-[50%] shrink-0">
+          <div className="aspect-video overflow-hidden bg-muted">
+            {currentImage ? (
+              <Image
+                src={currentImage}
+                alt={property.title}
+                width={400}
+                height={225}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400"
+                unoptimized
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                Ingen bild tillgänglig
+              </div>
+            )}
           </div>
 
           {/* Badges */}
@@ -188,9 +193,9 @@ export default function PropertyCard({
                 className={cn(
                   "px-2 py-0.5 text-xs font-semibold shadow-md",
                   property.adTier === "premium" &&
-                    "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white",
+                    "bg-linear-to-r from-amber-500 via-orange-500 to-amber-600 text-white",
                   property.adTier === "plus" &&
-                    "bg-gradient-to-r from-blue-500 to-cyan-500 text-white",
+                    "bg-linear-to-r from-blue-500 to-cyan-500 text-white",
                   property.adTier === "free" &&
                     "bg-muted text-muted-foreground",
                 )}
@@ -216,12 +221,12 @@ export default function PropertyCard({
           </div>
 
           {/* Image Navigation */}
-          {hasMultipleImages && (
+          {images.length > 1 && (
             <>
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 rounded-full text-white bg-black/30 hover:bg-black/50 hover:text-white"
                 onClick={previousImage}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -229,7 +234,7 @@ export default function PropertyCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full text-white bg-black/30 hover:bg-black/50 hover:text-white"
                 onClick={nextImage}
               >
                 <ChevronRight className="h-4 w-4" />
