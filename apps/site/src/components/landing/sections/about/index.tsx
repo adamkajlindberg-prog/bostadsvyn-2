@@ -1,15 +1,5 @@
-import {
-  ArrowRightIcon,
-  BrainIcon,
-  CalculatorIcon,
-  FileTextIcon,
-  SearchIcon,
-  SparklesIcon,
-  TrendingUpIcon,
-  UsersIcon,
-} from "lucide-react";
+import { Brain, Sparkles } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import livingRoomAfter from "@/images/living-room-after.webp";
 import livingRoomBefore from "@/images/living-room-before.webp";
@@ -18,15 +8,32 @@ import villaBefore from "@/images/villa-before-edit.webp";
 
 const highlights = [
   {
-    badgeIcon: <BrainIcon size={16} className="text-primary-foreground" />,
+    badgeIcon: <Brain size={16} className="text-primary-foreground" />,
     badgeText: "AI-Homestyling",
     title: "Se potentialen i varje rum",
     description:
-      "Vår AI-teknik kan transformera rum till den stil eller miljö som önskas så att du som köpare kan visualisera din framtida bostad.",
-    details: [
-      "Fotorealistiska resultat på sekunder",
-      "Olika inredningsstilar att välja mellan",
-      "Automatisk anpassning till rumsstorlek",
+      "Transformera rum med AI – visualisera nya golv, väggar, färger och inredning. Renovera badrum och kök, möblera tomma rum eller ta bort möbler för att se rummets fulla potential. Perfekt för att planera renoveringar och inredning.",
+    features: [
+      {
+        title: "Inredning & Design",
+        items: [
+          "Möblera och ta bort möbler",
+          "Olika inredningsstilar",
+          "Gardiner och belysning",
+          "Garderober och förvaring",
+          "Trappor och nivåskillnader",
+        ],
+      },
+      {
+        title: "Renovering & Finish",
+        items: [
+          "Golv, väggar och tak",
+          "Färger och material",
+          "Badrum och kök",
+          "Fotorealistiska resultat",
+          "Och mycket mer",
+        ],
+      },
     ],
     imageBefore: livingRoomBefore,
     imageBeforeAlt: "Vardagsrum innan",
@@ -34,15 +41,32 @@ const highlights = [
     imageAfterAlt: "Vardagsrum efter",
   },
   {
-    badgeIcon: <SparklesIcon size={16} className="text-primary-foreground" />,
+    badgeIcon: <Sparkles size={16} className="text-primary-foreground" />,
     badgeText: "AI Bildredigering",
     title: "Visualisera renoveringar, förändringar och tillbyggnader",
     description:
-      "Vårt AI-verktyg låter dig enkelt lägga till eller ta bort element från fastighetbilder. Visa potentialen i utomhusutrymmen genom att lägga till pooler, terrasser, och andra förbättringar.",
-    details: [
-      "Lägg till pooler, terrasser och uteplatser",
-      "Ta bort eller ändra befintliga element",
-      "Visa renoveringspotential i olika stilar",
+      "Vårt AI-verktyg låter dig enkelt lägga till eller ta bort element från fastighetbilder. Visa potentialen i både utomhus- och exteriörutrymmen genom att visualisera förändringar och tillbyggnader. Via chatten på det specifika objektet får du resultatet på sekunder.",
+    features: [
+      {
+        title: "Lägg till",
+        items: [
+          "Pooler och terrasser",
+          "Våningsplan och tillbyggnader",
+          "Uteplatser och staket",
+          "Infarter och garage",
+          "Balkonger och attefallshus",
+        ],
+      },
+      {
+        title: "Byt ut",
+        items: [
+          "Tak och fasad",
+          "Färger och material",
+          "Fönster och dörrar",
+          "Entré och yttemiljö",
+          "Och mycket mer",
+        ],
+      },
     ],
     imageBefore: villaBefore,
     imageBeforeAlt: "Villa innan",
@@ -51,257 +75,158 @@ const highlights = [
   },
 ];
 
-const features = [
-  {
-    href: "/ai-homestyling",
-    badgeIcon: (
-      <BrainIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    badgeText: "Populär",
-    title: "AI-Homestyling",
-    description:
-      "Transformera tomma rum till inredda drömhem med vår avancerade AI-teknik",
-    details: ["Fotorealistiska resultat", "Olika stilar", "Snabb rendering"],
-  },
-  {
-    href: "/prisanalys",
-    badgeIcon: (
-      <TrendingUpIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    badgeText: "AI-driven",
-    title: "Prisanalys & Prognoser",
-    description:
-      "Få exakta värderingar och framtida prisförutsägelser baserat på marknadsdata",
-    details: ["Realtidsdata", "Konfidensintervall", "Områdesanalys"],
-  },
-  {
-    href: "/maklarportal",
-    badgeIcon: (
-      <UsersIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    badgeText: "Professionell",
-    title: "Mäklarportal",
-    description:
-      "Professionella verktyg för mäklare att hantera kunder, visningar och annonser",
-    details: ["Kundhantering", "Statistik & rapporter", "Automatisering"],
-  },
-  {
-    href: "/digitala-hyreskontrakt",
-    badgeIcon: (
-      <FileTextIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    badgeText: "Säker",
-    title: "Digitala Hyreskontrakt",
-    description:
-      "Säkra signeringar med BankID och automatiserade juridiska dokument",
-    details: ["BankID-integration", "Automatisering", "Juridisk säkerhet"],
-  },
-  {
-    href: "#",
-    badgeIcon: (
-      <CalculatorIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    title: "Kostnadskalkylator",
-    description:
-      "Beräkna totala kostnader inklusive skatter, avgifter och låneinformation",
-    details: ["Lånekalkyler", "Skatteinfo", "Månadsbudget"],
-  },
-  {
-    href: "#",
-    badgeIcon: (
-      <SearchIcon
-        size={44}
-        className="text-primary/70 p-2.5 bg-primary-light/10 rounded-md"
-      />
-    ),
-    badgeText: "Smart",
-    title: "AI Sökassistent",
-    description:
-      "Säkra signeringar med BankID och automatiserade juridiska dokument",
-    details: ["Personliga tips", "Lärandealgoritm", "Endast för medlemmar"],
-  },
-];
-
 const About = () => {
   return (
-    <div className="bg-gradient-to-b from-nordic-ice to-background">
-      <div className="container mx-auto max-w-7xl py-16 px-6 @lg:px-8 @8xl:px-0">
-        <h1 className="text-center text-4xl @4xl:text-6xl font-semibold tracking-tight mb-6">
-          Bostadsvyn
-        </h1>
-        <p className="text-center text-muted-foreground text-lg @lg:text-xl max-w-4xl mx-auto leading-relaxed mb-8">
+    <div>
+      <h1 className="text-center text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+        Bostadsvyn
+      </h1>
+      <div className="max-w-4xl mx-auto space-y-6 mb-20">
+        <p className="text-lg text-center text-foreground font-medium leading-relaxed">
           Välkommen till framtidens bostadsportal med det bredaste utbudet av
-          bostäder i Sverige. Hos oss hittar du allt från
-          <span className="font-semibold text-foreground"> villor</span>,
-          <span className="font-semibold text-foreground"> gårdar</span>,
-          <span className="font-semibold text-foreground"> lägenheter</span>,
-          <span className="font-semibold text-foreground"> tomter</span> och
-          <span className="font-semibold text-foreground"> fritidshus</span>{" "}
-          till
-          <span className="font-semibold text-foreground"> radhus</span>,
-          <span className="font-semibold text-foreground"> kedjehus</span>,
-          <span className="font-semibold text-foreground"> parhus</span>,
-          <span className="font-semibold text-foreground"> hyresbostäder</span>,
-          <span className="font-semibold text-foreground"> nyproduktion</span>{" "}
-          och
-          <span className="font-semibold text-foreground">
-            {" "}
-            kommersiella fastigheter
-          </span>
-          – allt på samma plattform.
+          bostäder i både Sverige och utlandet. Hos oss hittar du allt från{" "}
+          <span className="font-semibold">villor</span>,{" "}
+          <span className="font-semibold">gårdar</span>,{" "}
+          <span className="font-semibold">lägenheter</span>,{" "}
+          <span className="font-semibold">tomter</span> och{" "}
+          <span className="font-semibold">fritidshus</span> till{" "}
+          <span className="font-semibold">radhus</span>,{" "}
+          <span className="font-semibold">kedjehus</span>,{" "}
+          <span className="font-semibold">parhus</span>,{" "}
+          <span className="font-semibold">hyresbostäder</span>,{" "}
+          <span className="font-semibold">nyproduktion</span> och{" "}
+          <span className="font-semibold">kommersiella fastigheter</span> – allt
+          på samma plattform.
         </p>
-        <p className="text-center text-muted-foreground text-base @lg:text-lg max-w-4xl mx-auto leading-relaxed mb-20">
+        <p className="text-lg text-center text-foreground font-medium leading-relaxed">
           Vår vision är att revolutionera bostadsmarknaden genom att kombinera
           cutting-edge AI-teknologi med personlig service och rådgivning. Vi är
           här för att hjälpa dig genom hela processen och göra din största affär
           till en trygg och smidig upplevelse – oavsett om du köper, säljer
           eller hyr.
         </p>
+      </div>
 
-        <div className="flex justify-center mb-4">
-          <div className="flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full">
-            <SparklesIcon size={16} className="text-primary-foreground" />
-            <div className="text-xs font-semibold text-primary-foreground">
-              AI-Powered Features
+      <div className="mb-16">
+        <Card className="border-2 border-accent/30 bg-gradient-to-br from-accent/0 to-white py-8">
+          <CardContent className="px-8">
+            <div className="flex items-start gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+                  Grundat och byggt av en fastighetsmäklare med
+                  branscherfarenhet
+                </h2>
+                <p className="text-accent font-semibold">
+                  Fem års erfarenhet från fastighetsbranschen
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+            <p className="text-foreground leading-relaxed mb-4 text-lg">
+              Bostadsvyn är grundat och byggt av en registrerad
+              fastighetsmäklare med gedigen branscherfarenhet men också
+              personlig erfarenhet från bostadsmarknaden. Genom fem års
+              erfarenhet har vi identifierat de verktyg och funktioner som
+              verkligen tillför värde för samtliga aktörer på
+              fastighetsmarknaden – fastighetsmäklare, säljare, köpare,
+              spekulanter och hyresvärdar.
+            </p>
 
-        <h2 className="text-center text-3xl @4xl:text-5xl font-semibold tracking-tight mb-6">
-          Revolutionerande fastighetsteknologi
-        </h2>
-        <p className="text-center text-muted-foreground text-lg @lg:text-xl max-w-3xl mx-auto leading-relaxed mb-12">
-          Vi kombinerar artificiell intelligens med djup marknadskunskap för att
-          skapa den mest avancerade bostadsplattformen i Norden. Vår vision är
-          att hjälpa alla parter på bästa möjliga sätt och med de verktygen vi
-          har tagit fram är vi säkra på att vi kan just det. Läs mer nedan!
-        </p>
+            <blockquote className="mt-6 border-l-4 border-accent pl-6 italic text-foreground text-lg">
+              <p className="leading-relaxed mb-2">
+                "Jag har sedan hösten 2024 funderat mycket på varför vi i
+                Sverige inte har EN bostadsportal för alla typer av bostäder
+                utan folk måste söka sig till 4-5 olika sidor, beroende på vad
+                de söker. Det var så jag fick idén för Bostadsvyn! Målet för mig
+                är att ta allt jag har lärt mig från att vara en köpare, säljare
+                och mäklare till att tillsammans med den otroliga teknologin som
+                finns idag, skapa den absolut bästa plattformen för bostäder som
+                finns i Sverige. Alla ska kunna annonsera och alla ska ha nytta
+                av portalen och dessa unika verktyg som vi har tagit fram.
+                Förhoppningsvis så kan jag med detta hårda jobb underlätta för
+                er från början till slut, oavsett vad ni söker för bostad."
+              </p>
+              <p className="text-sm font-semibold not-italic text-accent">
+                — Adam, Grundare och VD
+              </p>
+            </blockquote>
+          </CardContent>
+        </Card>
+      </div>
 
-        <div className="space-y-16 mb-16">
-          {highlights.map((highlight) => (
-            <Card
-              key={highlight.badgeText}
-              className="border-none p-0 bg-card overflow-hidden"
-            >
-              <CardContent className="p-0">
-                <div className="pt-8 @lg:pt-12 pb-12 @lg:pb-16 px-8 @lg:px-10 @4xl:px-12">
-                  <div className="inline-flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full mb-4">
-                    {highlight.badgeIcon}
-                    <div className="text-xs font-semibold text-primary-foreground">
-                      {highlight.badgeText}
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl @lg:text-3xl font-semibold tracking-tight mb-4">
-                    {highlight.title}
-                  </h3>
-                  <p className="text-muted-foreground text-base @lg:text-lg leading-relaxed mb-6">
-                    {highlight.description}
-                  </p>
-
-                  <ul className="list-disc list-inside marker:text-primary marker:text-xl space-y-1">
-                    {highlight.details.map((detail, index) => (
-                      <li
-                        className="text-sm @lg:text-base"
-                        key={`${highlight.badgeText}-detail-${index}`}
-                      >
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="grid grid-cols-1 @6xl:grid-cols-2">
-                  <div className="relative h-60 @lg:h-96 @2xl:h-96 @4xl:h-[500px] @6xl:h-[430px]">
-                    <Image
-                      src={highlight.imageBefore}
-                      alt={highlight.imageBeforeAlt}
-                      fill
-                      className="object-cover"
-                    />
-
-                    <div className="absolute top-4 left-4 @lg:top-5 @lg:left-5 text-sm bg-background/90 px-4 py-1 rounded-full shadow-sm">
-                      Före
-                    </div>
-                  </div>
-                  <div className="relative h-60 @lg:h-96 @4xl:h-[500px] @6xl:h-[430px]">
-                    <Image
-                      src={highlight.imageAfter}
-                      alt={highlight.imageAfterAlt}
-                      fill
-                      className="object-cover"
-                    />
-
-                    <div className="absolute top-4 right-4 @lg:top-5 @lg:right-5 text-sm text-primary-foreground bg-primary/90 px-4 py-1 rounded-full shadow-sm">
-                      Efter
-                    </div>
+      <div className="space-y-16 mb-16">
+        {highlights.map((highlight) => (
+          <Card
+            key={highlight.badgeText}
+            className="overflow-hidden shadow-elevated bg-card/40 backdrop-blur-lg border border-primary-foreground/20 py-0"
+          >
+            <CardContent className="px-0">
+              <div className="p-8 lg:p-12">
+                <div className="inline-flex items-center gap-1 bg-accent py-1 px-2.5 rounded-full mb-4 text-accent-foreground">
+                  {highlight.badgeIcon}
+                  <div className="text-xs font-semibold">
+                    {highlight.badgeText}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
 
-        <div className="grid grid-cols-1 @2xl:grid-cols-2 @6xl:grid-cols-3 auto-rows-min gap-6">
-          {features.map((feature, index) => (
-            <Link key={`card-${index}`} href={feature.href}>
-              <Card className="border-none p-0 bg-card overflow-hidden group hover:shadow-lg hover:scale-105 transition-all duration-300 h-full">
-                <CardContent className="p-0 h-full flex flex-col">
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="flex items-center gap-x-4 mb-4">
-                      {feature.badgeIcon}
-                      {feature.badgeText && (
-                        <div className="text-xs text-primary-deep font-medium bg-primary/20 px-3 py-1 rounded-full">
-                          {feature.badgeText}
-                        </div>
-                      )}
+                <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">
+                  {highlight.title}
+                </h3>
+                <p className="text-foreground text-base font-medium mb-5 leading-relaxed">
+                  {highlight.description}
+                </p>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-7">
+                  {highlight.features.map((feature) => (
+                    <div key={feature.title}>
+                      <h4 className="text-sm font-semibold text-foreground mb-3">
+                        {feature.title}
+                      </h4>
+
+                      <ul className="space-y-2">
+                        {feature.items.map((item) => (
+                          <li
+                            key={item}
+                            className="flex items-center gap-2 text-foreground text-sm font-medium"
+                          >
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    <h4 className="text-xl group-hover:text-primary font-semibold mb-3">
-                      {feature.title}
-                    </h4>
-                    <p className="text-muted-foreground mb-4">
-                      {feature.description}
-                    </p>
+              <div className="grid grid-cols-1 @6xl:grid-cols-2">
+                <div className="relative h-60 @lg:h-96 @2xl:h-96 @4xl:h-[500px] @6xl:h-[430px]">
+                  <Image
+                    src={highlight.imageBefore}
+                    alt={highlight.imageBeforeAlt}
+                    fill
+                    className="object-cover"
+                  />
 
-                    <ul className="list-disc list-inside marker:text-primary marker:text-xl space-y-1 mb-6">
-                      {feature.details.map((detail, index) => (
-                        <li
-                          key={`card-detail-${index}`}
-                          className="text-sm text-muted-foreground"
-                        >
-                          {detail}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="flex justify-center mt-auto">
-                      <div className="text-primary flex items-center gap-x-1 group-hover:underline underline-offset-3">
-                        Läs mer
-                        <ArrowRightIcon size={14} />
-                      </div>
-                    </div>
+                  <div className="absolute top-4 left-4 @lg:top-5 @lg:left-5 text-sm bg-background/90 px-4 py-1 rounded-full shadow-sm">
+                    Före
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                </div>
+                <div className="relative h-60 @lg:h-96 @4xl:h-[500px] @6xl:h-[430px]">
+                  <Image
+                    src={highlight.imageAfter}
+                    alt={highlight.imageAfterAlt}
+                    fill
+                    className="object-cover"
+                  />
+
+                  <div className="absolute top-4 right-4 @lg:top-5 @lg:right-5 text-sm text-primary-foreground bg-primary/90 px-4 py-1 rounded-full shadow-sm">
+                    Efter
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

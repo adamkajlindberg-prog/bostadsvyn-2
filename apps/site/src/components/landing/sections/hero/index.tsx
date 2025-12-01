@@ -385,13 +385,11 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center w-full">
         <div className="space-y-8">
           {/* Main Headline */}
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight tracking-tight">
-              <span className="block text-white drop-shadow-2xl">
-                Välkommen till Bostadsvyn!
-              </span>
-            </h1>
-          </div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight mt-10">
+            <span className="block text-white drop-shadow-2xl">
+              Välkommen till Bostadsvyn!
+            </span>
+          </h1>
 
           {/* Feature Highlights */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
@@ -412,7 +410,7 @@ const Hero = () => {
           </div>
 
           {/* Search Interface */}
-          <div className="max-w-6xl mx-auto mt-12">
+          <div className="max-w-6xl mx-auto mt-8">
             <Card className="bg-card/40 backdrop-blur-lg border border-primary-foreground/20 shadow-2xl">
               <CardContent className="p-8">
                 {/* Unified Search Interface */}
