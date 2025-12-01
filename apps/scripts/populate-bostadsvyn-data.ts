@@ -1,42 +1,40 @@
-import { embeddings, getDbClient, resources } from "db";
+import { bostadsvyn, getDbClient } from "db";
 import { generateEmbeddings } from "../site/src/lib/ai/embedding";
 import { generateChunks } from "../site/src/lib/ai/generate-chunk";
 
-type EmbeddingRow = Awaited<ReturnType<typeof generateEmbeddings>>[number];
-
-const generateChunkEmbeddings = async (chunks: string[]) => {
+// Insert data chunks and their embeddings into DB
+const insertData = async (chunks: string[]) => {
   const db = getDbClient();
+
   for (const content of chunks) {
     if (!content.trim()) continue;
-    // Save chunk to resources table
-    const [resource] = await db
-      .insert(resources)
-      .values({ content })
-      .returning();
-
     // Generate embeddings for the chunk
     const embeddingQuery = await generateEmbeddings(content);
+
     // Save embeddings to embedding table
-    await db.insert(embeddings).values(
-      embeddingQuery.map((embedding: EmbeddingRow) => ({
-        resourceId: resource?.id,
+    await db.insert(bostadsvyn).values(
+      embeddingQuery.map((embedding) => ({
         ...embedding,
       })),
     );
+
     console.log(`Saved chunk and embeddings: ${content.slice(0, 40)}...`);
   }
 };
 
-(async () => {
+// Main function to populate Bostadsvyn data
+const populateBostadsvynData = async () => {
   try {
     console.log("Processing embeddings...");
 
-    const svText = await generateChunks();
-    const svChunks = svText.split("\n").filter(Boolean);
-    await generateChunkEmbeddings(svChunks);
+    const data = await generateChunks();
+    const dataChunks = data.split("\n").filter(Boolean);
+    await insertData(dataChunks);
 
     console.log("Chunks and embeddings generated and saved to DB.");
   } catch (error) {
     console.error("Error:", error);
   }
-})();
+};
+
+populateBostadsvynData();

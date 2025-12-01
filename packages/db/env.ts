@@ -18,5 +18,6 @@ export const env = createEnv({
       .default("1536")
       .transform((s) => parseInt(s, 10)),
     AI_CHAT_AGENT: z.string().default("OPENAI"),
+    TRAFIKVERKET_API_KEY: z.string().default(""),
   },
 });

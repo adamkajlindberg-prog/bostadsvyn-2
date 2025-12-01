@@ -61,9 +61,6 @@ export const env = createEnv({
       .transform((s) => parseInt(s, 10)),
     AI_CHAT_AGENT: z.string().default("OPENAI"),
 
-    // Trafikverket
-    TRAFIKVERKET_API_KEY: z.string().default(""),
-
     R2_ACCESS_KEY_ID: z
       .string()
       .min(1)

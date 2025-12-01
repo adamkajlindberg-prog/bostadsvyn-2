@@ -24,3 +24,6 @@ data.ms
 # Scripts generated images
 apps/scripts/images/
 
+# whitelist
+!.drizzle
+

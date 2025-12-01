@@ -8,7 +8,7 @@
   },
   "scripts": {
     "push": "with-env drizzle-kit push",
-    "studio": "with-envdrizzle-kit studio --port 5556",
+    "studio": "with-env drizzle-kit studio --port 5556",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
