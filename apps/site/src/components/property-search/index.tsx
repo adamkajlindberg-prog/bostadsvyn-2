@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
@@ -40,10 +41,20 @@ type ViewMode = "grid" | "map";
 const sortOptions = [
   { value: "created_desc", label: "Nyast först" },
   { value: "created_asc", label: "Äldst först" },
-  { value: "price_asc", label: "Pris: Lägst först" },
-  { value: "price_desc", label: "Pris: Högst först" },
-  { value: "area_desc", label: "Storlek: Störst först" },
-  { value: "area_asc", label: "Storlek: Minst först" },
+  { value: "price_asc", label: "Billigast först" },
+  { value: "price_desc", label: "Dyrast först" },
+  { value: "living_area_desc", label: "Störst först (m²)" },
+  { value: "living_area_asc", label: "Minst först (m²)" },
+  { value: "plot_area_desc", label: "Tomt – störst först (m²)" },
+  { value: "plot_area_asc", label: "Tomt – minst först (m²)" },
+  { value: "price_sqm_desc", label: "Lägst kvadratmeterpris (kr/m²)" },
+  { value: "price_sqm_asc", label: "Högst kvadratmeterpris (kr/m²)" },
+  { value: "rooms_desc", label: "Flest rum först" },
+  { value: "rooms_asc", label: "Minst antal rum först" },
+  { value: "fee_desc", label: "Lägst avgift (kr/mån)" },
+  { value: "fee_asc", label: "Högst avgift (kr/mån)" },
+  { value: "address_desc", label: "Adress A–Ö" },
+  { value: "address_asc", label: "Adress Ö–A" },
 ];
 
 const commonFeatures = [
@@ -93,7 +104,36 @@ const defaultFilters: PropertySearchInput = {
   maxPlotArea: 10000,
 };
 
+const getFiltersFromParams = (params: URLSearchParams): PropertySearchInput => {
+  return {
+    ...defaultFilters,
+    aiQuery: params.get("aiQuery") || "",
+    aiSearch: params.get("aiSearch") === "true",
+    query: params.get("query") || "",
+    propertyType: params.get("propertyType") || "",
+    listingType: params.get("listingType") || "",
+    minPrice: Number(params.get("minPrice")) || 0,
+    maxPrice: Number(params.get("maxPrice")) || 20000000,
+    minArea: Number(params.get("minArea")) || 0,
+    maxArea: Number(params.get("maxArea")) || 1000,
+    minRooms: Number(params.get("minRooms")) || 0,
+    maxRooms: Number(params.get("maxRooms")) || 10,
+    city: params.get("city") || "",
+    features: params.getAll("features"),
+    energyClass: params.getAll("energyClass"),
+    sortBy: params.get("sortBy") || "created_desc",
+    minRent: Number(params.get("minRent")) || 0,
+    maxRent: Number(params.get("maxRent")) || 50000,
+    minMonthlyFee: Number(params.get("minMonthlyFee")) || 0,
+    maxMonthlyFee: Number(params.get("maxMonthlyFee")) || 10000,
+    minPlotArea: Number(params.get("minPlotArea")) || 0,
+    maxPlotArea: Number(params.get("maxPlotArea")) || 10000,
+  };
+};
+
 export default function PropertySearch() {
+  const searchParams = useSearchParams();
+
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [activeTab, setActiveTab] = useState<
     | "ALL"
@@ -119,7 +159,9 @@ export default function PropertySearch() {
   >(undefined);
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
 
-  const [filters, setFilters] = useState<PropertySearchInput>(defaultFilters);
+  const [filters, setFilters] = useState<PropertySearchInput>(
+    getFiltersFromParams(searchParams),
+  );
 
   const clearFilters = () => {
     setFilters(defaultFilters);
@@ -162,7 +204,7 @@ export default function PropertySearch() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Sök alla fastigheter</h1>
+          <h1 className="text-3xl font-semibold">Sök alla fastigheter</h1>
           <p className="text-muted-foreground">
             {isFetching
               ? "Söker fastigheter..."

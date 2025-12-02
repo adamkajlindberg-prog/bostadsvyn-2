@@ -229,59 +229,71 @@ const Hero = () => {
     if (isNaturalLanguage) {
       setIsAISearching(true);
       try {
-        const data = await performAISearch(searchQuery);
-        if (data?.searchCriteria) {
-          toast.success(
-            data.message || `Hittade ${data.count} matchande bostäder`,
-          );
-
-          // Navigate to search page with AI-extracted criteria
-          const params = new URLSearchParams();
-          const criteria = data.searchCriteria;
-          if (criteria.location) params.set("location", criteria.location);
-          if (criteria.propertyType && criteria.propertyType.length > 0) {
-            params.set("propertyType", criteria.propertyType.join(","));
-          }
-          if (criteria.minRooms)
-            params.set("minRooms", criteria.minRooms.toString());
-          if (criteria.maxRooms)
-            params.set("maxRooms", criteria.maxRooms.toString());
-          if (criteria.minArea)
-            params.set("minArea", criteria.minArea.toString());
-          if (criteria.maxArea)
-            params.set("maxArea", criteria.maxArea.toString());
-          if (criteria.minPrice)
-            params.set("minPrice", criteria.minPrice.toString());
-          if (criteria.maxPrice)
-            params.set("maxPrice", criteria.maxPrice.toString());
-          if (criteria.minBedrooms)
-            params.set("minBedrooms", criteria.minBedrooms.toString());
-          if (criteria.minBathrooms)
-            params.set("minBathrooms", criteria.minBathrooms.toString());
-
-          // Handle features
-          if (criteria.features && criteria.features.length > 0) {
-            if (criteria.features.includes("balcony"))
-              params.set("balcony", "true");
-            if (criteria.features.includes("parking"))
-              params.set("parking", "true");
-            if (criteria.features.includes("elevator"))
-              params.set("elevator", "true");
-            if (criteria.features.includes("outdoorSpace"))
-              params.set("outdoorSpace", "true");
-          }
-          if (criteria.keywords) params.set("keywords", criteria.keywords);
-          params.set("searchQuery", searchQuery);
-          setIsAISearching(false);
-          router.push(`/search?${params.toString()}&aiSearch=true`);
-          return;
-        }
+        router.push(
+          `/search?aiQuery=${encodeURIComponent(searchQuery)}&aiSearch=true`,
+        );
+        return;
       } catch (err) {
         console.error("AI search exception:", err);
         toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
         setIsAISearching(false);
         return;
       }
+
+      // try {
+      //   const data = await performAISearch(searchQuery);
+      //   if (data?.searchCriteria) {
+      //     toast.success(
+      //       data.message || `Hittade ${data.count} matchande bostäder`,
+      //     );
+
+      //     // Navigate to search page with AI-extracted criteria
+      //     const params = new URLSearchParams();
+      //     const criteria = data.searchCriteria;
+      //     if (criteria.location) params.set("location", criteria.location);
+      //     if (criteria.propertyType && criteria.propertyType.length > 0) {
+      //       params.set("propertyType", criteria.propertyType.join(","));
+      //     }
+      //     if (criteria.minRooms)
+      //       params.set("minRooms", criteria.minRooms.toString());
+      //     if (criteria.maxRooms)
+      //       params.set("maxRooms", criteria.maxRooms.toString());
+      //     if (criteria.minArea)
+      //       params.set("minArea", criteria.minArea.toString());
+      //     if (criteria.maxArea)
+      //       params.set("maxArea", criteria.maxArea.toString());
+      //     if (criteria.minPrice)
+      //       params.set("minPrice", criteria.minPrice.toString());
+      //     if (criteria.maxPrice)
+      //       params.set("maxPrice", criteria.maxPrice.toString());
+      //     if (criteria.minBedrooms)
+      //       params.set("minBedrooms", criteria.minBedrooms.toString());
+      //     if (criteria.minBathrooms)
+      //       params.set("minBathrooms", criteria.minBathrooms.toString());
+
+      //     // Handle features
+      //     if (criteria.features && criteria.features.length > 0) {
+      //       if (criteria.features.includes("balcony"))
+      //         params.set("balcony", "true");
+      //       if (criteria.features.includes("parking"))
+      //         params.set("parking", "true");
+      //       if (criteria.features.includes("elevator"))
+      //         params.set("elevator", "true");
+      //       if (criteria.features.includes("outdoorSpace"))
+      //         params.set("outdoorSpace", "true");
+      //     }
+      //     if (criteria.keywords) params.set("keywords", criteria.keywords);
+      //     params.set("searchQuery", searchQuery);
+      //     setIsAISearching(false);
+      //     router.push(`/search?${params.toString()}&aiSearch=true`);
+      //     return;
+      //   }
+      // } catch (err) {
+      //   console.error("AI search exception:", err);
+      //   toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
+      //   setIsAISearching(false);
+      //   return;
+      // }
     }
 
     // Standard search (location-based)
