@@ -30,7 +30,7 @@ const navMenu = [
   },
   {
     title: "Hyra",
-    url: "/hyra",
+    url: "/hyresbostader",
     icon: HomeIcon,
   },
   {
@@ -144,6 +144,7 @@ const Header = () => {
                   type="button"
                   className="lg:hidden"
                   aria-label="Öppna meny"
+                  suppressHydrationWarning
                 >
                   <MenuIcon />
                 </button>

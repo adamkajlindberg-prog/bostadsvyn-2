@@ -475,6 +475,7 @@ const Hero = () => {
                         <Button
                           variant="outline"
                           className="bg-background/80 border-accent/30 hover:bg-accent/10 h-12 w-32 text-sm"
+                          suppressHydrationWarning
                         >
                           <SlidersHorizontalIcon className="h-4 w-4 mr-1" />
                           Filter

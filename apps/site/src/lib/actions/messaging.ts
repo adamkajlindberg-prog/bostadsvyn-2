@@ -258,6 +258,60 @@ export async function markMessagesAsRead(conversationId: string) {
   }
 }
 
+export async function getOrCreateConversation(
+  propertyId: string,
+  sellerId: string,
+) {
+  try {
+    const session = await getServerSession();
+
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Du måste logga in för att skapa en konversation",
+      };
+    }
+
+    const db = getDbClient();
+
+    // Check if conversation already exists
+    const [existing] = await db
+      .select()
+      .from(conversations)
+      .where(
+        and(
+          eq(conversations.propertyId, propertyId),
+          eq(conversations.buyerId, session.user.id),
+          eq(conversations.sellerId, sellerId),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      return { success: true, conversation: existing };
+    }
+
+    // Create new conversation
+    const [newConversation] = await db
+      .insert(conversations)
+      .values({
+        propertyId,
+        buyerId: session.user.id,
+        sellerId,
+        status: "active",
+      })
+      .returning();
+
+    return { success: true, conversation: newConversation };
+  } catch (error) {
+    console.error("Error getting or creating conversation:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
 export async function sendMessage(
   conversationId: string,
   content: string,

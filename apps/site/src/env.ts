@@ -11,6 +11,7 @@ export const env = createEnv({
     NEXT_PUBLIC_WEB_URL: z.url(),
     NEXT_PUBLIC_BUCKET_URL: z.url(),
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string(),
+    NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID: z.string(),
   },
   emptyStringAsUndefined: true,
   experimental__runtimeEnv: {
@@ -20,8 +21,12 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_WEB_URL: process.env.NEXT_PUBLIC_WEB_URL,
     NEXT_PUBLIC_BUCKET_URL: process.env.NEXT_PUBLIC_BUCKET_URL,
+
+    // Google
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
   },
   server: {
     // Auth
@@ -85,5 +90,8 @@ export const env = createEnv({
     IDURA_CLIENT_ID: z.string().min(1),
     IDURA_CLIENT_SECRET: z.string().min(1),
     IDURA_CLIENT_URL: z.url(),
+
+    // Google OAuth
+    GOOGLE_OAUTH_CLIENT_SECRET: z.string().min(1),
   },
 });
