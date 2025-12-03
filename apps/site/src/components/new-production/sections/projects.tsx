@@ -14,6 +14,9 @@ const projects: Project[] = [
     image: bgImage,
     badgeOneText: "Lanseras Q2 2025",
     badgeTwoText: "15% sålt",
+    badgeOneColor: "premium",
+    badgeTwoColor: "success",
+    borderColor: "premium",
     name: "Nya Kajen",
     location: "Hammarby Sjöstad, Stockholm",
     description:
@@ -23,72 +26,80 @@ const projects: Project[] = [
       <StarIcon
         size={16}
         fill="currentColor"
-        className="fill-primary-light stroke-primary-light"
+        className="text-accent fill-current"
       />
     ),
     otherInfo: "A+ energiklass",
     button: {
-      icon: <CalendarIcon />,
+      icon: <CalendarIcon size={16} />,
       text: "Boka visning",
       variant: "default",
-      className: "",
+      className: "bg-premium hover:bg-premium-dark",
     },
+    href: "/nyproduktion/nya-kajen",
   },
   {
     image: bgImage,
     badgeOneText: "Bygger nu",
     badgeTwoText: "68% sålt",
+    badgeOneColor: "accent",
+    badgeTwoColor: "critical",
+    borderColor: "accent",
     name: "Villastad Syd",
     location: "Nacka, Stockholm",
     description:
       "45 exklusiva villor i naturnära miljö. Moderna arkitektoniska lösningar med hållbarhetsfokus.",
     price: "Från 8,9M kr",
-    otherIcon: <ZapIcon size={16} className="text-primary-light" />,
+    otherIcon: <ZapIcon size={16} className="text-success" />,
     otherInfo: "Solceller inkl.",
     button: {
-      icon: <UsersIcon />,
+      icon: <UsersIcon size={16} />,
       text: "Intresseanmälan",
       variant: "outline",
-      className: "border border-primary text-primary hover:border-transparent",
+      className: "border-accent text-accent hover:bg-accent/10",
     },
+    href: "/nyproduktion/villastad-syd",
   },
   {
     image: bgImage,
     badgeOneText: "Inflyttning 2025",
     badgeTwoText: "42% sålt",
+    badgeOneColor: "success",
+    badgeTwoColor: "accent",
+    borderColor: "success",
     name: "Centrum Park",
     location: "Centrum, Göteborg",
     description:
       "89 lägenheter i hjärtat av Göteborg. Närhet till kollektivtrafik och stadens alla faciliteter.",
     price: "Från 3,1M kr",
-    otherIcon: <CircleCheckBigIcon size={16} className="text-primary-light" />,
+    otherIcon: <CircleCheckBigIcon size={16} className="text-success" />,
     otherInfo: "BRF bildad",
     button: {
-      icon: <ClockIcon />,
+      icon: <ClockIcon size={16} />,
       text: "Se tillgängliga",
       variant: "default",
+      className: "bg-success hover:bg-success-light",
     },
+    href: "/nyproduktion/centrum-park",
   },
 ];
 
 const Projects = () => {
   return (
-    <>
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
-        <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">
-          Utvalda projekt
-        </h3>
-        <div className="text-xs text-primary-foreground text-center font-semibold bg-primary rounded-full px-3 py-1">
+    <div className="mb-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Utvalda projekt</h2>
+        <div className="bg-premium text-premium-foreground text-xs font-semibold rounded-full px-3 py-1">
           Lanseras snart
         </div>
       </div>
 
-      <div className="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
           <ProjectCard key={project.name} project={project} />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

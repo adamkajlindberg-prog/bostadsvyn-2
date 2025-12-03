@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 
-import { admin, genericOAuth, magicLink } from "better-auth/plugins";
+import { admin, genericOAuth, magicLink, oneTap } from "better-auth/plugins";
 import { getDbClient } from "db";
 import Stripe from "stripe";
 import { sendEmail } from "@/email";
@@ -32,6 +32,12 @@ const authConfig = {
       });
     },
   },
+  socialProviders: {
+    google: {
+      clientId: env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: env.GOOGLE_OAUTH_CLIENT_SECRET,
+    },
+  },
   account: {
     accountLinking: {
       // Needed for BankID since no email is provided
@@ -39,6 +45,7 @@ const authConfig = {
     },
   },
   plugins: [
+    oneTap(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
         sendEmail({

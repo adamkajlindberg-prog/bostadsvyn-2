@@ -1,4 +1,3 @@
-import type { TRPCRouterRecord } from "@trpc/server";
 import { getDbClient, properties, propertyEmbeddings } from "db";
 import {
   and,
@@ -9,12 +8,13 @@ import {
   gte,
   ilike,
   lte,
+  ne,
   or,
   sql,
 } from "drizzle-orm";
 import z from "zod/v4";
 import { generateEmbedding } from "@/lib/ai/embedding";
-import { publicProcedure } from "@/trpc/init";
+import { createTRPCRouter, publicProcedure } from "@/trpc/init";
 
 const zPropertySearchInput = z.object({
   aiQuery: z.string().optional(),
@@ -42,8 +42,7 @@ const zPropertySearchInput = z.object({
 
 export type PropertySearchInput = z.infer<typeof zPropertySearchInput>;
 
-const propertyRouter = {
-  // --- Search ---
+const propertyRouter = createTRPCRouter({
   search: publicProcedure
     .input(zPropertySearchInput)
     .query(async ({ input }) => {
@@ -267,6 +266,79 @@ const propertyRouter = {
         };
       }
     }),
-} satisfies TRPCRouterRecord;
+  similar: publicProcedure
+    .input(z.object({ propertyId: z.string().uuid() }))
+    .query(async ({ input }) => {
+      try {
+        const db = getDbClient();
+
+        // Fetch the current property
+        const [currentProperty] = await db
+          .select()
+          .from(properties)
+          .where(eq(properties.id, input.propertyId))
+          .limit(1);
+
+        if (!currentProperty) {
+          return {
+            properties: [],
+            total: 0,
+          };
+        }
+
+        // Calculate price range (±30%)
+        const minPrice = Math.floor(currentProperty.price * 0.7);
+        const maxPrice = Math.ceil(currentProperty.price * 1.3);
+
+        // Build conditions for similar properties
+        const conditions = [
+          // Exclude current property
+          ne(properties.id, input.propertyId),
+          // Same listing type (status)
+          eq(properties.status, currentProperty.status),
+          // Same property type
+          eq(properties.propertyType, currentProperty.propertyType),
+          // Same city
+          ilike(properties.addressCity, currentProperty.addressCity),
+        ];
+
+        // Add price filters based on listing type
+        if (currentProperty.status === "FOR_RENT") {
+          // For rentals, use price field as rent
+          conditions.push(gte(properties.price, minPrice));
+          conditions.push(lte(properties.price, maxPrice));
+        } else {
+          // For sale properties, use price field
+          conditions.push(gte(properties.price, minPrice));
+          conditions.push(lte(properties.price, maxPrice));
+        }
+
+        // Query similar properties
+        const similarProperties = await db
+          .select()
+          .from(properties)
+          .where(and(...conditions))
+          .orderBy(desc(properties.createdAt))
+          .limit(6);
+
+        return {
+          properties: similarProperties,
+          total: similarProperties.length,
+        };
+      } catch (error) {
+        console.error(
+          "[property-similar] Error fetching similar properties:",
+          error,
+        );
+        if (error instanceof Error) {
+          console.error("[property-similar] Error stack:", error.stack);
+        }
+        return {
+          properties: [],
+          total: 0,
+        };
+      }
+    }),
+});
 
 export default propertyRouter;

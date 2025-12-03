@@ -154,6 +154,7 @@
   /* Enhanced shadows with color variations */
   --shadow-nordic: 0 8px 32px -8px hsl(var(--primary) / 0.1);
   --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
+  --shadow-hover: 0 8px 24px -4px hsl(var(--primary) / 0.12);
   --shadow-elevated: 0 16px 64px -12px hsl(var(--primary) / 0.15);
   --shadow-premium: 0 8px 32px -8px hsl(var(--premium) / 0.2);
   --shadow-success: 0 8px 32px -8px hsl(var(--success) / 0.15);
@@ -232,6 +233,7 @@
   /* Dark mode shadows */
   --shadow-nordic: 0 8px 32px -8px hsl(var(--primary) / 0.1);
   --shadow-card: 0 4px 20px -4px hsl(var(--primary) / 0.08);
+  --shadow-hover: 0 8px 24px -4px hsl(var(--primary) / 0.12);
   --shadow-elevated: 0 16px 64px -12px hsl(var(--primary) / 0.15);
   --shadow-premium: 0 8px 32px -8px hsl(var(--premium) / 0.2);
   --shadow-success: 0 8px 32px -8px hsl(var(--success) / 0.15);
