@@ -1,14 +1,18 @@
 import About from "./sections/about";
+import AiTutorials from "./sections/ai-tutorials";
+import Feature from "./sections/features";
 import Hero from "./sections/hero";
-import Properties from "./sections/properties";
 
 const LandingContent = () => {
   return (
     <div className="@container">
       <Hero />
-      <About />
-      <div className="bg-nordic-ice py-14 @lg:py-16 px-6 @lg:px-8 @8xl:px-0">
-        <Properties />
+      <div className="pt-20 pb-14 bg-gradient-to-b from-nordic-ice to-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <About />
+          <AiTutorials />
+          <Feature />
+        </div>
       </div>
     </div>
   );

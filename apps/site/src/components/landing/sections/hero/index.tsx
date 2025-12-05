@@ -229,59 +229,71 @@ const Hero = () => {
     if (isNaturalLanguage) {
       setIsAISearching(true);
       try {
-        const data = await performAISearch(searchQuery);
-        if (data?.searchCriteria) {
-          toast.success(
-            data.message || `Hittade ${data.count} matchande bostäder`,
-          );
-
-          // Navigate to search page with AI-extracted criteria
-          const params = new URLSearchParams();
-          const criteria = data.searchCriteria;
-          if (criteria.location) params.set("location", criteria.location);
-          if (criteria.propertyType && criteria.propertyType.length > 0) {
-            params.set("propertyType", criteria.propertyType.join(","));
-          }
-          if (criteria.minRooms)
-            params.set("minRooms", criteria.minRooms.toString());
-          if (criteria.maxRooms)
-            params.set("maxRooms", criteria.maxRooms.toString());
-          if (criteria.minArea)
-            params.set("minArea", criteria.minArea.toString());
-          if (criteria.maxArea)
-            params.set("maxArea", criteria.maxArea.toString());
-          if (criteria.minPrice)
-            params.set("minPrice", criteria.minPrice.toString());
-          if (criteria.maxPrice)
-            params.set("maxPrice", criteria.maxPrice.toString());
-          if (criteria.minBedrooms)
-            params.set("minBedrooms", criteria.minBedrooms.toString());
-          if (criteria.minBathrooms)
-            params.set("minBathrooms", criteria.minBathrooms.toString());
-
-          // Handle features
-          if (criteria.features && criteria.features.length > 0) {
-            if (criteria.features.includes("balcony"))
-              params.set("balcony", "true");
-            if (criteria.features.includes("parking"))
-              params.set("parking", "true");
-            if (criteria.features.includes("elevator"))
-              params.set("elevator", "true");
-            if (criteria.features.includes("outdoorSpace"))
-              params.set("outdoorSpace", "true");
-          }
-          if (criteria.keywords) params.set("keywords", criteria.keywords);
-          params.set("searchQuery", searchQuery);
-          setIsAISearching(false);
-          router.push(`/search?${params.toString()}&aiSearch=true`);
-          return;
-        }
+        router.push(
+          `/search?aiQuery=${encodeURIComponent(searchQuery)}&aiSearch=true`,
+        );
+        return;
       } catch (err) {
         console.error("AI search exception:", err);
         toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
         setIsAISearching(false);
         return;
       }
+
+      // try {
+      //   const data = await performAISearch(searchQuery);
+      //   if (data?.searchCriteria) {
+      //     toast.success(
+      //       data.message || `Hittade ${data.count} matchande bostäder`,
+      //     );
+
+      //     // Navigate to search page with AI-extracted criteria
+      //     const params = new URLSearchParams();
+      //     const criteria = data.searchCriteria;
+      //     if (criteria.location) params.set("location", criteria.location);
+      //     if (criteria.propertyType && criteria.propertyType.length > 0) {
+      //       params.set("propertyType", criteria.propertyType.join(","));
+      //     }
+      //     if (criteria.minRooms)
+      //       params.set("minRooms", criteria.minRooms.toString());
+      //     if (criteria.maxRooms)
+      //       params.set("maxRooms", criteria.maxRooms.toString());
+      //     if (criteria.minArea)
+      //       params.set("minArea", criteria.minArea.toString());
+      //     if (criteria.maxArea)
+      //       params.set("maxArea", criteria.maxArea.toString());
+      //     if (criteria.minPrice)
+      //       params.set("minPrice", criteria.minPrice.toString());
+      //     if (criteria.maxPrice)
+      //       params.set("maxPrice", criteria.maxPrice.toString());
+      //     if (criteria.minBedrooms)
+      //       params.set("minBedrooms", criteria.minBedrooms.toString());
+      //     if (criteria.minBathrooms)
+      //       params.set("minBathrooms", criteria.minBathrooms.toString());
+
+      //     // Handle features
+      //     if (criteria.features && criteria.features.length > 0) {
+      //       if (criteria.features.includes("balcony"))
+      //         params.set("balcony", "true");
+      //       if (criteria.features.includes("parking"))
+      //         params.set("parking", "true");
+      //       if (criteria.features.includes("elevator"))
+      //         params.set("elevator", "true");
+      //       if (criteria.features.includes("outdoorSpace"))
+      //         params.set("outdoorSpace", "true");
+      //     }
+      //     if (criteria.keywords) params.set("keywords", criteria.keywords);
+      //     params.set("searchQuery", searchQuery);
+      //     setIsAISearching(false);
+      //     router.push(`/search?${params.toString()}&aiSearch=true`);
+      //     return;
+      //   }
+      // } catch (err) {
+      //   console.error("AI search exception:", err);
+      //   toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
+      //   setIsAISearching(false);
+      //   return;
+      // }
     }
 
     // Standard search (location-based)
@@ -385,13 +397,11 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center w-full">
         <div className="space-y-8">
           {/* Main Headline */}
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight tracking-tight">
-              <span className="block text-white drop-shadow-2xl">
-                Välkommen till Bostadsvyn!
-              </span>
-            </h1>
-          </div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight mt-10">
+            <span className="block text-white drop-shadow-2xl">
+              Välkommen till Bostadsvyn!
+            </span>
+          </h1>
 
           {/* Feature Highlights */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
@@ -412,7 +422,7 @@ const Hero = () => {
           </div>
 
           {/* Search Interface */}
-          <div className="max-w-6xl mx-auto mt-12">
+          <div className="max-w-6xl mx-auto mt-8">
             <Card className="bg-card/40 backdrop-blur-lg border border-primary-foreground/20 shadow-2xl">
               <CardContent className="p-8">
                 {/* Unified Search Interface */}
