@@ -8,6 +8,7 @@ import {
 import type { NextRequest } from "next/server";
 import z from "zod";
 import { env } from "@/env";
+import findBrokers from "@/lib/actions/ai-chat-tools/find-brokers";
 import getCompoundedAverage from "@/lib/actions/ai-chat-tools/get-compounded-average";
 import getInterestRate from "@/lib/actions/ai-chat-tools/get-interest-rate";
 import getLantmateriet from "@/lib/actions/ai-chat-tools/get-lantmateriet";
@@ -120,6 +121,12 @@ export async function POST(req: NextRequest) {
         description:
           "get information such as statistics, population, labour market, export, import, inflation, etc. from your knowledge base to answer questions.",
         execute: async ({ question }) => getScbInfo(question),
+        inputSchema: questionSchema,
+      }),
+      findBrokers: tool({
+        description:
+          "get broker or real estate agent information from your knowledge base to answer questions.",
+        execute: async ({ question }) => findBrokers(question),
         inputSchema: questionSchema,
       }),
     },

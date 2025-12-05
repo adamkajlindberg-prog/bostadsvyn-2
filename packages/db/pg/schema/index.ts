@@ -1,6 +1,7 @@
 export * from "./ads";
 export * from "./bostadsvyn";
 export * from "./broker";
+export * from "./hitta-maklare";
 export * from "./lantmateriet";
 export * from "./lantmateriet-category";
 export * from "./messaging";
