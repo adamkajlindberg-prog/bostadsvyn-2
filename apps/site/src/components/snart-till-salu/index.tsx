@@ -1,7 +1,9 @@
 "use client";
 
 import ContainerWrapper from "@/components/common/container-wrapper";
-import PropertySearch from "@/components/property-search";
+
+// Temporarily commented some code out to fix build issues that has something to do with <PropertySearch /> component
+// import PropertySearch from "@/components/property-search";
 
 const SnartTillSalu = () => {
   return (
@@ -12,7 +14,7 @@ const SnartTillSalu = () => {
           Bostäder som snart kommer att säljas
         </p>
       </div>
-      <PropertySearch />
+      {/* <PropertySearch /> */}
     </ContainerWrapper>
   );
 };
