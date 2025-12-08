@@ -7,6 +7,8 @@ type T_Broker_Data = {
   name: string;
   realEstateAgency: string;
   office: string;
+  county: string;
+  locality: string;
   telephone: string;
   email: string;
   streetAddress: string;
@@ -107,6 +109,33 @@ const extractData = async (brokers: string[]) => {
         const officeLink = hasOffice.nextElementSibling;
         if (officeLink && officeLink.tagName === "A") {
           office = officeLink.innerText.trim();
+        }
+      }
+
+      // Extract county and locality from breadcrumbs
+      let county = "";
+      let locality = "";
+
+      // @ts-expect-error
+      const breadcrumb = document.querySelector(
+        'div[itemtype="http://schema.org/BreadcrumbList"]',
+      );
+      if (breadcrumb) {
+        // Get all breadcrumb items
+        const items = Array.from(
+          breadcrumb.querySelectorAll('span[itemprop="itemListElement"]'),
+        );
+        // County is usually the third item (index 2)
+        if (items[2]) {
+          // @ts-expect-error
+          const countySpan = items[2].querySelector('span[itemprop="name"]');
+          if (countySpan) county = countySpan.innerText.trim();
+        }
+        // Locality is usually the fourth item (index 3)
+        if (items[3]) {
+          // @ts-expect-error
+          const localitySpan = items[3].querySelector('span[itemprop="name"]');
+          if (localitySpan) locality = localitySpan.innerText.trim();
         }
       }
 
@@ -240,6 +269,8 @@ const extractData = async (brokers: string[]) => {
         name,
         realEstateAgency,
         office,
+        county,
+        locality,
         telephone,
         email,
         streetAddress,
@@ -262,11 +293,7 @@ const extractData = async (brokers: string[]) => {
 
 // Insert broker data into DB
 const insertData = async (brokerData: T_Broker_Data) => {
-  const dataToEmbed = [
-    brokerData.office,
-    brokerData.streetAddress,
-    brokerData.addressLocality,
-  ]
+  const dataToEmbed = [brokerData.county, brokerData.locality]
     .filter(Boolean)
     .join(", ");
 

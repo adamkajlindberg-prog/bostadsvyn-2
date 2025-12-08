@@ -17,6 +17,8 @@ const findBrokers = async (userQuery: string) => {
       name: hittaMaklare.name,
       realEstateAgency: hittaMaklare.realEstateAgency,
       office: hittaMaklare.office,
+      county: hittaMaklare.county,
+      locality: hittaMaklare.locality,
       telephone: hittaMaklare.telephone,
       email: hittaMaklare.email,
       streetAddress: hittaMaklare.streetAddress,
@@ -31,7 +33,7 @@ const findBrokers = async (userQuery: string) => {
       similarity,
     })
     .from(hittaMaklare)
-    .where(gt(similarity, 0.5))
+    .where(gt(similarity, 0.8))
     .orderBy((t) => desc(t.similarity))
     .limit(4);
 
