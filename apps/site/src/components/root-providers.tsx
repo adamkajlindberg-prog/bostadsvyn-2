@@ -12,6 +12,10 @@ const Devtools =
     ? dynamic(() => import("./devtools"), { ssr: false })
     : () => null;
 
+const CookieBanner = dynamic(() => import("./common/cookie-banner"), {
+  ssr: false,
+});
+
 export function RootProviders(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
@@ -24,6 +28,7 @@ export function RootProviders(props: { children: React.ReactNode }) {
       <Devtools />
       <TRPCProvider queryClient={queryClient} trpcClient={trpcClient}>
         {props.children}
+        <CookieBanner />
       </TRPCProvider>
     </QueryClientProvider>
   );

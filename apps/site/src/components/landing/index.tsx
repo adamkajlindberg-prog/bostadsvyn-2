@@ -1,15 +1,22 @@
+import LazyLoadWrapper from "@/components/common/lazy-load-wrapper";
 import About from "./sections/about";
 import Hero from "./sections/hero";
 import Properties from "./sections/properties";
+import Tutorials from "./sections/tutorials";
 
 const LandingContent = () => {
   return (
     <div className="@container">
       <Hero />
       <About />
-      <div className="bg-nordic-ice py-14 @lg:py-16 px-6 @lg:px-8 @8xl:px-0">
-        <Properties />
-      </div>
+      <LazyLoadWrapper minHeight={400}>
+        <Tutorials />
+      </LazyLoadWrapper>
+      <LazyLoadWrapper minHeight={600}>
+        <div className="bg-nordic-ice py-14 @lg:py-16 px-6 @lg:px-8 @8xl:px-0">
+          <Properties />
+        </div>
+      </LazyLoadWrapper>
     </div>
   );
 };

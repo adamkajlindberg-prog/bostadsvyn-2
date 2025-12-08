@@ -165,13 +165,55 @@ const About = () => {
           </span>
           – allt på samma plattform.
         </p>
-        <p className="text-center text-muted-foreground text-base @lg:text-lg max-w-4xl mx-auto leading-relaxed mb-20">
+        <p className="text-center text-muted-foreground text-base @lg:text-lg max-w-4xl mx-auto leading-relaxed mb-12">
           Vår vision är att revolutionera bostadsmarknaden genom att kombinera
           cutting-edge AI-teknologi med personlig service och rådgivning. Vi är
           här för att hjälpa dig genom hela processen och göra din största affär
           till en trygg och smidig upplevelse – oavsett om du köper, säljer
           eller hyr.
         </p>
+
+        {/* Founder Story Card */}
+        <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent mb-16 @lg:mb-20">
+          <CardContent className="p-6 @lg:p-8">
+            <div className="mb-4 @lg:mb-6">
+              <h2 className="text-xl @lg:text-2xl @4xl:text-3xl font-bold mb-2">
+                Grundat och byggt av en fastighetsmäklare med branscherfarenhet
+              </h2>
+              <p className="text-primary font-semibold text-sm @lg:text-base">
+                Fem års erfarenhet från fastighetsbranschen
+              </p>
+            </div>
+            <p className="text-foreground leading-relaxed mb-4 text-sm @lg:text-base @4xl:text-lg">
+              Bostadsvyn är grundat och byggt av en registrerad fastighetsmäklare
+              med gedigen branscherfarenhet men också personlig erfarenhet från
+              bostadsmarknaden. Genom fem års erfarenhet har vi identifierat de
+              verktyg och funktioner som verkligen tillför värde för samtliga
+              aktörer på fastighetsmarknaden – fastighetsmäklare, säljare,
+              köpare, spekulanter och hyresvärdar.
+            </p>
+
+            <blockquote className="mt-6 border-l-4 border-primary pl-4 @lg:pl-6 italic text-foreground text-sm @lg:text-base @4xl:text-lg">
+              <p className="leading-relaxed mb-2">
+                &ldquo;Jag har sedan hösten 2024 funderat mycket på varför vi i
+                Sverige inte har EN bostadsportal för alla typer av bostäder
+                utan folk måste söka sig till 4-5 olika sidor, beroende på vad
+                de söker. Det var så jag fick idén för Bostadsvyn! Målet för mig
+                är att ta allt jag har lärt mig från att vara en köpare, säljare
+                och mäklare till att tillsammans med den otroliga teknologin som
+                finns idag, skapa den absolut bästa plattformen för bostäder som
+                finns i Sverige. Alla ska kunna annonsera och alla ska ha nytta
+                av portalen och dessa unika verktyg som vi har tagit fram.
+                Förhoppningsvis så kan jag med detta hårda jobb underlätta för
+                er från början till slut, oavsett vad ni söker för
+                bostad.&rdquo;
+              </p>
+              <p className="text-sm font-semibold not-italic text-primary">
+                — Adam
+              </p>
+            </blockquote>
+          </CardContent>
+        </Card>
 
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-1.5 bg-primary py-2 px-4 rounded-full">
