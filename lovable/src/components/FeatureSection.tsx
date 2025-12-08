@@ -59,7 +59,7 @@ const features = [{
 }];
 const FeatureSection = () => {
   return <section className="py-20 bg-gradient-to-b from-nordic-ice to-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
         {/* Intro Section */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">Bostadsvyn</h2>

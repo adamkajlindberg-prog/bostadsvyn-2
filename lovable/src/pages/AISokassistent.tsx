@@ -12,7 +12,7 @@ const AISokassistent = () => {
       
       {/* Hero Section */}
       <section className="pt-24 pb-16 bg-gradient-to-b from-primary/5 to-background">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
           <div className="text-center mb-12">
             <Badge variant="accent" className="mb-4">
               <Brain className="h-4 w-4 mr-1" />
@@ -30,7 +30,7 @@ const AISokassistent = () => {
 
       {/* Main Content */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
           {/* What is AI Search Assistant */}
           <div className="mb-20">
             <div className="max-w-4xl">

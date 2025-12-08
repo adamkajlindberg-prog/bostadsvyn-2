@@ -124,7 +124,7 @@ const Header = () => {
 
   return (
     <nav
-      className="sticky top-0 z-30 bg-background border-b border-border px-12 transition-all duration-300"
+      className="sticky top-0 z-30 bg-background border-b border-border p-0 md:py-2 md:px-12 transition-all duration-300"
       aria-label="Huvudnavigering"
     >
       <div className="px-3 sm:px-4 max-w-full">
@@ -141,7 +141,7 @@ const Header = () => {
                 aria-hidden="true"
               />
             </div>
-            <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap  xs:inline">
+            <span className="hidden md:block text-base sm:text-lg font-bold text-foreground whitespace-nowrap  xs:inline">
               Bostadsvyn.se
             </span>
           </Link>
@@ -422,7 +422,7 @@ const Header = () => {
                   </div>
 
                   {/* Auth buttons in mobile menu */}
-                  <div className="mt-6 pt-4 border-t space-y-2">
+                  <div className="mt-6 px-2 md:px-0 pt-4 border-t space-y-2">
                     {!user ? (
                       <>
                         <Button variant="outline" className="w-full" asChild>

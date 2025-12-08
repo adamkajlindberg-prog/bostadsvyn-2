@@ -177,7 +177,7 @@ const HeroSection = () => {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 p-0 text-center">
         <div className="space-y-8">
           {/* Main Headline */}
           <div className="space-y-4">

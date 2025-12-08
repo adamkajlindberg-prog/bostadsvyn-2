@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="pt-12 pb-4 bg-nordic-midnight @container">
       <div className="container mx-auto px-6 @lg:px-8">
         <div className="flex w-full flex-col justify-between gap-10 @5xl:flex-row @5xl:items-start @5xl:text-left pb-2">
-          <div className="flex w-full @5xl:max-w-xs @8xl:max-w-lg flex-col justify-between gap-6 lg:items-start">
+          <div className="flex w-full @5xl:max-w-xs @8xl:max-w-sm flex-col justify-between gap-6 lg:items-start">
             <Link href="/">
               <h2 className="text-lg @lg:text-xl text-nordic-aurora font-semibold">
                 Bostadsvyn.se
@@ -88,10 +88,9 @@ const Footer = () => {
         </div>
         <div className="text-nordic-mist text-center text-xs mt-6 border-t border-t-nordic-fjord/30 py-8 font-medium">
           <p className="mb-1">
-            &copy; 2024 Bostadsvyn AB. Alla rättigheter förbehållna. Org.nr:
-            559000-0000
+            &copy; ${new Date().getFullYear()} Bostadsvyn Sverige AB. Alla rättigheter förbehållna. Org.nr: 559551-3176
           </p>
-          <p>Auktoriserad av Fastighetsmäklarinspektionen (FMI)</p>
+          {/* <p>Auktoriserad av Fastighetsmäklarinspektionen (FMI)</p> */}
         </div>
       </div>
     </footer>

@@ -15,7 +15,7 @@ const LandingContent = () => {
         <Tutorials />
       </LazyLoadWrapper>
       <LazyLoadWrapper minHeight={600}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
           <Feature />
         </div>
       </LazyLoadWrapper>

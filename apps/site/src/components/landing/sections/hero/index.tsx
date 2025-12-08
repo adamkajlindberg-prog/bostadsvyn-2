@@ -388,7 +388,7 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 p-0 text-center w-full">
         <div className="space-y-8">
           {/* Main Headline */}
           <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight mt-10">
