@@ -124,11 +124,11 @@ const Header = () => {
 
   return (
     <nav
-      className="sticky top-0 z-30 bg-background border-b border-border transition-all duration-300"
+      className="sticky top-0 z-30 bg-background border-b border-border px-12 transition-all duration-300"
       aria-label="Huvudnavigering"
     >
       <div className="px-3 sm:px-4 max-w-full">
-        <div className="flex items-center h-12 sm:h-14 flex-nowrap">
+        <div className="flex items-center h-12 md:h-auto flex-nowrap">
           {/* Logo */}
           <Link
             href="/"
@@ -141,7 +141,7 @@ const Header = () => {
                 aria-hidden="true"
               />
             </div>
-            <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap hidden xs:inline">
+            <span className="text-base sm:text-lg font-bold text-foreground whitespace-nowrap  xs:inline">
               Bostadsvyn.se
             </span>
           </Link>
@@ -209,7 +209,7 @@ const Header = () => {
                       className="h-3.5 w-3.5 mr-1.5"
                       aria-hidden="true"
                     />
-                    <span className="hidden xs:inline">Logga in</span>
+                    <span className="xs:inline">Logga in</span>
                   </Link>
                 </Button>
               </>
