@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "../../globals.css";
 import ChatSidebar from "@/components/chat-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Bostadsvyn",
@@ -12,19 +8,15 @@ export const metadata: Metadata = {
     "Bostadsvyn - Framtidens bostadsportal | AI-Homestyling & Prisanalys",
 };
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased bg-neutral-200/30`}>
-        <SidebarProvider defaultOpen={false}>
-          <ChatSidebar />
-          <main className="w-full">{children}</main>
-        </SidebarProvider>
-      </body>
-    </html>
+    <SidebarProvider defaultOpen={false}>
+      <ChatSidebar />
+      <main className="w-full bg-neutral-200/30 min-h-svh">{children}</main>
+    </SidebarProvider>
   );
 }
