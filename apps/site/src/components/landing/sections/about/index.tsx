@@ -86,7 +86,7 @@ const About = () => {
             Bostadsvyn
           </h2>
           <div className="max-w-4xl mx-auto space-y-6">
-            <p className="text-lg text-foreground font-medium leading-relaxed">
+            <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
               Välkommen till framtidens bostadsportal med det bredaste utbudet
               av bostäder i både Sverige och utlandet. Hos oss hittar du allt
               från <span className="font-semibold">villor</span>,{" "}
@@ -102,7 +102,7 @@ const About = () => {
               <span className="font-semibold">kommersiella fastigheter</span> –
               allt på samma plattform.
             </p>
-            <p className="text-lg text-foreground font-medium leading-relaxed">
+            <p className="text-sm md:text-lg text-foreground font-medium leading-relaxed">
               Vår vision är att revolutionera bostadsmarknaden genom att
               kombinera cutting-edge AI-teknologi med personlig service och
               rådgivning. Vi är här för att hjälpa dig genom hela processen och
@@ -127,7 +127,7 @@ const About = () => {
                   </p>
                 </div>
               </div>
-              <p className="text-foreground leading-relaxed mb-4 text-lg">
+              <p className="text-foreground leading-relaxed mb-4 text-sm md:text-lg">
                 Bostadsvyn är grundat och byggt av en registrerad
                 fastighetsmäklare med gedigen branscherfarenhet men också
                 personlig erfarenhet från bostadsmarknaden. Genom fem års
@@ -137,7 +137,7 @@ const About = () => {
                 spekulanter och hyresvärdar.
               </p>
 
-              <blockquote className="mt-6 border-l-4 border-accent pl-6 italic text-foreground text-lg">
+              <blockquote className="mt-6 border-l-4 border-accent pl-6 italic text-foreground text-sm md:text-lg">
                 <p className="leading-relaxed mb-2">
                   "Jag har sedan hösten 2024 funderat mycket på varför vi i
                   Sverige inte har EN bostadsportal för alla typer av bostäder

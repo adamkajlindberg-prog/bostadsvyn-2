@@ -458,7 +458,7 @@ const Hero = () => {
                     <div className="flex-1">
                       <Input
                         placeholder="Beskriv din önskade bostad eller sök på gata, område, kommun eller stad..."
-                        className="bg-background/80 border-accent/30 text-foreground placeholder:text-muted-foreground focus:border-accent h-12 text-base"
+                        className="bg-background/80 border-accent/30 text-foreground placeholder:text-muted-foreground focus:border-accent h-12 text-sm md:text-base"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => {
@@ -478,10 +478,10 @@ const Hero = () => {
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
-                          className="bg-background/80 border-accent/30 hover:bg-accent/10 h-12 w-32 text-sm"
+                          className="bg-background/80 border-accent/30 hover:bg-accent/10 h-12 w-auto md:w-32 text-sm"
                         >
                           <SlidersHorizontalIcon className="h-4 w-4 mr-1" />
-                          Filter
+                          <span className="hidden md:block">Filter</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
