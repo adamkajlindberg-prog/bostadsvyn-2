@@ -20,6 +20,8 @@ export const hittaMaklare = pgTable(
     name: varchar("name", { length: 100 }).notNull(),
     realEstateAgency: varchar("real_estate_agency", { length: 100 }).notNull(),
     office: varchar("office", { length: 100 }).notNull(),
+    county: varchar("county", { length: 100 }),
+    locality: varchar("locality", { length: 100 }),
     telephone: varchar("telephone", { length: 50 }),
     email: varchar("email", { length: 100 }),
     streetAddress: varchar("street_address", { length: 200 }),
