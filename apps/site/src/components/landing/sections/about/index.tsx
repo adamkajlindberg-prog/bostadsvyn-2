@@ -78,7 +78,7 @@ const highlights = [
 
 const About = () => {
   return (
-    <section className="py-20 bg-gradient-to-b from-nordic-ice to-background">
+    <section className="pt-20 pb-12 bg-gradient-to-b from-nordic-ice to-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Intro Section */}
         <div className="text-center mb-20">
@@ -114,7 +114,7 @@ const About = () => {
 
         {/* Founder Story */}
         <div className="mb-16">
-          <Card className="border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+          <Card className="rounded-lg bg-card text-card-foreground shadow-sm border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
             <CardContent className="p-8">
               <div className="flex items-start gap-4 mb-6">
                 <div>

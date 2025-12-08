@@ -58,7 +58,7 @@ const Tutorials = () => {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8 @lg:mb-12">
-          <Badge variant="secondary" className="mb-4">
+          <Badge variant="secondary" className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-accent text-accent-foreground hover:bg-accent/80 mb-4">
             <PlayCircleIcon className="h-4 w-4 mr-1" />
             Guider & Tutorials
           </Badge>
