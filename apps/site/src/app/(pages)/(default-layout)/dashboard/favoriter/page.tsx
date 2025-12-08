@@ -38,9 +38,9 @@ const FavoriterSuspense = async ({ session }: { session: Session }) => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Mina favoriter</h2>
-        <p className="text-muted-foreground">{stats.favoriteCount} favoriter</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <h2 className="text-lg sm:text-2xl font-bold">Mina favoriter</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">{stats.favoriteCount} favoriter</p>
       </div>
 
       {favoriteProperties.length === 0 ? (

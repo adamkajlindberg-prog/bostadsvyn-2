@@ -110,7 +110,7 @@ const LoginTab = () => {
 
   return (
     <div>
-      <FieldGroup className="gap-y-6">
+      <FieldGroup className="gap-y-6 gap-0">
         <Field>
           <Button
             type="button"

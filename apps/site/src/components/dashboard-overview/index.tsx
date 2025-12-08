@@ -37,7 +37,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Favoriter Card */}
-        <Card className="hover:border-primary transition-colors cursor-pointer">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/favoriter">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -59,7 +59,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
         </Card>
 
         {/* Mina Annonser Card */}
-        <Card className="hover:border-primary transition-colors cursor-pointer">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/mina-annonser">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
         </Card>
 
         {/* Grupp Card */}
-        <Card className="hover:border-primary transition-colors cursor-pointer">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/gruppkonton">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
         </Card>
 
         {/* AI-bilder Card */}
-        <Card className="hover:border-primary transition-colors cursor-pointer">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/ai-bildgalleri">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -128,11 +128,11 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
         </Card>
 
         {/* AI-verktyg Card */}
-        <Card className="hover:border-primary transition-colors cursor-pointer">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/ai-verktyg">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-purple-500/10">
+                <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10">
                   <Wand2 className="h-6 w-6 text-purple-500" />
                 </div>
                 <CardTitle>AI-verktyg</CardTitle>
@@ -151,7 +151,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
         </Card>
 
         {/* Meddelanden Card */}
-        <Card className="hover:border-primary transition-colors">
+        <Card className="py-5 hover:border-primary transition-colors shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-lg bg-green-500/10">
