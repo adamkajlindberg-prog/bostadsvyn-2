@@ -65,7 +65,7 @@ export function DashboardHeader({
   return (
     <div className="flex items-center justify-between mb-8">
       <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
-        <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
+        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 hidden md:block">
           <AvatarFallback className="bg-primary text-primary-foreground text-base sm:text-lg">
             {getUserInitials()}
           </AvatarFallback>
