@@ -53,7 +53,7 @@ export function DashboardNav() {
 
   return (
     <nav className="w-full">
-      <div className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10 gap-1 bg-muted p-1 rounded-lg">
+      <div className="inline-flex h-auto w-full items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -62,12 +62,13 @@ export function DashboardNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold ring-offset-background transition-all text-foreground border-2 border-border hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                isActive &&
-                  "bg-primary text-primary-foreground border-primary shadow-md",
+                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                isActive
+                  ? "bg-background text-foreground shadow-sm"
+                  : "hover:bg-background/50 hover:text-foreground",
               )}
             >
-              {Icon && <Icon className="h-4 w-4 mr-1" />}
+              {Icon && <Icon className="h-4 w-4 mr-1.5" />}
               {item.label}
             </Link>
           );
