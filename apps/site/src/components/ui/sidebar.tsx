@@ -632,6 +632,7 @@ function SidebarMenuSkeleton({
             "--skeleton-width": width,
           } as React.CSSProperties
         }
+        suppressHydrationWarning
       />
     </div>
   );

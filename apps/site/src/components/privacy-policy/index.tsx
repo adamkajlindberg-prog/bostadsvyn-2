@@ -131,12 +131,7 @@ const PrivacyPolicy = () => {
           </h2>
         </div>
         <div className="text-sm @lg:text-base text-muted-foreground mb-10">
-          Senast uppdaterad:{" "}
-          {new Date().toLocaleDateString("sv-SE", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
+          Senast uppdaterad: 8 december 2025
         </div>
 
         <div className="flex flex-col @lg:flex-row @lg:items-center flex-wrap gap-2 mb-2">

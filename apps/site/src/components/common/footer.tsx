@@ -87,8 +87,9 @@ const Footer = () => {
           </div>
         </div>
         <div className="text-nordic-mist text-center text-xs mt-6 border-t border-t-nordic-fjord/30 py-8 font-medium">
-          <p className="mb-1">
-            &copy; ${new Date().getFullYear()} Bostadsvyn Sverige AB. Alla rättigheter förbehållna. Org.nr: 559551-3176
+          <p className="mb-1" suppressHydrationWarning>
+            &copy; {new Date().getFullYear()} Bostadsvyn Sverige AB. Alla
+            rättigheter förbehållna. Org.nr: 559551-3176
           </p>
           {/* <p>Auktoriserad av Fastighetsmäklarinspektionen (FMI)</p> */}
         </div>
