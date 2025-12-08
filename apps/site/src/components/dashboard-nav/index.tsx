@@ -53,7 +53,7 @@ export function DashboardNav() {
 
   return (
     <nav className="w-full">
-      <div className="inline-flex h-auto w-full items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1 rounded-lg bg-muted p-1 text-muted-foreground">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -62,13 +62,13 @@ export function DashboardNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                "inline-flex items-center justify-center whitespace-nowrap rounded-md px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                 isActive
                   ? "bg-background text-foreground shadow-sm"
                   : "hover:bg-background/50 hover:text-foreground",
               )}
             >
-              {Icon && <Icon className="h-4 w-4 mr-1.5" />}
+              {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />}
               {item.label}
             </Link>
           );

@@ -38,15 +38,15 @@ const MinaAnnonserSuspense = async ({ session }: { session: Session }) => {
       {/* Pending Approval Ads Section */}
       {adsData.pendingApprovalAds.length > 0 && (
         <div className="space-y-4 mb-8">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-yellow-600" />
-            <h2 className="text-2xl font-bold">Inväntar ditt godkännande</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
+            <h2 className="text-lg sm:text-2xl font-bold">Inväntar ditt godkännande</h2>
             <Badge variant="outline" className="bg-yellow-500/10">
               {adsData.pendingApprovalAds.length} annons
               {adsData.pendingApprovalAds.length !== 1 ? "er" : ""}
             </Badge>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             Granska och godkänn annonserna nedan för att publicera dem.
           </p>
           {/* TODO: Add SellerAdReview component */}
@@ -54,9 +54,9 @@ const MinaAnnonserSuspense = async ({ session }: { session: Session }) => {
       )}
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold">Mina annonser</h2>
+            <h2 className="text-lg sm:text-2xl font-bold">Mina annonser</h2>
             {session.user?.role !== "broker" && (
               <p className="text-sm text-muted-foreground mt-1">
                 Skapa hyresannonser för bostäder och lokaler eller följ din egna
@@ -64,7 +64,7 @@ const MinaAnnonserSuspense = async ({ session }: { session: Session }) => {
               </p>
             )}
           </div>
-          <Button asChild>
+          <Button asChild className="w-full sm:w-auto">
             <Link href="/skapa-hyresannons">
               <Plus className="h-4 w-4 mr-2" />
               Skapa hyresannons

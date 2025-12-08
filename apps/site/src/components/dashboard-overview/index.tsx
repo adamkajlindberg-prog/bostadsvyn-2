@@ -37,7 +37,7 @@ export function DashboardOverview({ user, stats }: DashboardOverviewProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Favoriter Card */}
-        <Card className="py-5 py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
+        <Card className="py-5 hover:border-primary transition-colors cursor-pointer shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)]">
           <Link href="/dashboard/favoriter">
             <CardHeader>
               <div className="flex items-center gap-3">
