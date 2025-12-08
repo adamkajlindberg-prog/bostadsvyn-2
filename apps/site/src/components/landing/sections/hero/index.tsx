@@ -6,7 +6,6 @@ import {
   ClockIcon,
   FileSignatureIcon,
   HomeIcon,
-  InfoIcon,
   Loader2Icon,
   SearchIcon,
   SlidersHorizontalIcon,
@@ -74,11 +73,6 @@ const features = [
   },
 ];
 
-const popularSearches = [
-  "3 rum Stockholm under 5M",
-  "Lägenhet nära tunnelbana Göteborg",
-  "Villa med trädgård Malmö",
-];
 
 const Hero = () => {
   const router = useRouter();
@@ -436,7 +430,7 @@ const Hero = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <InfoIcon className="h-4 w-4 text-white/70 cursor-help" />
+                            <span />
                           </TooltipTrigger>
                           <TooltipContent className="max-w-xs">
                             <p className="text-sm font-light">
@@ -485,7 +479,6 @@ const Hero = () => {
                         <Button
                           variant="outline"
                           className="bg-background/80 border-accent/30 hover:bg-accent/10 h-12 w-32 text-sm"
-                          suppressHydrationWarning
                         >
                           <SlidersHorizontalIcon className="h-4 w-4 mr-1" />
                           Filter
@@ -1424,10 +1417,7 @@ const Hero = () => {
                               Rensa filter
                             </Button>
                             <Button
-                              onClick={() => {
-                                setFilterDialogOpen(false);
-                                handleSearch();
-                              }}
+                              onClick={() => setFilterDialogOpen(false)}
                               className="flex-1 bg-accent hover:bg-accent/90"
                             >
                               <SearchIcon className="h-4 w-4 mr-2" />
@@ -1467,20 +1457,36 @@ const Hero = () => {
                       Populära sökningar:
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {popularSearches.map((search, index) => (
-                        <Button
-                          key={`popular-search-${index}`}
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 text-xs bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
-                          onClick={() => {
-                            setSearchQuery(search);
-                            handleSearch();
-                          }}
-                        >
-                          {search}
-                        </Button>
-                      ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                        onClick={() =>
+                          setSearchQuery("3 rum och kök Stockholm under 5 miljoner")
+                        }
+                      >
+                        3 rum Stockholm under 5M
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                        onClick={() =>
+                          setSearchQuery("Lägenhet nära tunnelbana Göteborg")
+                        }
+                      >
+                        Lägenhet nära tunnelbana Göteborg
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                        onClick={() =>
+                          setSearchQuery("Villa med trädgård Malmö")
+                        }
+                      >
+                        Villa med trädgård Malmö
+                      </Button>
                     </div>
                   </div>
                 </div>
