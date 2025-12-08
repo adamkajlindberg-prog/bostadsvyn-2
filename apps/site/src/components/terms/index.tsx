@@ -350,12 +350,7 @@ const Terms = () => {
               Allmänna villkor för Bostadsvyn
             </h2>
             <div className="text-sm @lg:text-base text-muted-foreground">
-              Senast uppdaterad:{" "}
-              {new Date().toLocaleDateString("sv-SE", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              Senast uppdaterad: 8 december 2025
             </div>
           </div>
 
