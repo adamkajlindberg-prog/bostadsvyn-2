@@ -1,5 +1,7 @@
 import LazyLoadWrapper from "@/components/common/lazy-load-wrapper";
 import About from "./sections/about";
+import AiTutorials from "./sections/ai-tutorials";
+import Feature from "./sections/features";
 import Hero from "./sections/hero";
 import Properties from "./sections/properties";
 import Tutorials from "./sections/tutorials";

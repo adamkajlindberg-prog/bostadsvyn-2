@@ -29,6 +29,13 @@
       "when": 1764142328451,
       "tag": "0003_unique_lantmateriet",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764662384415,
+      "tag": "0004_unique_property_embedding",
+      "breakpoints": true
     }
   ]
 }
