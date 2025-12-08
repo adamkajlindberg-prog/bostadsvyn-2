@@ -37,7 +37,7 @@ type SidebarContextProps = {
   setOpen: (open: boolean) => void;
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
-  isMobile: boolean;
+  isMobile: boolean | undefined;
   toggleSidebar: () => void;
 };
 
@@ -180,7 +180,10 @@ function Sidebar({
     );
   }
 
-  if (isMobile) {
+  // Only render mobile Sheet after we know we're on mobile (isMobile === true)
+  // During SSR and initial hydration, isMobile is undefined, so render desktop version
+  // to avoid hydration mismatch
+  if (isMobile === true) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
