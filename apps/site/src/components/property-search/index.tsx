@@ -38,6 +38,7 @@ import { useTRPC } from "@/trpc/client";
 import type { PropertySearchInput } from "@/trpc/routes/property";
 import { searchPropertyTabs } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
 
@@ -192,6 +193,16 @@ export default function PropertySearch() {
 
   const onChangeSearchTab = (value: string) => {
     setActiveSearchTab(value);
+    setActiveTab(
+      value as
+      | "ALL"
+      | "FOR_SALE"
+      | "FOR_RENT"
+      | "COMING_SOON"
+      | "SOLD"
+      | "COMMERCIAL"
+      | "NYPRODUKTION",
+    )
     setFilters((prev) => ({ ...prev, listingType: value }));
   };
 
@@ -568,17 +579,17 @@ export default function PropertySearch() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <Tabs
                 value={activeTab}
-                className="hidden md:block"
-                onValueChange={onChangeSearchTab}
+                className="hidden md:block overflow-x-auto"
+                onValueChange={(value) => onChangeSearchTab(value)}
               >
                 <TabsList className="grid grid-cols-7">
-                  <TabsTrigger value="ALL">Alla</TabsTrigger>
-                  <TabsTrigger value="FOR_SALE">Till salu</TabsTrigger>
-                  <TabsTrigger value="COMING_SOON">Snart till salu</TabsTrigger>
-                  <TabsTrigger value="SOLD">Slutpriser</TabsTrigger>
-                  <TabsTrigger value="FOR_RENT">Uthyrning</TabsTrigger>
-                  <TabsTrigger value="NYPRODUKTION">Nyproduktion</TabsTrigger>
-                  <TabsTrigger value="COMMERCIAL">Kommersiellt</TabsTrigger>
+                  <TabsTrigger value="ALL">Alla {`(${getCount(data?.properties ?? [])})`}</TabsTrigger>
+                  <TabsTrigger value="FOR_SALE">Till salu {`(${getCount(data?.properties ?? [], 'FOR_SALE', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="COMING_SOON">Snart till salu {`(${getCount(data?.properties ?? [], 'COMING_SOON', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="SOLD">Slutpriser {`(${getCount(data?.properties ?? [], 'SOLD', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="FOR_RENT">Uthyrning {`(${getCount(data?.properties ?? [], 'FOR_RENT', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="NYPRODUKTION">Nyproduktion {`(${getCount(data?.properties ?? [], 'NYPRODUKTION', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="COMMERCIAL">Kommersiellt {`(${getCount(data?.properties ?? [], 'COMMERCIAL', "status")})`}</TabsTrigger>
                 </TabsList>
               </Tabs>
               <div className="sm:hidden w-full">
