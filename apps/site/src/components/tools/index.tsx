@@ -19,12 +19,20 @@ const Tools = () => {
       <Tabs defaultValue="comparison" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="comparison" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Jämför fastigheter
+            <div className="flex items-center gap-2 overflow-hidden">
+              <BarChart3 className="h-4 w-4" />
+              <span className="truncate">
+                Jämför fastigheterss
+              </span>
+            </div>
           </TabsTrigger>
           <TabsTrigger value="calculator" className="flex items-center gap-2">
-            <Calculator className="h-4 w-4" />
-            Lånekalkylator
+            <div className="flex items-center gap-2 overflow-hidden">
+              <Calculator className="h-4 w-4" />
+              <span className="truncate">
+                Lånekalkylator
+              </span>
+            </div>
           </TabsTrigger>
         </TabsList>
 
