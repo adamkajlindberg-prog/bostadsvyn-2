@@ -5,6 +5,7 @@ import type { Property } from "db";
 import {
   ArrowUpDown,
   Brain,
+  ChevronDown,
   Filter,
   Grid,
   Home,
@@ -35,6 +36,8 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
 import type { PropertySearchInput } from "@/trpc/routes/property";
+import { searchPropertyTabs } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 type ViewMode = "grid" | "map";
 
@@ -150,14 +153,15 @@ export default function PropertySearch() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<
     | {
-        center_lat?: number;
-        center_lng?: number;
-        name?: string;
-        type?: string;
-      }
+      center_lat?: number;
+      center_lng?: number;
+      name?: string;
+      type?: string;
+    }
     | undefined
   >(undefined);
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
+  const [activeSearchTab, setActiveSearchTab] = useState("");
 
   const [filters, setFilters] = useState<PropertySearchInput>(
     getFiltersFromParams(searchParams),
@@ -184,6 +188,11 @@ export default function PropertySearch() {
     }
 
     setFilters((prev) => ({ ...prev, query: naturalSearchQuery }));
+  };
+
+  const onChangeSearchTab = (value: string) => {
+    setActiveSearchTab(value);
+    setFilters((prev) => ({ ...prev, listingType: value }));
   };
 
   if (isLoading && !data) {
@@ -491,8 +500,8 @@ export default function PropertySearch() {
                                 energyClass,
                               )
                                 ? prev.energyClass.filter(
-                                    (e) => e !== energyClass,
-                                  )
+                                  (e) => e !== energyClass,
+                                )
                                 : [...(prev.energyClass || []), energyClass],
                             }))
                           }
@@ -559,18 +568,8 @@ export default function PropertySearch() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <Tabs
                 value={activeTab}
-                onValueChange={(value) =>
-                  setActiveTab(
-                    value as
-                      | "ALL"
-                      | "FOR_SALE"
-                      | "FOR_RENT"
-                      | "COMING_SOON"
-                      | "SOLD"
-                      | "COMMERCIAL"
-                      | "NYPRODUKTION",
-                  )
-                }
+                className="hidden md:block"
+                onValueChange={onChangeSearchTab}
               >
                 <TabsList className="grid grid-cols-7">
                   <TabsTrigger value="ALL">Alla</TabsTrigger>
@@ -582,6 +581,42 @@ export default function PropertySearch() {
                   <TabsTrigger value="COMMERCIAL">Kommersiellt</TabsTrigger>
                 </TabsList>
               </Tabs>
+              <div className="sm:hidden w-full">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between bg-muted hover:bg-muted/80 border-0"
+                    >
+                      <span className="flex items-center gap-2">
+                        {searchPropertyTabs.find((item) => item.value === activeSearchTab)?.label || "Alla"}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-[var(--radix-dropdown-menu-trigger-width)]"
+                    align="start"
+                  >
+                    {searchPropertyTabs.map((item) => {
+                      const isActive = activeSearchTab === item.value;
+                      return (
+                        <DropdownMenuItem key={item.value} asChild>
+                          <span className={cn(
+                            "flex items-center gap-2 cursor-pointer",
+                            isActive && "bg-accent font-medium",
+                          )}
+                            onClick={() => onChangeSearchTab(item.value)}
+                          >
+                            {item.label}
+                          </span>
+
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

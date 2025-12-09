@@ -268,7 +268,7 @@ const PropertyMarketing: React.FC<PropertyMarketingProps> = ({ property }) => {
                   {selectedImages.includes(imageUrl) && (
                     <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                       <div className="bg-primary text-primary-foreground rounded-full p-1">
-                        <Check className="h-4 w-4" />
+                        <Check className="h-4 w-4" />s
                       </div>
                     </div>
                   )}
