@@ -5,6 +5,7 @@ export * from "./hitta-maklare";
 export * from "./lantmateriet";
 export * from "./lantmateriet-category";
 export * from "./messaging";
+export * from "./organization";
 export * from "./police-events";
 export * from "./property";
 export * from "./property-embeddings";

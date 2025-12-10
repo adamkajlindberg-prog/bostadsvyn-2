@@ -3,6 +3,7 @@ import {
   adminClient,
   magicLinkClient,
   oneTapClient,
+  organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { env } from "@/env";
@@ -13,6 +14,7 @@ export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_WEB_URL,
   plugins: [
     magicLinkClient(),
+    organizationClient(),
     oneTapClient({
       clientId: env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
     }),
