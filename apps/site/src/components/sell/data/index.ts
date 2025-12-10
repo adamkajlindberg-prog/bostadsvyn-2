@@ -28,14 +28,14 @@ export const AD_TIERS: readonly AdTierData[] = [
   {
     tier: "premium",
     iconName: "crown",
-    iconColorClass: "text-amber-600",
-    iconBgClass: "bg-gradient-to-br from-amber-500/20 to-amber-500/10",
+    iconColorClass: "text-blue-600",
+    iconBgClass: "bg-gradient-to-br from-blue-500/20 to-blue-500/10",
     title: "Exklusivpaket",
     price: "3995 kr",
     description:
       "Störst synlighet, unika AI-verktyg och kostnadsfri förnyelse varje månad",
-    cardBgClass: "bg-gradient-to-br from-amber-500/10 to-card",
-    cardBorderClass: "border-amber-500/30",
+    cardBgClass: "bg-gradient-to-br from-blue-500/10 to-card",
+    cardBorderClass: "border-blue-500/30",
     features: [
       {
         title: "Maximerad synlighet",
@@ -372,7 +372,7 @@ export const SECTION_HEADERS = {
   adTierComparison: {
     badgeIconName: "eye",
     badgeText: "Jämför paketen",
-    badgeColorClass: "bg-amber-50 text-amber-700 border-amber-200",
+    badgeColorClass: "bg-blue-50 text-blue-700 border-blue-200",
     title: "Se skillnaden mellan våra paket",
     description:
       "Samma bostad, samma text och bild - men stor skillnad i synlighet och funktioner",
