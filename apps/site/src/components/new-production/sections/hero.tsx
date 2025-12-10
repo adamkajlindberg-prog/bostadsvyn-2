@@ -12,7 +12,7 @@ const Hero = () => {
           Exklusiv förtur
         </Badge>
       </div>
-      <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-premium bg-clip-text text-transparent">
+      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#134194]">
         Nyproduktion & kommande projekt
       </h1>
       <p className="text-lg text-foreground font-medium max-w-3xl mx-auto leading-relaxed">
