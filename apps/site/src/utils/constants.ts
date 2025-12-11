@@ -10,6 +10,7 @@ import {
   Building,
   Calculator,
   CheckCircle,
+  CircleQuestionMarkIcon,
   Clock,
   Droplet,
   Euro,
@@ -973,6 +974,64 @@ export const faqs: FAQSection[] = [
     ],
   },
 ];
+
+// =============================================================================
+// FAQ PAGE CONFIG
+// =============================================================================
+
+export interface FAQPageConfig {
+  badge: {
+    text: string;
+  };
+  hero: {
+    title: string;
+    description: string;
+  };
+  search: {
+    placeholder: string;
+  };
+  buttons: {
+    chatWithAI: string;
+    aiSupport: string;
+  };
+  support: {
+    title: string;
+    description: string;
+    contact: {
+      email: string;
+      phone: string;
+      phoneHref: string;
+    };
+  };
+}
+
+export const FAQ_PAGE_CONFIG: FAQPageConfig = {
+  badge: {
+    text: "Support & Hjälp",
+  },
+  hero: {
+    title: "Frågor & Svar",
+    description:
+      "Hittar du inte svaret du söker? Chatta med vår AI-supportbot som kan hjälpa dig direkt!",
+  },
+  search: {
+    placeholder: "Sök efter frågor...",
+  },
+  buttons: {
+    chatWithAI: "Chatta med AI-supportbot",
+    aiSupport: "AI-Support (24/7)",
+  },
+  support: {
+    title: "Behöver du mer hjälp?",
+    description:
+      "Vår AI-supportbot är tillgänglig dygnet runt för att svara på dina frågor. För komplexa ärenden kan du också kontakta vår mänskliga support.",
+    contact: {
+      email: "support@bostadsvyn.se",
+      phone: "08-123 45 67",
+      phoneHref: "tel:+461234567",
+    },
+  },
+};
 
 // =============================================================================
 // PROPERTY SEARCH DATA
