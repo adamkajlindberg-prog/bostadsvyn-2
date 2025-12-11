@@ -10,11 +10,13 @@ import {
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import slugify from "slugify";
+import { toast } from "sonner";
 import { authClient } from "@/auth/client";
-import { addOfficeAndBroker } from "@/lib/actions/broker";
+import { addOfficeBroker } from "@/lib/actions/broker";
 import { cn } from "@/lib/utils";
 import { formatPhone, phoneRegex } from "@/utils/format-phone";
 import Logo from "../common/logo";
@@ -32,9 +34,23 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "../ui/input-group";
-import SpinnerLoader from "../ui/spinner-loader";
-import useAddBroker, { type T_Broker_Input } from "./hooks/use-add-broker";
-import useAddOffice, { type T_Office_Input } from "./hooks/use-add-office";
+import Spinner from "../ui/spinner";
+
+type T_Office_Input = {
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  phone: string;
+  email: string;
+};
+
+type T_Broker_Input = {
+  fullName: string;
+  phone: string;
+  licenseNumber: string;
+  email: string;
+};
 
 type T_Form_Input = {
   office: T_Office_Input;
@@ -43,6 +59,7 @@ type T_Form_Input = {
 
 const BrokerOnBoarding = () => {
   const [step, setStep] = useState<number>(1);
+  const router = useRouter()
 
   const {
     register,
@@ -51,9 +68,6 @@ const BrokerOnBoarding = () => {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<T_Form_Input>();
-
-  const { mutate: mutateOffice } = useAddOffice();
-  const { mutate: mutateBroker } = useAddBroker();
 
   const handlePhoneChange =
     (field: "office.phone" | "broker.phone") =>
@@ -70,6 +84,16 @@ const BrokerOnBoarding = () => {
     });
 
     if (step === 1) {
+      // Validate phone number format for office phone
+      if (!phoneRegex.test(formData.office.phone)) {
+        setError("office.phone", {
+          type: "manual",
+          message: "Ogiltigt telefonnummerformat.",
+        });
+        return;
+      }
+
+      // Check if organization slug is taken
       const { error: slugError } = await authClient.organization.checkSlug({
         slug,
       });
@@ -89,47 +113,42 @@ const BrokerOnBoarding = () => {
 
       setStep(2);
     } else {
-      const officeData = {
-        name: formData.office.name,
-        slug,
-        metadata: {
-          type: "broker",
-          office: {
-            address: formData.office.address,
-            city: formData.office.city,
-            postalCode: formData.office.postalCode,
-            phone: formData.office.phone,
-            email: formData.office.email,
+      // Validate phone number format for broker phone
+      if (!phoneRegex.test(formData.broker.phone)) {
+        setError("broker.phone", {
+          type: "manual",
+          message: "Ogiltigt telefonnummerformat.",
+        });
+        return;
+      }
+
+      const data = {
+        office: {
+          name: formData.office.name,
+          slug,
+          metadata: {
+            type: "broker",
+            office: {
+              address: formData.office.address,
+              city: formData.office.city,
+              postalCode: formData.office.postalCode,
+              phone: formData.office.phone,
+              email: formData.office.email,
+            },
           },
+        },
+        broker: {
+          brokerName: formData.broker.fullName,
+          brokerEmail: formData.broker.email,
+          brokerPhone: formData.broker.phone,
+          licenseNumber: formData.broker.licenseNumber,
         },
       };
 
-      addOfficeAndBroker(officeData);
+      const res = await addOfficeBroker(data);
 
-      // mutateOffice(officeData, {
-      //   onSuccess: (office) => {
-      //     const brokerData = {
-      //       userId: office.members[0]?.userId ?? "",
-      //       organizationId: office.id,
-      //       brokerName: formData.broker.fullName,
-      //       brokerEmail: formData.broker.email,
-      //       brokerPhone: formData.broker.phone,
-      //       licenseNumber: formData.broker.license,
-      //     };
-
-      //     mutateBroker(brokerData, {
-      //       onSuccess: (broker) => {
-      //         console.log("Broker registered successfully:", broker);
-      //       },
-      //       onError: (error) => {
-      //         console.error("Failed to add broker:", error);
-      //       },
-      //     });
-      //   },
-      //   onError: (error) => {
-      //     console.error("Failed to create organization:", error);
-      //   },
-      // });
+      if (res?.success && res.brokerId) router.push(`/maklare/${res.brokerId}`);
+      else toast.error("Misslyckades med att registrera kontor och mäklare");
     }
   };
 
@@ -233,10 +252,6 @@ const BrokerOnBoarding = () => {
                         placeholder="+46123456789"
                         {...register("office.phone", {
                           required: true,
-                          pattern: {
-                            value: phoneRegex,
-                            message: "Ogiltigt telefonnummerformat.",
-                          },
                           onChange: handlePhoneChange("office.phone"),
                         })}
                         required
@@ -295,10 +310,6 @@ const BrokerOnBoarding = () => {
                         placeholder="+46123456789"
                         {...register("broker.phone", {
                           required: true,
-                          pattern: {
-                            value: phoneRegex,
-                            message: "Ogiltigt telefonnummerformat.",
-                          },
                           onChange: handlePhoneChange("broker.phone"),
                         })}
                         required
@@ -314,12 +325,14 @@ const BrokerOnBoarding = () => {
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="license">Mäklarlicens</FieldLabel>
+                    <FieldLabel>Mäklarlicens</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
                         type="text"
                         placeholder="Ditt mäklarlicensnummer"
-                        {...register("broker.license", { required: true })}
+                        {...register("broker.licenseNumber", {
+                          required: true,
+                        })}
                         required
                       />
                       <InputGroupAddon>
@@ -346,7 +359,7 @@ const BrokerOnBoarding = () => {
               <Field>
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
-                    <SpinnerLoader />
+                    <Spinner />
                   ) : step === 1 ? (
                     "Fortsätta"
                   ) : (

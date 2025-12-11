@@ -6,8 +6,7 @@ export const brokers = pgTable("brokers", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: varchar("user_id", { length: 255 })
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" })
-    .unique(),
+    .references(() => user.id, { onDelete: "cascade" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),

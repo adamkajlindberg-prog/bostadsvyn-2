@@ -8,6 +8,7 @@ import {
   PhoneIcon,
   UserIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/auth/client";
@@ -36,18 +37,26 @@ const RegisterTab = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      const { data, error: signUpError } = await authClient.signUp.email({
-        name: fullName,
-        email: email,
-        password: password,
-        callbackURL: "/dashboard",
-      });
+      const { data, error: signUpError } = await authClient.signUp.email(
+        {
+          name: fullName,
+          email: email,
+          password: password,
+        },
+        {
+          onSuccess: () => {
+            router.push("/dashboard");
+          },
+        },
+      );
 
       if (signUpError) {
         setError(signUpError.message || "Kunde inte skapa konto");

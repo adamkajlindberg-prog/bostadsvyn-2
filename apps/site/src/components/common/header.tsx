@@ -3,6 +3,8 @@
 import {
   BriefcaseIcon,
   Building2Icon,
+  CheckIcon,
+  ChevronsUpDownIcon,
   HelpCircleIcon,
   HomeIcon,
   LogOutIcon,
@@ -34,6 +36,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useGetUserProfiles } from "../select-profile/hooks/use-get-user-profiles";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Logo from "./logo";
 
 const navMenu = [
@@ -82,6 +86,12 @@ const Header = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const router = useRouter();
+
+  const {
+    data: profilesData,
+    isLoading: profilesIsLoading,
+    error: profilesIsError,
+  } = useGetUserProfiles();
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -185,34 +195,15 @@ const Header = () => {
           <div className="flex items-center gap-2 ml-auto">
             {/* Not logged in */}
             {!user && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex text-sm"
-                  asChild
-                >
-                  <Link
-                    href="/maklare-login"
-                    aria-label="Logga in som fastighetsmäklare"
-                  >
-                    <Building2Icon
-                      className="h-3.5 w-3.5 mr-1.5"
-                      aria-hidden="true"
-                    />
-                    Mäklare
-                  </Link>
-                </Button>
-                <Button size="sm" className="text-sm" asChild>
-                  <Link href="/login" aria-label="Logga in på ditt konto">
-                    <UserIcon
-                      className="h-3.5 w-3.5 mr-1.5"
-                      aria-hidden="true"
-                    />
-                    <span className="xs:inline">Logga in</span>
-                  </Link>
-                </Button>
-              </>
+              <Button size="sm" className="text-sm" asChild>
+                <Link href="/login" aria-label="Logga in på ditt konto">
+                  <UserIcon
+                    className="h-3.5 w-3.5 mr-1.5"
+                    aria-hidden="true"
+                  />
+                  <span className="xs:inline">Logga in</span>
+                </Link>
+              </Button>
             )}
 
             {/* Logged in */}
@@ -238,13 +229,46 @@ const Header = () => {
                   </Button>
                 )}
 
+                {/* Profile switcher */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="hidden sm:flex text-sm justify-between"
+                      variant="outline"
+                      disabled={profilesIsLoading}
+                    >
+                      <div className="w-full overflow-hidden truncate">
+                        Byt profil
+                      </div>
+                      <ChevronsUpDownIcon className="opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-0.5">
+                    {profilesData?.map((profile, key) => (
+                      <Button
+                        key={`profile-${key}`}
+                        variant="ghost"
+                        className="w-full justify-between rounded-sm"
+                      >
+                        <div className="w-full overflow-hidden truncate text-left">
+                          {profile.name}
+                        </div>
+                        {/* {
+                          session?.activeOrganizationId === profile.id && (
+                            <CheckIcon />
+                          )
+                        } */}
+
+                      </Button>
+                    ))}
+
+                  </PopoverContent>
+                </Popover>
+
                 {/* My pages button for non-brokers */}
                 {!isBroker && (
-                  <Button
-                    size="sm"
-                    className="hidden sm:flex text-sm"
-                    asChild
-                  >
+                  <Button size="sm" className="hidden sm:flex text-sm" asChild>
                     <Link href="/dashboard" aria-label="Gå till mina sidor">
                       <UserIcon
                         className="h-3.5 w-3.5 mr-1.5"
@@ -336,10 +360,7 @@ const Header = () => {
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOutIcon
-                        className="mr-2 h-4 w-4"
-                        aria-hidden="true"
-                      />
+                      <LogOutIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                       <span>Logga ut</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -385,10 +406,7 @@ const Header = () => {
                             {user.email}
                           </p>
                           {user.role && (
-                            <Badge
-                              variant="secondary"
-                              className="text-xs mt-1"
-                            >
+                            <Badge variant="secondary" className="text-xs mt-1">
                               {getRoleLabel(user.role)}
                             </Badge>
                           )}
