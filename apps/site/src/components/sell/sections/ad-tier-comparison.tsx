@@ -8,7 +8,7 @@ import {
   SECTION_HEADERS,
   type AdTierData,
   type TierFeature,
-} from "../data";
+} from "@/utils/constants";
 import { renderIcon } from "../utils/icons";
 import {
   premiumExample,
