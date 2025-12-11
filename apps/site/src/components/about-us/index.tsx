@@ -1,8 +1,8 @@
 import ContainerWrapper from "@/components/common/container-wrapper";
-import BrowseMore from "./sections/browse-more";
+import FounderStory from "./sections/founder-story";
 import Hero from "./sections/hero";
 import LegalDocuments from "./sections/legal-documents";
-import OurValues from "./sections/our-values";
+import PlatformOverview from "./sections/platform-overview";
 import SecurityCompliance from "./sections/security-compliance";
 
 const AboutUs = () => {
@@ -10,10 +10,10 @@ const AboutUs = () => {
     <div className="@container">
       <ContainerWrapper className="py-10">
         <Hero />
-        <OurValues />
+        <FounderStory />
+        <PlatformOverview />
         <SecurityCompliance />
         <LegalDocuments />
-        <BrowseMore />
       </ContainerWrapper>
     </div>
   );

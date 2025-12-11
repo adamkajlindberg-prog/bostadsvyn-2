@@ -1,55 +1,59 @@
-import { RocketIcon, TargetIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Rocket, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Hero = () => {
   return (
     <>
-      <div className="flex items-center justify-center mb-4">
-        <div className="bg-primary text-xs text-primary-foreground rounded-full px-3 py-1.5">
-          Grundat 2024
-        </div>
+      <div className="text-center mb-16">
+        <Badge className="bg-accent text-accent-foreground mb-4">Grundat 2025</Badge>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground">
+          Om Bostadsvyn
+        </h1>
+        <p className="text-xl text-foreground font-medium max-w-4xl mx-auto leading-relaxed">
+          Vi erbjuder en modern fastighetsplattform som kombinerar AI-teknologi med användarvänlig design för att förenkla och förbättra sökandet efter bostad för alla.
+        </p>
       </div>
 
-      <h1 className="text-4xl @lg:text-5xl text-primary text-center font-semibold tracking-tight leading-tight mb-4">
-        Framtidens fastighetsplattform
-      </h1>
-      <p className="text-lg @lg:text-xl text-center text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-12">
-        Vi revolutionerar fastighetsmarknaden genom att kombinera avancerad
-        AI-teknik med användarvänlig design för att skapa Sveriges mest
-        innovativa bostadsportal.
-      </p>
-
-      <div className="grid grid-cols-1 @4xl:grid-cols-2 gap-8 mb-14">
-        <Card className="py-6 shadow-xs">
-          <CardContent className="px-6">
-            <div className="flex flex-wrap items-center gap-2.5 mb-4">
-              <TargetIcon className="text-primary" />
-              <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">
-                Vår Mission
-              </h3>
-            </div>
-            <p className="text-sm @lg:text-base text-muted-foreground">
-              Att demokratisera fastighetsmarknaden genom att göra avancerad
-              teknik och marknadsdata tillgänglig för alla. Vi vill att varje
-              person ska kunna fatta välgrundade beslut när det gäller sitt hem
-              - oavsett om man köper, säljer eller hyr.
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <Target className="h-6 w-6 text-primary" />
+              Vår Mission
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground leading-relaxed mb-4">
+              Vi revolutionerar fastighetsmarknaden genom att förena avancerad teknologi med djup
+              branschkunskap. Vårt mål är att skapa en transparent, effektiv och användarvänlig
+              plattform som förenklar hela fastighetsprocessen.
+            </p>
+            <p className="text-foreground leading-relaxed">
+              Med fokus på tillgänglighet och kvalitet levererar vi professionella verktyg och
+              beslutsunderlag för privatpersoner, företag och fastighetsmäklare – oavsett om det
+              gäller köp, försäljning eller uthyrning.
             </p>
           </CardContent>
         </Card>
 
-        <Card className="py-6 shadow-xs">
-          <CardContent className="px-6">
-            <div className="flex flex-wrap items-center gap-2.5 mb-4">
-              <RocketIcon className="text-primary" />
-              <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">
-                Vår Vision
-              </h3>
-            </div>
-            <p className="text-sm @lg:text-base text-muted-foreground">
-              Att bli Nordens ledande fastighetsplattform där AI-driven
-              innovation möter mänsklig expertis. En plattform som förenar
-              köpare, säljare, mäklare och investerare i ett transparent och
-              effektivt ekosystem.
+        <Card className="border-2 border-accent/20 hover:border-accent/40 transition-all">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <Rocket className="h-6 w-6 text-accent" />
+              Vår Vision
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground leading-relaxed mb-4">
+              Att bli den ledande fastighetsplattformen i Sverige genom att sätta nya standarder
+              för användarvänlighet, transparens och professionalism. Vi skapar ett ekosystem där
+              alla parter – köpare, säljare, mäklare och hyresvärdar – får tillgång till samma
+              högkvalitativa verktyg och information.
+            </p>
+            <p className="text-foreground leading-relaxed">
+              Genom kontinuerlig innovation och nära kontakt med branschen bygger vi framtidens
+              fastighetsmarknad – en marknad som är mer rättvis, effektiv och tillgänglig för alla.
             </p>
           </CardContent>
         </Card>
