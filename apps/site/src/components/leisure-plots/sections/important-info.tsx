@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InfoItem, InfoSection, INFO_SECTIONS } from "@/utils/contants";
+import { InfoItem, InfoSection, INFO_SECTIONS } from "@/utils/constants";
 
 
 const InfoItemRow = ({ icon: Icon, text }: InfoItem) => (

@@ -15,6 +15,10 @@ import {
   Zap,
   LucideIcon
 } from "lucide-react";
+import  {
+  type Project,
+} from "@/components/new-production/project-card";
+import bgImage from "@/images/bg-image.webp";
 
 export type InfoItem = {
   icon: LucideIcon;
@@ -103,3 +107,83 @@ export const INFO_SECTIONS: InfoSection[] = [
     ],
   },
 ];
+
+
+export const properties: Project[] = [
+  {
+    image: bgImage,
+    badgeOneText: "Prime Location",
+    badgeTwoText: "Uthyres",
+    name: "Prestigekontorer City",
+    location: "Östermalm, Stockholm",
+    description:
+      "Exklusiva kontorslokaler i hjärtat av Stockholm. Representativa ytor med modern teknik och service.",
+    price: "15,500 kr/m²",
+    otherInfo: "450 m² • 8 rum",
+    button: {
+      text: "Boka visning",
+      variant: "outline",
+    },
+  },
+  {
+    image: bgImage,
+    badgeOneText: "Butik",
+    badgeTwoText: "Till salu",
+    name: "Butikslokal Avenyn",
+    location: "Centrum, Göteborg",
+    description:
+      "Strategiskt placerad butik på Avenyn med högt fotgängarflöde. Perfekt för detaljhandel.",
+    price: "12,5M kr",
+    otherInfo: "180 m² • Gatuplan",
+    button: {
+      text: "Kontakta mäklare",
+      variant: "outline",
+    },
+  },
+  {
+    image: bgImage,
+    badgeOneText: "Logistik",
+    badgeTwoText: "Ny byggnad",
+    name: "Ny byggnad",
+    location: "Arlanda, Stockholm",
+    description:
+      "Modern logistikfastighet med optimal anslutning till E4 och Arlanda. Flexibla lösningar för distribution.",
+    price: "2,800 kr/m²",
+    otherInfo: "8,500 m² • Lager",
+    button: {
+      text: "Begär information",
+      variant: "outline",
+    },
+  },
+];
+
+export const searchPropertyTabs = [
+  {
+    label: "Alla",
+    value: "ALL",
+  },
+  {
+    label: "Till salu",
+    value: "FOR_SALE",
+  },
+  {
+    label: "Snart till salu",
+    value: "COMING_SOON",
+  },
+  {
+    label: "Slutpriser",
+    value: "SOLD",
+  },
+  {
+    label: "Uthyrning",
+    value: "FOR_RENT",
+  },
+  {
+    label: "Nyproduktion",
+    value: "NYPRODUKTION",
+  },
+  {
+    label: "Kommersiellt",
+    value: "COMMERCIAL",
+  },
+]

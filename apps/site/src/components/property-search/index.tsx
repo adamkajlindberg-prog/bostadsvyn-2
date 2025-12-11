@@ -36,7 +36,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
 import type { PropertySearchInput } from "@/trpc/routes/property";
-import { searchPropertyTabs } from "@/lib/constants";
+import { searchPropertyTabs } from "@/utils/constants";
 import { cn } from "@/lib/utils";
 import { getCount } from "@/utils/objects";
 
