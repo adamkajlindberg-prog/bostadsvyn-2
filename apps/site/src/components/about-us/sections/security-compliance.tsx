@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { securityItems } from "../data/security-items";
-import { securityComplianceHeader } from "../data/content";
+import { securityItems, securityComplianceHeader } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
 
 const SecurityCompliance = () => {

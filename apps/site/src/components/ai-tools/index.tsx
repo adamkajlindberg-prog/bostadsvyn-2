@@ -1,7 +1,7 @@
 import ContainerWrapper from "@/components/common/container-wrapper";
 import { SectionHeader } from "./section-header";
 import { ToolCard } from "./tool-card";
-import { aiTools } from "./tools-data";
+import { aiTools } from "@/utils/constants";
 
 const Tools = () => {
   return (

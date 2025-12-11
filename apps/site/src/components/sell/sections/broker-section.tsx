@@ -5,7 +5,7 @@ import {
   BROKER_FEATURES,
   BROKER_INTRO_TEXT,
   SECTION_HEADERS,
-} from "../data";
+} from "@/utils/constants";
 
 export default function BrokerSection() {
   const headerData = SECTION_HEADERS.brokerSection;

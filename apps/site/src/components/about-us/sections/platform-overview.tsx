@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { platformFeatures } from "../data/platform-features";
-import { platformOverviewHeader } from "../data/content";
+import { platformFeatures, platformOverviewHeader } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
 
 const PlatformOverview = () => {

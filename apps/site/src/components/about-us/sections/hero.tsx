@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { heroContent, missionVisionCards } from "../data/content";
+import { heroContent, missionVisionCards } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
 
 const Hero = () => {

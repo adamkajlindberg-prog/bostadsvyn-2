@@ -36,77 +36,18 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
 import type { PropertySearchInput } from "@/trpc/routes/property";
-import { searchPropertyTabs } from "@/utils/constants";
+import {
+  searchPropertyTabs,
+  sortOptions,
+  commonFeatures,
+  energyClasses,
+  propertyTypeLabels,
+  defaultFilters,
+} from "@/utils/constants";
 import { cn } from "@/lib/utils";
 import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
-
-const sortOptions = [
-  { value: "created_desc", label: "Nyast först" },
-  { value: "created_asc", label: "Äldst först" },
-  { value: "price_asc", label: "Billigast först" },
-  { value: "price_desc", label: "Dyrast först" },
-  { value: "living_area_desc", label: "Störst först (m²)" },
-  { value: "living_area_asc", label: "Minst först (m²)" },
-  { value: "plot_area_desc", label: "Tomt – störst först (m²)" },
-  { value: "plot_area_asc", label: "Tomt – minst först (m²)" },
-  { value: "price_sqm_desc", label: "Lägst kvadratmeterpris (kr/m²)" },
-  { value: "price_sqm_asc", label: "Högst kvadratmeterpris (kr/m²)" },
-  { value: "rooms_desc", label: "Flest rum först" },
-  { value: "rooms_asc", label: "Minst antal rum först" },
-  { value: "fee_desc", label: "Lägst avgift (kr/mån)" },
-  { value: "fee_asc", label: "Högst avgift (kr/mån)" },
-  { value: "address_desc", label: "Adress A–Ö" },
-  { value: "address_asc", label: "Adress Ö–A" },
-];
-
-const commonFeatures = [
-  "Balkong",
-  "Balkong/Terrass",
-  "Terrass",
-  "Garage",
-  "Parkering",
-  "Hiss",
-  "Vind",
-  "Källare",
-  "El inkluderat",
-  "Värme inkluderat",
-  "Internet inkluderat",
-];
-
-const energyClasses = ["A", "B", "C", "D", "E", "F", "G"];
-
-const propertyTypeLabels: Record<string, string> = {
-  APARTMENT: "Lägenheter",
-  HOUSE: "Villor",
-  TOWNHOUSE: "Radhus/Parhus/Kedjehus",
-  COTTAGE: "Fritidshus",
-  PLOT: "Tomter",
-  COMMERCIAL: "Kommersiellt",
-};
-
-const defaultFilters: PropertySearchInput = {
-  query: "",
-  propertyType: "",
-  listingType: "",
-  minPrice: 0,
-  maxPrice: 20000000,
-  minArea: 0,
-  maxArea: 1000,
-  minRooms: 0,
-  maxRooms: 10,
-  city: "",
-  features: [],
-  energyClass: [],
-  sortBy: "created_desc",
-  minRent: 0,
-  maxRent: 50000,
-  minMonthlyFee: 0,
-  maxMonthlyFee: 10000,
-  minPlotArea: 0,
-  maxPlotArea: 10000,
-};
 
 const getFiltersFromParams = (params: URLSearchParams): PropertySearchInput => {
   return {

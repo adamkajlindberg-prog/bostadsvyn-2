@@ -1,8 +1,7 @@
 import { CheckCircle2, ExternalLink, FileText } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { legalDocuments, complianceItems } from "../data/legal-documents";
-import { legalDocumentsHeader } from "../data/content";
+import { legalDocuments, complianceItems, legalDocumentsHeader } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
 
 const LegalDocuments = () => {

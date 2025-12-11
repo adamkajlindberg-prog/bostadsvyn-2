@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { founderStoryContent } from "../data/content";
+import { founderStoryContent } from "@/utils/constants";
 
 const FounderStory = () => {
   return (

@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { valueCategories, advantages } from "../data/values";
-import { advantagesHeader, ourValuesHeader } from "../data/content";
+import { valueCategories, advantages, advantagesHeader, ourValuesHeader } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
 
 const OurValues = () => {

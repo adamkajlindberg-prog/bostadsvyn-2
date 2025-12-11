@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "../components/section-header";
-import { SELLING_STEPS, SECTION_HEADERS, type SellingStep } from "../data";
+import { SELLING_STEPS, SECTION_HEADERS, type SellingStep } from "@/utils/constants";
 import { renderIcon } from "../utils/icons";
 
 interface StepCardProps {
