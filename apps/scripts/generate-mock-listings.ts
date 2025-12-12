@@ -305,6 +305,7 @@ async function createOrGetTestUser(): Promise<string> {
     id: testUserId,
     name: "Mock Data User",
     email: testEmail,
+    stripeCustomerId: "dummy-stripe-id",
     emailVerified: true,
   });
 
