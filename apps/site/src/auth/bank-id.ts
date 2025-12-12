@@ -1,6 +1,6 @@
 import { betterFetch } from "@better-fetch/fetch";
 import type { GenericOAuthConfig } from "better-auth/plugins";
-import { env } from "@/env";
+import { env } from "../env";
 
 /**
  * BankID SE (Swedish BankID) authentication response data
