@@ -56,13 +56,12 @@ type BrokerInfo = {
   brokerEmail: string;
   brokerPhone?: string | null;
   licenseNumber?: string | null;
-  office: {
-    officeName: string;
-    officeAddress?: string | null;
-    officeCity?: string | null;
-    officePhone?: string | null;
-    officeEmail?: string | null;
-    officeWebsite?: string | null;
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    logo?: string | null;
+    metadata?: string | null;
   } | null;
 };
 
@@ -87,7 +86,7 @@ export default function PropertyDetails({
 
   useEffect(() => {
     // Track view
-    trackPropertyView(property.id, navigator.userAgent).catch(() => {});
+    trackPropertyView(property.id, navigator.userAgent).catch(() => { });
 
     // Check favorite status
     checkFavoriteStatus(property.id).then(setIsFavorite);
@@ -163,41 +162,53 @@ export default function PropertyDetails({
 
   const floorPlanImages = getFloorPlanImages();
   const propertyMapImages = getPropertyMapImages();
+
+  // Parse organization metadata for website
+  const organizationMetadata = brokerInfo?.organization?.metadata
+    ? (JSON.parse(brokerInfo.organization.metadata) as {
+      website?: string;
+      address?: string;
+      city?: string;
+      phone?: string;
+      email?: string;
+    })
+    : null;
+
   const brokerWebsite =
-    brokerInfo?.office?.officeWebsite ||
+    organizationMetadata?.website ||
     (property.userId === "test"
       ? `https://www.maklarexempel.se/objekt/${property.id}`
       : undefined);
 
   const rentalInfo = property.rentalInfo as
     | {
-        available_from?: string;
-        lease_duration?: string;
-        floor_level?: string;
-        building_year?: number;
-        energy_rating?: string;
-        max_occupants?: number;
-        min_income?: number;
-        min_age?: number;
-        references_required?: boolean;
-        neighborhood_description?: string;
-        nearest_metro?: string;
-        transport_description?: string;
-        kitchen_amenities?: string[];
-        bathroom_amenities?: string[];
-        tech_amenities?: string[];
-        other_amenities?: string[];
-      }
+      available_from?: string;
+      lease_duration?: string;
+      floor_level?: string;
+      building_year?: number;
+      energy_rating?: string;
+      max_occupants?: number;
+      min_income?: number;
+      min_age?: number;
+      references_required?: boolean;
+      neighborhood_description?: string;
+      nearest_metro?: string;
+      transport_description?: string;
+      kitchen_amenities?: string[];
+      bathroom_amenities?: string[];
+      tech_amenities?: string[];
+      other_amenities?: string[];
+    }
     | null
     | undefined;
 
   const propertyDocuments = property.propertyDocuments as
     | Array<{
-        name: string;
-        url: string;
-        type: string;
-        uploaded_at: string;
-      }>
+      name: string;
+      url: string;
+      type: string;
+      uploaded_at: string;
+    }>
     | null
     | undefined;
 
