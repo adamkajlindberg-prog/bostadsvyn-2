@@ -1,224 +1,89 @@
-import { getDbClient, properties, propertyEmbeddings, sql } from "db";
-import { and, cosineDistance, desc, gte, ilike, lte, or } from "drizzle-orm";
-import { type NextRequest, NextResponse } from "next/server";
-import { generateEmbedding } from "@/lib/ai/embedding";
+import { desc, getDbClient, getTableColumns, properties, sql } from "db";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const db = getDbClient();
-  const searchParams = request.nextUrl.searchParams;
+export const maxDuration = 30;
 
-  // Extract query parameters
-  const query = searchParams.get("query") || "";
-  const searchType = searchParams.get("type") || "text"; // 'text', 'ai', 'hybrid'
-  const propertyType = searchParams.get("propertyType");
-  const status = searchParams.get("status") || "FOR_SALE";
-  const city = searchParams.get("city");
-  const minPrice = Number(searchParams.get("minPrice")) || 0;
-  const maxPrice = Number(searchParams.get("maxPrice")) || 20000000;
-  const minArea = Number(searchParams.get("minArea")) || 0;
-  const maxArea = Number(searchParams.get("maxArea")) || 1000;
-  const minRooms = Number(searchParams.get("minRooms")) || 0;
-  const maxRooms = Number(searchParams.get("maxRooms")) || 10;
-  const sortBy = searchParams.get("sortBy") || "created_desc";
-  const page = Number(searchParams.get("page")) || 1;
-  const limit = Number(searchParams.get("limit")) || 20;
-  const offset = (page - 1) * limit;
+// export async function GET(req: Request) {
+//   const { searchParams } = new URL(req.url);
+//   const search = searchParams.get("search");
 
-  try {
-    // FULL-TEXT SEARCH (Swedish text search)
-    if (searchType === "text" && query) {
-      const results = await db
-        .select({
-          ...properties,
-          rank: sql<number>`ts_rank(${properties.searchVector}, plainto_tsquery('swedish', ${query}))`,
-        })
-        .from(properties)
-        .where(
-          and(
-            sql`${properties.searchVector} @@ plainto_tsquery('swedish', ${query})`,
-            // Additional filters
-            ...(propertyType
-              ? [sql`${properties.propertyType} = ${propertyType}`]
-              : []),
-            sql`${properties.status} = ${status}`,
-            sql`${properties.price} BETWEEN ${minPrice} AND ${maxPrice}`,
-          ),
-        )
-        .orderBy(
-          sql`ts_rank(${properties.searchVector}, plainto_tsquery('swedish', ${query})) DESC`,
-        )
-        .limit(limit)
-        .offset(offset);
+//   if (!search) {
+//     return NextResponse.json(
+//       { error: "Missing 'search' query parameter" },
+//       { status: 400 },
+//     );
+//   }
 
-      return NextResponse.json({
-        properties: results,
-        total: results.length,
-        searchType: "text",
-      });
-    }
-    // AI SEMANTIC SEARCH (using embeddings)
-    if (searchType === "ai" && query) {
-      // Generate embedding for the search query
-      const queryEmbedding = await generateEmbedding(query);
+//   const db = getDbClient();
 
-      const similarity = sql<number>`1 - (${cosineDistance(
-        propertyEmbeddings.embedding,
-        queryEmbedding,
-      )})`;
+//   const matchQuery = sql`(
+//     setweight(to_tsvector('swedish', ${properties.addressCity}), 'A') ||
+//     setweight(to_tsvector('swedish', ${properties.addressStreet}), 'B') ||
+//     setweight(to_tsvector('swedish', ${properties.propertyType}), 'C') ||
+//     setweight(to_tsvector('swedish', ${properties.status}), 'D')),
+//     websearch_to_tsquery('swedish', ${search})`;
 
-      const results = await db
-        .select({
-          property: properties,
-          similarity,
-        })
-        .from(propertyEmbeddings)
-        .innerJoin(
-          properties,
-          sql`${propertyEmbeddings.propertyId} = ${properties.id}`,
-        )
-        .where(
-          and(
-            sql`${similarity} > 0.7`, // Similarity threshold
-            sql`${properties.status} = ${status}`,
-            ...(propertyType
-              ? [sql`${properties.propertyType} = ${propertyType}`]
-              : []),
-            sql`${properties.price} BETWEEN ${minPrice} AND ${maxPrice}`,
-          ),
-        )
-        .orderBy(desc(similarity))
-        .limit(limit)
-        .offset(offset);
+//   const results = await db
+//     .select({
+//       ...getTableColumns(properties),
+//       rank: sql`ts_rank(${matchQuery})`,
+//     })
+//     .from(properties)
+//     .where(
+//       sql`(
+//         setweight(to_tsvector('swedish', ${properties.addressCity}), 'A') ||
+//         setweight(to_tsvector('swedish', ${properties.addressStreet}), 'B') ||
+//         setweight(to_tsvector('swedish', ${properties.propertyType}), 'C') ||
+//         setweight(to_tsvector('swedish', ${properties.status}), 'D')
+//       ) @@ websearch_to_tsquery('swedish', ${search})`,
+//     )
+//     .orderBy((t) => desc(t.rank));
 
-      return NextResponse.json({
-        properties: results.map((r) => ({
-          ...r.property,
-          similarity: r.similarity,
-        })),
-        total: results.length,
-        searchType: "ai",
-      });
-    }
+//   return NextResponse.json(results);
+// }
 
-    // HYBRID SEARCH (combines text + AI + filters)
-    if (searchType === "hybrid" && query) {
-      const queryEmbedding = await generateEmbedding(query);
-      const similarity = sql<number>`1 - (${cosineDistance(
-        propertyEmbeddings.embedding,
-        queryEmbedding,
-      )})`;
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const search = searchParams.get("search");
 
-      const textRank = sql<number>`ts_rank(${properties.searchVector}, plainto_tsquery('swedish', ${query}))`;
-
-      // Combine text search + semantic search with weighted scoring
-      const results = await db
-        .select({
-          property: properties,
-          textScore: textRank,
-          semanticScore: similarity,
-          combinedScore: sql<number>`(${textRank} * 0.3) + (${similarity} * 0.7)`,
-        })
-        .from(propertyEmbeddings)
-        .innerJoin(
-          properties,
-          sql`${propertyEmbeddings.propertyId} = ${properties.id}`,
-        )
-        .where(
-          and(
-            or(
-              sql`${properties.searchVector} @@ plainto_tsquery('swedish', ${query})`,
-              sql`${similarity} > 0.7`,
-            ),
-            sql`${properties.status} = ${status}`,
-            ...(propertyType
-              ? [sql`${properties.propertyType} = ${propertyType}`]
-              : []),
-            sql`${properties.price} BETWEEN ${minPrice} AND ${maxPrice}`,
-          ),
-        )
-        .orderBy(sql`(${textRank} * 0.3) + (${similarity} * 0.7) DESC`)
-        .limit(limit)
-        .offset(offset);
-
-      return NextResponse.json({
-        properties: results.map((r) => ({
-          ...r.property,
-          textScore: r.textScore,
-          semanticScore: r.semanticScore,
-          combinedScore: r.combinedScore,
-        })),
-        total: results.length,
-        searchType: "hybrid",
-      });
-    }
-
-    // ================================================================
-    // EXAMPLE 4: STRUCTURED FILTER SEARCH (no text query)
-    // ================================================================
-    const conditions = [];
-
-    if (city) {
-      conditions.push(ilike(properties.addressCity, `%${city}%`));
-    }
-
-    if (propertyType) {
-      conditions.push(sql`${properties.propertyType} = ${propertyType}`);
-    }
-
-    conditions.push(sql`${properties.status} = ${status}`);
-    conditions.push(gte(properties.price, minPrice));
-    conditions.push(lte(properties.price, maxPrice));
-
-    if (minArea > 0) {
-      conditions.push(gte(properties.livingArea, minArea));
-    }
-    if (maxArea < 1000) {
-      conditions.push(lte(properties.livingArea, maxArea));
-    }
-
-    if (minRooms > 0) {
-      conditions.push(gte(properties.rooms, minRooms));
-    }
-    if (maxRooms < 10) {
-      conditions.push(lte(properties.rooms, maxRooms));
-    }
-
-    let resultsQuery = db
-      .select()
-      .from(properties)
-      .where(and(...conditions));
-
-    // Apply sorting
-    switch (sortBy) {
-      case "price_asc":
-        resultsQuery = resultsQuery.orderBy(properties.price);
-        break;
-      case "price_desc":
-        resultsQuery = resultsQuery.orderBy(desc(properties.price));
-        break;
-      case "area_asc":
-        resultsQuery = resultsQuery.orderBy(properties.livingArea);
-        break;
-      case "area_desc":
-        resultsQuery = resultsQuery.orderBy(desc(properties.livingArea));
-        break;
-      case "created_desc":
-      default:
-        resultsQuery = resultsQuery.orderBy(desc(properties.createdAt));
-    }
-
-    const results = await resultsQuery.limit(limit).offset(offset);
-
-    return NextResponse.json({
-      properties: results,
-      total: results.length,
-      searchType: "filter",
-    });
-  } catch (error) {
-    console.error("Search error:", error);
+  if (!search) {
     return NextResponse.json(
-      { error: "Failed to search properties" },
-      { status: 500 },
+      { error: "Missing 'search' query parameter" },
+      { status: 400 },
     );
   }
+
+  const db = getDbClient();
+
+  const results = await db
+    .select()
+    .from(properties)
+    .where(
+      sql`to_tsvector('swedish', 
+        ${properties.title} || ' ' || 
+        COALESCE(${properties.description}, '') || ' ' || 
+        ${properties.propertyType} || ' ' || 
+        ${properties.status} || ' ' ||
+        ${properties.price}::text || ' ' ||
+        ${properties.addressStreet} || ' ' ||
+        ${properties.addressCity} || ' ' ||
+        ${properties.addressPostalCode} || ' ' ||
+        ${properties.addressCountry} || ' ' ||
+        COALESCE(${properties.livingArea}::text, '') || ' ' ||
+        COALESCE(${properties.plotArea}::text, '') || ' ' ||
+        COALESCE(${properties.rooms}::text, '') || ' ' ||
+        COALESCE(${properties.bedrooms}::text, '') || ' ' ||
+        COALESCE(${properties.bathrooms}::text, '') || ' ' ||
+        COALESCE(${properties.yearBuilt}::text, '') || ' ' ||
+        COALESCE(${properties.energyClass}, '') || ' ' ||
+        COALESCE(${properties.monthlyFee}::text, '') || ' ' ||
+        COALESCE(array_to_string(${properties.features}, ' '), '') || ' ' ||
+        COALESCE(${properties.operatingCosts}::text, '') || ' ' ||
+        COALESCE(${properties.kitchenDescription}, '') || ' ' ||
+        COALESCE(${properties.bathroomDescription}, '') || ' ' ||
+        ${properties.adTier}
+      ) @@ websearch_to_tsquery('swedish', ${search})`,
+    );
+
+  return NextResponse.json(results);
 }

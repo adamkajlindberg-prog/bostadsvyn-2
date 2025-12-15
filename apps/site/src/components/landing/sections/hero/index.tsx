@@ -321,6 +321,7 @@ const Hero = () => {
     if (minBathrooms && minBathrooms !== "none")
       params.set("minBathrooms", minBathrooms);
     params.set("searchQuery", searchQuery);
+    params.set("query", searchQuery);
     router.push(`/search?${params.toString()}`);
   };
 

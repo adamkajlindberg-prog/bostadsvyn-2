@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   check,
-  customType,
   decimal,
   index,
   integer,
@@ -14,13 +13,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./user";
-
-// Custom tsvector type for full-text search
-const tsvector = customType<{ data: string }>({
-  dataType() {
-    return "tsvector";
-  },
-});
 
 export const properties = pgTable(
   "properties",
@@ -59,7 +51,6 @@ export const properties = pgTable(
     rentalInfo: jsonb("rental_info"),
     threedTourUrl: text("threed_tour_url"),
     adTier: varchar("ad_tier", { length: 20 }).notNull().default("free"),
-    searchVector: tsvector("search_vector"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -82,88 +73,76 @@ export const properties = pgTable(
     ),
     check("ad_tier_check", sql`${table.adTier} IN ('free', 'plus', 'premium')`),
 
-    // Indexes for filtering and sorting
-    index("property_status_idx").on(table.status),
-    index("property_type_idx").on(table.propertyType),
-    index("property_city_idx").on(table.addressCity),
-    index("property_price_idx").on(table.price),
-    index("property_created_at_idx").on(table.createdAt),
-    index("property_ad_tier_idx").on(table.adTier),
-
-    // Composite indexes for common filter combinations
-    index("property_status_type_idx").on(table.status, table.propertyType),
-    index("property_status_price_idx").on(table.status, table.price),
-    index("property_status_city_idx").on(table.status, table.addressCity),
-    index("property_status_type_price_idx").on(
-      table.status,
-      table.propertyType,
-      table.price,
+    // index("property_search_index").using(
+    //   "gin",
+    //   sql`(
+    //       setweight(to_tsvector('swedish', ${table.addressCity}), 'A') ||
+    //       setweight(to_tsvector('swedish', ${table.addressStreet}), 'B') ||
+    //       setweight(to_tsvector('swedish', ${table.propertyType}), 'C') ||
+    //       setweight(to_tsvector('swedish', ${table.status}), 'D')
+    //   )`,
+    // ),
+    index("property_search_index").using(
+      "gin",
+      sql`(
+      to_tsvector('swedish', 
+        ${table.title} || ' ' || 
+        COALESCE(${table.description}, '') || ' ' || 
+        ${table.propertyType} || ' ' || 
+        ${table.status} || ' ' ||
+        ${table.price}::text || ' ' ||
+        ${table.addressStreet} || ' ' ||
+        ${table.addressCity} || ' ' ||
+        COALESCE(${table.livingArea}::text, '') || ' ' ||
+        COALESCE(${table.plotArea}::text, '') || ' ' ||
+        COALESCE(${table.rooms}::text, '') || ' ' ||
+        COALESCE(${table.bedrooms}::text, '') || ' ' ||
+        COALESCE(${table.bathrooms}::text, '') || ' ' ||
+        COALESCE(${table.yearBuilt}::text, '') || ' ' ||
+        COALESCE(${table.monthlyFee}::text, '') || ' ' ||
+        COALESCE(array_to_string(${table.features}, ' '), '') || ' ' ||
+        COALESCE(${table.operatingCosts}::text, '') || ' ' ||
+        COALESCE(${table.kitchenDescription}, '') || ' ' ||
+        COALESCE(${table.bathroomDescription}, '') || ' ' ||
+        ${table.adTier}
+      ))`,
     ),
-
-    // Range query indexes
-    index("property_living_area_idx").on(table.livingArea),
-    index("property_rooms_idx").on(table.rooms),
-
-    // Geospatial queries
-    index("property_lat_lng_idx").on(table.latitude, table.longitude),
-
-    // User's properties
-    index("property_user_id_idx").on(table.userId),
   ],
 );
 
 export type Property = typeof properties.$inferSelect;
 export type NewProperty = typeof properties.$inferInsert;
 
-export const propertyFavorites = pgTable(
-  "property_favorites",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    propertyId: uuid("property_id")
-      .notNull()
-      .references(() => properties.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("property_favorites_user_idx").on(table.userId),
-    index("property_favorites_property_idx").on(table.propertyId),
-    index("property_favorites_user_property_idx").on(
-      table.userId,
-      table.propertyId,
-    ),
-  ],
-);
+export const propertyFavorites = pgTable("property_favorites", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  propertyId: uuid("property_id")
+    .notNull()
+    .references(() => properties.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export type PropertyFavorite = typeof propertyFavorites.$inferSelect;
 export type NewPropertyFavorite = typeof propertyFavorites.$inferInsert;
 
-export const propertyViews = pgTable(
-  "property_views",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    propertyId: uuid("property_id")
-      .notNull()
-      .references(() => properties.id, { onDelete: "cascade" }),
-    userId: varchar("user_id", { length: 255 }).references(() => user.id, {
-      onDelete: "set null",
-    }),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("property_views_property_idx").on(table.propertyId),
-    index("property_views_user_idx").on(table.userId),
-    index("property_views_created_at_idx").on(table.createdAt),
-  ],
-);
+export const propertyViews = pgTable("property_views", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  propertyId: uuid("property_id")
+    .notNull()
+    .references(() => properties.id, { onDelete: "cascade" }),
+  userId: varchar("user_id", { length: 255 }).references(() => user.id, {
+    onDelete: "set null",
+  }),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export type PropertyView = typeof propertyViews.$inferSelect;
 export type NewPropertyView = typeof propertyViews.$inferInsert;

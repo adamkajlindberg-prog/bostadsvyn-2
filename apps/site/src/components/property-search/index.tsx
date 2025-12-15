@@ -34,10 +34,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTRPC } from "@/trpc/client";
-import type { PropertySearchInput } from "@/trpc/routes/property";
 import { searchPropertyTabs } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
+import type { PropertySearchInput } from "@/trpc/routes/property";
 import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
@@ -179,6 +179,9 @@ export default function PropertySearch() {
     trpc.property.search.queryOptions(filters),
   );
 
+  const { data: searchData, isLoading: isLoadingSearchData } = useQuery(trpc.propertySearch.search.queryOptions({ query: filters.query ?? "" }))
+  if (!isLoadingSearchData) console.log("Search Data:", searchData);
+
   const properties: Property[] = data?.properties ?? [];
   const totalResults = data?.total ?? 0;
 
@@ -202,7 +205,7 @@ export default function PropertySearch() {
       | "SOLD"
       | "COMMERCIAL"
       | "NYPRODUKTION",
-    )
+    );
     setFilters((prev) => ({ ...prev, listingType: value }));
   };
 
@@ -583,13 +586,33 @@ export default function PropertySearch() {
                 onValueChange={(value) => onChangeSearchTab(value)}
               >
                 <TabsList className="grid grid-cols-7">
-                  <TabsTrigger value="ALL">Alla {`(${getCount(data?.properties ?? [])})`}</TabsTrigger>
-                  <TabsTrigger value="FOR_SALE">Till salu {`(${getCount(data?.properties ?? [], 'FOR_SALE', "status")})`}</TabsTrigger>
-                  <TabsTrigger value="COMING_SOON">Snart till salu {`(${getCount(data?.properties ?? [], 'COMING_SOON', "status")})`}</TabsTrigger>
-                  <TabsTrigger value="SOLD">Slutpriser {`(${getCount(data?.properties ?? [], 'SOLD', "status")})`}</TabsTrigger>
-                  <TabsTrigger value="FOR_RENT">Uthyrning {`(${getCount(data?.properties ?? [], 'FOR_RENT', "status")})`}</TabsTrigger>
-                  <TabsTrigger value="NYPRODUKTION">Nyproduktion {`(${getCount(data?.properties ?? [], 'NYPRODUKTION', "status")})`}</TabsTrigger>
-                  <TabsTrigger value="COMMERCIAL">Kommersiellt {`(${getCount(data?.properties ?? [], 'COMMERCIAL', "status")})`}</TabsTrigger>
+                  <TabsTrigger value="ALL">
+                    Alla {`(${getCount(data?.properties ?? [])})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="FOR_SALE">
+                    Till salu{" "}
+                    {`(${getCount(data?.properties ?? [], "FOR_SALE", "status")})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="COMING_SOON">
+                    Snart till salu{" "}
+                    {`(${getCount(data?.properties ?? [], "COMING_SOON", "status")})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="SOLD">
+                    Slutpriser{" "}
+                    {`(${getCount(data?.properties ?? [], "SOLD", "status")})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="FOR_RENT">
+                    Uthyrning{" "}
+                    {`(${getCount(data?.properties ?? [], "FOR_RENT", "status")})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="NYPRODUKTION">
+                    Nyproduktion{" "}
+                    {`(${getCount(data?.properties ?? [], "NYPRODUKTION", "status")})`}
+                  </TabsTrigger>
+                  <TabsTrigger value="COMMERCIAL">
+                    Kommersiellt{" "}
+                    {`(${getCount(data?.properties ?? [], "COMMERCIAL", "status")})`}
+                  </TabsTrigger>
                 </TabsList>
               </Tabs>
               <div className="sm:hidden w-full">
@@ -600,7 +623,9 @@ export default function PropertySearch() {
                       className="w-full justify-between bg-muted hover:bg-muted/80 border-0"
                     >
                       <span className="flex items-center gap-2">
-                        {searchPropertyTabs.find((item) => item.value === activeSearchTab)?.label || "Alla"}
+                        {searchPropertyTabs.find(
+                          (item) => item.value === activeSearchTab,
+                        )?.label || "Alla"}
                       </span>
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
@@ -613,15 +638,15 @@ export default function PropertySearch() {
                       const isActive = activeSearchTab === item.value;
                       return (
                         <DropdownMenuItem key={item.value} asChild>
-                          <span className={cn(
-                            "flex items-center gap-2 cursor-pointer",
-                            isActive && "bg-accent font-medium",
-                          )}
+                          <span
+                            className={cn(
+                              "flex items-center gap-2 cursor-pointer",
+                              isActive && "bg-accent font-medium",
+                            )}
                             onClick={() => onChangeSearchTab(item.value)}
                           >
                             {item.label}
                           </span>
-
                         </DropdownMenuItem>
                       );
                     })}
