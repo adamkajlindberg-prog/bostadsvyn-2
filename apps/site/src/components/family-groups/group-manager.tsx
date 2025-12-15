@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,13 +25,16 @@ interface GroupManagerProps {
   userId: string;
 }
 
-export function GroupManager({
+export const GroupManager = memo(function GroupManager({
   group: propsGroup,
   onGroupUpdated,
   onGroupCreated,
   showCreateOnly,
   userId,
 }: GroupManagerProps) {
+  const isMountedRef = useRef(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const [group, setGroup] = useState<GroupWithMemberCount | null>(propsGroup || null);
   const [groupMembers, setGroupMembers] = useState<GroupMemberWithProfile[]>([]);
   const [groupName, setGroupName] = useState("");
@@ -40,32 +43,69 @@ export function GroupManager({
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Cleanup on unmount
   useEffect(() => {
-    if (group) {
-      loadGroupMembers();
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Sync group prop changes
+  useEffect(() => {
+    if (propsGroup && propsGroup.id !== group?.id) {
+      setGroup(propsGroup);
     }
-  }, [group]);
+  }, [propsGroup, group?.id]);
 
-  const loadGroupMembers = async () => {
-    if (!group) return;
-
-    setLoadingMembers(true);
-    try {
-      const members = await getGroupMembers(group.id);
-      setGroupMembers(members);
-    } catch (error) {
-      console.error("Error loading group members:", error);
-    } finally {
-      setLoadingMembers(false);
+  // Load group members with abort controller
+  useEffect(() => {
+    if (!group) {
+      setGroupMembers([]);
+      return;
     }
-  };
 
-  const handleCreateGroup = async () => {
-    if (!groupName.trim()) return;
+    const abortController = new AbortController();
+
+    const loadGroupMembers = async () => {
+      if (!group || !isMountedRef.current) return;
+
+      setLoadingMembers(true);
+      try {
+        const members = await getGroupMembers(group.id);
+        
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+        
+        setGroupMembers(members);
+      } catch (error) {
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+        
+        console.error("Error loading group members:", error);
+      } finally {
+        if (isMountedRef.current && !abortController.signal.aborted) {
+          setLoadingMembers(false);
+        }
+      }
+    };
+
+    loadGroupMembers();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [group?.id]);
+
+  const handleCreateGroup = useCallback(async () => {
+    if (!groupName.trim() || !isMountedRef.current) return;
 
     setIsLoading(true);
     try {
       const result = await createGroup(groupName.trim(), userId);
+
+      if (!isMountedRef.current) return;
 
       if (!result.success || !result.group) {
         toast.error("Fel vid skapande av grupp", {
@@ -83,21 +123,27 @@ export function GroupManager({
         description: `Välkommen till "${result.group.name}"! Dela inbjudningskoden med vänner och familj så ni kan börja leta efter bostäder tillsammans.`,
       });
     } catch (error) {
+      if (!isMountedRef.current) return;
+      
       console.error("Error creating group:", error);
       toast.error("Fel", {
         description: "Kunde inte skapa grupp",
       });
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [groupName, userId, onGroupCreated]);
 
-  const handleJoinGroup = async () => {
-    if (!inviteCode.trim()) return;
+  const handleJoinGroup = useCallback(async () => {
+    if (!inviteCode.trim() || !isMountedRef.current) return;
 
     setIsLoading(true);
     try {
       const result = await joinGroup(inviteCode.trim(), userId);
+
+      if (!isMountedRef.current) return;
 
       if (!result.success || !result.group) {
         toast.error("Ogiltig inbjudningskod", {
@@ -115,31 +161,51 @@ export function GroupManager({
         description: `Nu är du med i "${result.group.name}". Börja rösta på bostäder tillsammans!`,
       });
     } catch (error) {
+      if (!isMountedRef.current) return;
+      
       console.error("Error joining group:", error);
       toast.error("Fel", {
         description: "Kunde inte ansluta till grupp",
       });
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [inviteCode, userId, onGroupCreated]);
 
-  const copyInviteCode = () => {
-    if (group?.inviteCode) {
-      navigator.clipboard.writeText(group.inviteCode);
-      setCopied(true);
-      toast.success("Kopierat!", {
-        description: "Inbjudningskoden har kopierats till urklipp",
-      });
-      setTimeout(() => setCopied(false), 2000);
+  const copyInviteCode = useCallback(() => {
+    if (!group?.inviteCode || !isMountedRef.current) return;
+
+    navigator.clipboard.writeText(group.inviteCode).catch((error) => {
+      console.error("Failed to copy to clipboard:", error);
+    });
+    
+    setCopied(true);
+    toast.success("Kopierat!", {
+      description: "Inbjudningskoden har kopierats till urklipp",
+    });
+    
+    // Clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  };
+    
+    // Set new timeout with cleanup
+    timeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        setCopied(false);
+      }
+    }, 2000);
+  }, [group?.inviteCode]);
 
-  const handleLeaveGroup = async () => {
-    if (!group) return;
+  const handleLeaveGroup = useCallback(async () => {
+    if (!group || !isMountedRef.current) return;
 
     try {
       const result = await leaveGroup(group.id, userId);
+
+      if (!isMountedRef.current) return;
 
       if (!result.success) {
         toast.error("Fel vid utträde", {
@@ -154,12 +220,36 @@ export function GroupManager({
         description: "Du har lämnat gruppen",
       });
     } catch (error) {
+      if (!isMountedRef.current) return;
+      
       console.error("Error leaving group:", error);
       toast.error("Fel", {
         description: "Kunde inte lämna gruppen",
       });
     }
-  };
+  }, [group, userId]);
+
+  const handleGroupNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setGroupName(e.target.value);
+  }, []);
+
+  const handleInviteCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInviteCode(e.target.value.toUpperCase());
+  }, []);
+
+  const handleGroupNameKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && groupName.trim() && !isLoading) {
+      handleCreateGroup();
+    }
+  }, [groupName, isLoading, handleCreateGroup]);
+
+  const handleInviteCodeKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && inviteCode.trim() && !isLoading) {
+      handleJoinGroup();
+    }
+  }, [inviteCode, isLoading, handleJoinGroup]);
+
+  const memberCount = useMemo(() => groupMembers.length, [groupMembers.length]);
 
   if (showCreateOnly) {
     return (
@@ -169,12 +259,8 @@ export function GroupManager({
           <Input
             id="group-name"
             value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && groupName.trim() && !isLoading) {
-                handleCreateGroup();
-              }
-            }}
+            onChange={handleGroupNameChange}
+            onKeyDown={handleGroupNameKeyDown}
             placeholder="T.ex. Familjen Andersson, Kompisgruppen"
           />
           <p className="text-xs text-muted-foreground mt-1">
@@ -209,16 +295,12 @@ export function GroupManager({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="group-name">Gruppens namn</Label>
+                <Label htmlFor="group-name-create">Gruppens namn</Label>
                 <Input
-                  id="group-name"
+                  id="group-name-create"
                   value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && groupName.trim() && !isLoading) {
-                      handleCreateGroup();
-                    }
-                  }}
+                  onChange={handleGroupNameChange}
+                  onKeyDown={handleGroupNameKeyDown}
                   placeholder="T.ex. Kompisgruppen, Familjen Johansson"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -252,12 +334,8 @@ export function GroupManager({
                 <Input
                   id="invite-code"
                   value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && inviteCode.trim() && !isLoading) {
-                      handleJoinGroup();
-                    }
-                  }}
+                  onChange={handleInviteCodeChange}
+                  onKeyDown={handleInviteCodeKeyDown}
                   placeholder="Ange inbjudningskod"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -313,7 +391,7 @@ export function GroupManager({
           {/* Group Members */}
           <Card>
             <CardHeader>
-              <CardTitle>Gruppmedlemmar ({groupMembers.length})</CardTitle>
+              <CardTitle>Gruppmedlemmar ({memberCount})</CardTitle>
             </CardHeader>
             <CardContent>
               {loadingMembers ? (
@@ -348,5 +426,5 @@ export function GroupManager({
       )}
     </div>
   );
-}
+});
 

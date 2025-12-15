@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown, Minus, Users } from "lucide-react";
@@ -15,38 +15,92 @@ interface PropertyVotingProps {
   userId: string;
 }
 
-export function PropertyVoting({
+export const PropertyVoting = memo(function PropertyVoting({
   groupId,
   propertyId,
   currentStatus,
   onVoteUpdated,
   userId,
 }: PropertyVotingProps) {
+  const isMountedRef = useRef(true);
+
   const [votes, setVotes] = useState<PropertyVote[]>([]);
   const [userVote, setUserVote] = useState<string | null>(null);
   const [isVoting, setIsVoting] = useState(false);
 
+  // Cleanup on unmount
   useEffect(() => {
-    loadVotes();
-  }, [groupId, propertyId]);
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-  const loadVotes = async () => {
+  // Load votes with abort controller
+  useEffect(() => {
+    if (!groupId || !propertyId) {
+      setVotes([]);
+      setUserVote(null);
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    const loadVotes = async () => {
+      if (!groupId || !propertyId || !isMountedRef.current) return;
+
+      try {
+        const votesData = await getPropertyVotes(groupId, propertyId);
+
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+
+        setVotes(votesData);
+
+        // Find user's current vote
+        const currentUserVote = votesData.find((vote) => vote.userId === userId);
+        setUserVote(currentUserVote?.vote || null);
+      } catch (error) {
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+
+        console.error("Error loading votes:", error);
+      }
+    };
+
+    loadVotes();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [groupId, propertyId, userId]);
+
+  const loadVotes = useCallback(async () => {
+    if (!groupId || !propertyId || !isMountedRef.current) return;
+
     try {
       const votesData = await getPropertyVotes(groupId, propertyId);
+
+      if (!isMountedRef.current) return;
+
       setVotes(votesData);
 
       // Find user's current vote
       const currentUserVote = votesData.find((vote) => vote.userId === userId);
       setUserVote(currentUserVote?.vote || null);
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       console.error("Error loading votes:", error);
     }
-  };
+  }, [groupId, propertyId, userId]);
 
-  const handleCastVote = async (voteType: "yes" | "no" | "maybe") => {
+  const handleCastVote = useCallback(async (voteType: "yes" | "no" | "maybe") => {
+    if (!isMountedRef.current) return;
+
     setIsVoting(true);
     try {
       const result = await castVote(groupId, propertyId, userId, voteType);
+
+      if (!isMountedRef.current) return;
 
       if (!result.success) {
         toast.error("Fel vid röstning", {
@@ -69,23 +123,27 @@ export function PropertyVoting({
         description: `Du röstade ${voteLabels[voteType]} på detta objekt.`,
       });
     } catch (error) {
+      if (!isMountedRef.current) return;
+
       console.error("Error casting vote:", error);
       toast.error("Fel vid röstning", {
         description: "Kunde inte registrera din röst",
       });
     } finally {
-      setIsVoting(false);
+      if (isMountedRef.current) {
+        setIsVoting(false);
+      }
     }
-  };
+  }, [groupId, propertyId, userId, loadVotes, onVoteUpdated]);
 
-  const getVoteCounts = () => {
+  const voteCounts = useMemo(() => {
     const yes = votes.filter((v) => v.vote === "yes").length;
     const no = votes.filter((v) => v.vote === "no").length;
     const maybe = votes.filter((v) => v.vote === "maybe").length;
     return { yes, no, maybe };
-  };
+  }, [votes]);
 
-  const { yes, no, maybe } = getVoteCounts();
+  const { yes, no, maybe } = voteCounts;
   const totalVotes = votes.length;
 
   return (
@@ -186,5 +244,5 @@ export function PropertyVoting({
       )}
     </div>
   );
-}
+});
 

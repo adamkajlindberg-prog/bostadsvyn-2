@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,34 +18,83 @@ interface GroupPropertiesProps {
   userId: string;
 }
 
-export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
+export const GroupProperties = memo(function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
+  const isMountedRef = useRef(true);
+  
   const [groupProperties, setGroupProperties] = useState<
     GroupPropertyWithDetails[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewFilter, setViewFilter] = useState<"active" | "rejected">("active");
 
+  // Cleanup on unmount
   useEffect(() => {
-    if (groupId) {
-      loadGroupProperties();
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Load group properties with abort controller
+  useEffect(() => {
+    if (!groupId) {
+      setGroupProperties([]);
+      setIsLoading(false);
+      return;
     }
+
+    const abortController = new AbortController();
+
+    const loadGroupProperties = async () => {
+      if (!groupId || !isMountedRef.current) return;
+
+      setIsLoading(true);
+      try {
+        const properties = await getGroupProperties(groupId);
+        
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+        
+        setGroupProperties(properties);
+      } catch (error) {
+        if (!isMountedRef.current || abortController.signal.aborted) return;
+        
+        console.error("Error loading group properties:", error);
+      } finally {
+        if (isMountedRef.current && !abortController.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadGroupProperties();
+
+    return () => {
+      abortController.abort();
+    };
   }, [groupId]);
 
-  const loadGroupProperties = async () => {
-    if (!groupId) return;
+  const loadGroupProperties = useCallback(async () => {
+    if (!groupId || !isMountedRef.current) return;
 
     setIsLoading(true);
     try {
       const properties = await getGroupProperties(groupId);
+      
+      if (!isMountedRef.current) return;
+      
       setGroupProperties(properties);
     } catch (error) {
+      if (!isMountedRef.current) return;
+      
       console.error("Error loading group properties:", error);
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [groupId]);
 
-  const formatPrice = (price: number, status: string) => {
+  const formatPrice = useCallback((price: number, status: string) => {
     if (status === "FOR_RENT") {
       return (
         new Intl.NumberFormat("sv-SE", {
@@ -62,9 +111,9 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-  };
+  }, []);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const statusConfig = {
       voting: {
         label: "Röstning pågår",
@@ -97,7 +146,12 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
         {config.label}
       </Badge>
     );
-  };
+  }, []);
+
+  const handleViewFilterChange = useCallback((filter: "active" | "rejected") => {
+    if (!isMountedRef.current) return;
+    setViewFilter(filter);
+  }, []);
 
   if (!groupId) {
     return (
@@ -112,10 +166,14 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
     );
   }
 
-  const filteredProperties = groupProperties.filter((gp) =>
-    viewFilter === "active"
-      ? gp.status !== "rejected"
-      : gp.status === "rejected",
+  const filteredProperties = useMemo(
+    () =>
+      groupProperties.filter((gp) =>
+        viewFilter === "active"
+          ? gp.status !== "rejected"
+          : gp.status === "rejected",
+      ),
+    [groupProperties, viewFilter],
   );
 
   return (
@@ -134,7 +192,7 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
             <Button
               variant={viewFilter === "active" ? "default" : "outline"}
               size="sm"
-              onClick={() => setViewFilter("active")}
+              onClick={() => handleViewFilterChange("active")}
             >
               <Heart className="h-4 w-4 mr-1" />
               Aktiva favoriter
@@ -142,7 +200,7 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
             <Button
               variant={viewFilter === "rejected" ? "default" : "outline"}
               size="sm"
-              onClick={() => setViewFilter("rejected")}
+              onClick={() => handleViewFilterChange("rejected")}
             >
               <ThumbsDown className="h-4 w-4 mr-1" />
               Avvisade
@@ -268,5 +326,5 @@ export function GroupProperties({ groupId, userId }: GroupPropertiesProps) {
       )}
     </div>
   );
-}
+});
 
