@@ -3,7 +3,6 @@
 import { randomUUID } from "node:crypto";
 import {
   and,
-  brokerOffices,
   brokers,
   count,
   desc,
@@ -12,6 +11,7 @@ import {
   inArray,
   ilike,
   or,
+  organization,
   type Property,
   properties,
   propertyFavorites,
@@ -350,32 +350,31 @@ export async function getPropertyOwner(userId: string) {
 export async function getBrokerInfo(userId: string) {
   try {
     const db = getDbClient();
-    const [broker] = await db
+    const [result] = await db
       .select({
         id: brokers.id,
         brokerName: brokers.brokerName,
         brokerEmail: brokers.brokerEmail,
         brokerPhone: brokers.brokerPhone,
         licenseNumber: brokers.licenseNumber,
+        organization: {
+          id: organization.id,
+          name: organization.name,
+          slug: organization.slug,
+          logo: organization.logo,
+          metadata: organization.metadata,
+        },
       })
       .from(brokers)
+      .leftJoin(organization, eq(brokers.organizationId, organization.id))
       .where(eq(brokers.userId, userId))
       .limit(1);
 
-    if (!broker) {
+    if (!result) {
       return null;
     }
 
-    const [office] = await db
-      .select()
-      .from(brokerOffices)
-      .where(eq(brokerOffices.brokerId, broker.id))
-      .limit(1);
-
-    return {
-      ...broker,
-      office: office || null,
-    };
+    return result;
   } catch (error) {
     console.error("Error fetching broker info:", error);
     return null;

@@ -3,11 +3,17 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 
-import { admin, genericOAuth, magicLink, oneTap } from "better-auth/plugins";
+import {
+  admin,
+  genericOAuth,
+  magicLink,
+  oneTap,
+  organization,
+} from "better-auth/plugins";
 import { getDbClient } from "db";
 import Stripe from "stripe";
-import { sendEmail } from "@/email";
-import { env } from "@/env";
+import { sendEmail } from "../email";
+import { env } from "../env";
 import { bankIdOauthConfig } from "./bank-id";
 import { cacheAdapter } from "./cache-adapter";
 import { ac, roles } from "./permissions";
@@ -46,6 +52,7 @@ const authConfig = {
   },
   plugins: [
     oneTap(),
+    organization(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
         sendEmail({

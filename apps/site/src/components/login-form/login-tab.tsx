@@ -19,6 +19,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
+import { getOrganizationBroker, getUserProfiles } from "@/lib/actions/organization";
 
 const LoginTab = () => {
   const router = useRouter();
@@ -35,11 +36,39 @@ const LoginTab = () => {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await authClient.signIn.email({
+      const { error: signInError } = await authClient.signIn.email({
         email: email,
         password: password,
         rememberMe: true,
-        callbackURL: "/dashboard",
+        // callbackURL: "/dashboard",
+      }, {
+        onSuccess: async () => {
+          const profiles = await getUserProfiles()
+          console.log("User profiles after sign-in:", profiles);
+
+          if (profiles.length > 2) {
+            router.push("/select-profile");
+          }
+          else if (profiles.length === 2) {
+            const broker = await getOrganizationBroker(profiles[1].id);
+
+            await authClient.organization.setActive({
+              organizationId: profiles[1].id,
+              organizationSlug: profiles[1].slug ?? "",
+            }, {
+              onSuccess: () => {
+                router.push(`/maklare/${broker?.id}`)
+              },
+              onError: (error) => {
+                console.error("Error setting active organization:", error);
+                toast.error(`Ett fel uppstod vid val av organisation`);
+              }
+            });
+          }
+          else {
+            router.push("/dashboard");
+          }
+        }
       });
 
       if (signInError) {
@@ -48,13 +77,6 @@ const LoginTab = () => {
           description: signInError.message || "Kunde inte logga in",
         });
         return;
-      }
-
-      if (data) {
-        toast.success("Välkommen tillbaka!", {
-          description: "Du är nu inloggad.",
-        });
-        router.push("/dashboard");
       }
     } catch (err) {
       const message =
