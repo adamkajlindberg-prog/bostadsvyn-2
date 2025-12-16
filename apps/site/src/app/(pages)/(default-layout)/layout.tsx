@@ -13,7 +13,7 @@ export default function DefaultLayout({
     <SidebarProvider defaultOpen={false}>
       <SkipToContent />
       <ChatSidebar />
-      <main id="main-content" className="w-full" role="main">
+      <main id="main-content" className="w-full overflow-x-hidden" role="main">
         <Header />
         {children}
         <Footer />

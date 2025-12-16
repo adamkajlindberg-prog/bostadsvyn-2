@@ -78,8 +78,8 @@ const highlights = [
 
 const About = () => {
   return (
-    <section className="pt-20 pb-12 bg-gradient-to-b from-nordic-ice to-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
+    <section className="pt-20 pb-12 bg-gradient-to-b from-nordic-ice to-background w-full overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Intro Section */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
