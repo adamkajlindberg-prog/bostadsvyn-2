@@ -73,15 +73,6 @@ export const properties = pgTable(
     ),
     check("ad_tier_check", sql`${table.adTier} IN ('free', 'plus', 'premium')`),
 
-    // index("property_search_index").using(
-    //   "gin",
-    //   sql`(
-    //       setweight(to_tsvector('swedish', ${table.addressCity}), 'A') ||
-    //       setweight(to_tsvector('swedish', ${table.addressStreet}), 'B') ||
-    //       setweight(to_tsvector('swedish', ${table.propertyType}), 'C') ||
-    //       setweight(to_tsvector('swedish', ${table.status}), 'D')
-    //   )`,
-    // ),
     index("property_search_index").using(
       "gin",
       sql`(
@@ -106,6 +97,13 @@ export const properties = pgTable(
         COALESCE(${table.bathroomDescription}, '') || ' ' ||
         ${table.adTier}
       ))`,
+    ),
+    index("property_location_index").using(
+      "gin",
+      sql`(
+          setweight(to_tsvector('swedish', ${table.addressStreet}), 'A') ||
+          setweight(to_tsvector('swedish', ${table.addressCity}), 'B')
+      )`,
     ),
   ],
 );

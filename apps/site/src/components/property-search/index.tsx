@@ -34,10 +34,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDebounce } from "@/hooks/use-debounce";
 import { searchPropertyTabs } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import type { PropertySearchInput } from "@/trpc/routes/property";
+import type { T_Property_Search_Input } from "@/trpc/routes/property-search";
 import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
@@ -86,57 +87,54 @@ const propertyTypeLabels: Record<string, string> = {
   COMMERCIAL: "Kommersiellt",
 };
 
-const defaultFilters: PropertySearchInput = {
-  query: "",
-  propertyType: "",
-  listingType: "",
-  minPrice: 0,
-  maxPrice: 20000000,
-  minArea: 0,
-  maxArea: 1000,
-  minRooms: 0,
-  maxRooms: 10,
-  city: "",
-  features: [],
-  energyClass: [],
-  sortBy: "created_desc",
-  minRent: 0,
-  maxRent: 50000,
-  minMonthlyFee: 0,
-  maxMonthlyFee: 10000,
-  minPlotArea: 0,
-  maxPlotArea: 10000,
-};
-
-const getFiltersFromParams = (params: URLSearchParams): PropertySearchInput => {
+const getFiltersFromParams = (
+  params: URLSearchParams,
+): T_Property_Search_Input => {
   return {
-    ...defaultFilters,
-    aiQuery: params.get("aiQuery") || "",
-    aiSearch: params.get("aiSearch") === "true",
     query: params.get("query") || "",
+    location: params.get("location") || "",
     propertyType: params.get("propertyType") || "",
     listingType: params.get("listingType") || "",
-    minPrice: Number(params.get("minPrice")) || 0,
-    maxPrice: Number(params.get("maxPrice")) || 20000000,
-    minArea: Number(params.get("minArea")) || 0,
-    maxArea: Number(params.get("maxArea")) || 1000,
-    minRooms: Number(params.get("minRooms")) || 0,
-    maxRooms: Number(params.get("maxRooms")) || 10,
-    city: params.get("city") || "",
+    minPrice: params.get("minPrice")
+      ? Number(params.get("minPrice"))
+      : undefined,
+    maxPrice: params.get("maxPrice")
+      ? Number(params.get("maxPrice"))
+      : undefined,
+    minArea: params.get("minArea") ? Number(params.get("minArea")) : undefined,
+    maxArea: params.get("maxArea") ? Number(params.get("maxArea")) : undefined,
+    minRooms: params.get("minRooms")
+      ? Number(params.get("minRooms"))
+      : undefined,
+    maxRooms: params.get("maxRooms")
+      ? Number(params.get("maxRooms"))
+      : undefined,
     features: params.getAll("features"),
     energyClass: params.getAll("energyClass"),
-    sortBy: params.get("sortBy") || "created_desc",
-    minRent: Number(params.get("minRent")) || 0,
-    maxRent: Number(params.get("maxRent")) || 50000,
-    minMonthlyFee: Number(params.get("minMonthlyFee")) || 0,
-    maxMonthlyFee: Number(params.get("maxMonthlyFee")) || 10000,
-    minPlotArea: Number(params.get("minPlotArea")) || 0,
-    maxPlotArea: Number(params.get("maxPlotArea")) || 10000,
+    sortBy: params.get("sortBy") || "",
+    minRent: params.get("minRent") ? Number(params.get("minRent")) : undefined,
+    maxRent: params.get("maxRent") ? Number(params.get("maxRent")) : undefined,
+    minMonthlyFee: params.get("minMonthlyFee")
+      ? Number(params.get("minMonthlyFee"))
+      : undefined,
+    maxMonthlyFee: params.get("maxMonthlyFee")
+      ? Number(params.get("maxMonthlyFee"))
+      : undefined,
+    minPlotArea: params.get("minPlotArea")
+      ? Number(params.get("minPlotArea"))
+      : undefined,
+    maxPlotArea: params.get("maxPlotArea")
+      ? Number(params.get("maxPlotArea"))
+      : undefined,
   };
 };
 
 export default function PropertySearch() {
   const searchParams = useSearchParams();
+
+  const [filters, setFilters] = useState<T_Property_Search_Input>(
+    getFiltersFromParams(searchParams),
+  );
 
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [activeTab, setActiveTab] = useState<
@@ -164,26 +162,71 @@ export default function PropertySearch() {
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
   const [activeSearchTab, setActiveSearchTab] = useState("");
 
-  const [filters, setFilters] = useState<PropertySearchInput>(
-    getFiltersFromParams(searchParams),
+  // Separated filter states
+  const [locationInput, setLocationInput] = useState(filters.location || "");
+  const [minPriceInput, setMinPriceInput] = useState(
+    filters.minPrice?.toString() || "",
+  );
+  const [maxPriceInput, setMaxPriceInput] = useState(
+    filters.maxPrice?.toString() || "",
   );
 
+
+  const debouncedLocationUpdate = useDebounce((value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      location: value,
+    }));
+  }, 1000);
+
+  const debouncedMinPriceUpdate = useDebounce((value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      minPrice: value ? Number(value) : undefined,
+    }));
+  }, 1000);
+
+  const debouncedMaxPriceUpdate = useDebounce((value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      maxPrice: value ? Number(value) : undefined,
+    }));
+  }, 1000);
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocationInput(value);
+    debouncedLocationUpdate(value);
+  };
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMinPriceInput(value);
+    debouncedMinPriceUpdate(value);
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMaxPriceInput(value);
+    debouncedMaxPriceUpdate(value);
+  };
+
   const clearFilters = () => {
-    setFilters(defaultFilters);
+    setFilters(getFiltersFromParams(new URLSearchParams()));
+    setLocationInput("");
     setSelectedLocation(undefined);
   };
 
   const trpc = useTRPC();
 
-  const { data, isLoading, isFetching } = useQuery(
-    trpc.property.search.queryOptions(filters),
-  );
+  const {
+    data: searchData,
+    isLoading: isLoadingSearchData,
+    isFetching: isFetchingSearchData,
+  } = useQuery(trpc.propertySearch.search.queryOptions(filters));
 
-  const { data: searchData, isLoading: isLoadingSearchData } = useQuery(trpc.propertySearch.search.queryOptions({ query: filters.query ?? "" }))
-  if (!isLoadingSearchData) console.log("Search Data:", searchData);
-
-  const properties: Property[] = data?.properties ?? [];
-  const totalResults = data?.total ?? 0;
+  const properties: Property[] = searchData?.properties ?? [];
+  const totalResults = searchData?.total ?? 0;
 
   const handleNaturalSearch = () => {
     if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
@@ -209,9 +252,9 @@ export default function PropertySearch() {
     setFilters((prev) => ({ ...prev, listingType: value }));
   };
 
-  if (isLoading && !data) {
+  if (isLoadingSearchData && !searchData) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 min-h-screen">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
@@ -229,7 +272,7 @@ export default function PropertySearch() {
         <div>
           <h1 className="text-3xl font-semibold">Sök alla fastigheter</h1>
           <p className="text-muted-foreground">
-            {isFetching
+            {isFetchingSearchData
               ? "Söker fastigheter..."
               : `${totalResults} fastigheter hittades`}
           </p>
@@ -306,7 +349,7 @@ export default function PropertySearch() {
                 <Label>Sök plats</Label>
                 <LocationAutocomplete
                   placeholder="Ange stad, kommun eller område"
-                  value={filters.query}
+                  value={filters.location}
                   onChange={(value) =>
                     setFilters((prev) => ({ ...prev, query: value }))
                   }
@@ -326,10 +369,8 @@ export default function PropertySearch() {
                 />
                 <Input
                   placeholder="T.ex. Stockholm"
-                  value={filters.city}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, city: e.target.value }))
-                  }
+                  value={locationInput}
+                  onChange={handleLocationChange}
                   className="mt-2"
                 />
               </div>
@@ -376,26 +417,14 @@ export default function PropertySearch() {
                     <Input
                       type="number"
                       placeholder="Från"
-                      value={filters.minPrice || ""}
-                      onChange={(e) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          minPrice: Number(e.target.value) || 0,
-                        }))
-                      }
+                      value={minPriceInput}
+                      onChange={handleMinPriceChange}
                     />
                     <Input
                       type="number"
                       placeholder="Till"
-                      value={
-                        filters.maxPrice === 20000000 ? "" : filters.maxPrice
-                      }
-                      onChange={(e) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          maxPrice: Number(e.target.value) || 20000000,
-                        }))
-                      }
+                      value={maxPriceInput}
+                      onChange={handleMaxPriceChange}
                     />
                   </div>
                 </div>
@@ -587,31 +616,31 @@ export default function PropertySearch() {
               >
                 <TabsList className="grid grid-cols-7">
                   <TabsTrigger value="ALL">
-                    Alla {`(${getCount(data?.properties ?? [])})`}
+                    Alla {`(${getCount(searchData?.properties ?? [])})`}
                   </TabsTrigger>
                   <TabsTrigger value="FOR_SALE">
                     Till salu{" "}
-                    {`(${getCount(data?.properties ?? [], "FOR_SALE", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "FOR_SALE", "status")})`}
                   </TabsTrigger>
                   <TabsTrigger value="COMING_SOON">
                     Snart till salu{" "}
-                    {`(${getCount(data?.properties ?? [], "COMING_SOON", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "COMING_SOON", "status")})`}
                   </TabsTrigger>
                   <TabsTrigger value="SOLD">
                     Slutpriser{" "}
-                    {`(${getCount(data?.properties ?? [], "SOLD", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "SOLD", "status")})`}
                   </TabsTrigger>
                   <TabsTrigger value="FOR_RENT">
                     Uthyrning{" "}
-                    {`(${getCount(data?.properties ?? [], "FOR_RENT", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "FOR_RENT", "status")})`}
                   </TabsTrigger>
                   <TabsTrigger value="NYPRODUKTION">
                     Nyproduktion{" "}
-                    {`(${getCount(data?.properties ?? [], "NYPRODUKTION", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "NYPRODUKTION", "status")})`}
                   </TabsTrigger>
                   <TabsTrigger value="COMMERCIAL">
                     Kommersiellt{" "}
-                    {`(${getCount(data?.properties ?? [], "COMMERCIAL", "status")})`}
+                    {`(${getCount(searchData?.properties ?? [], "COMMERCIAL", "status")})`}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -638,7 +667,8 @@ export default function PropertySearch() {
                       const isActive = activeSearchTab === item.value;
                       return (
                         <DropdownMenuItem key={item.value} asChild>
-                          <span
+                          <button
+                            type="button"
                             className={cn(
                               "flex items-center gap-2 cursor-pointer",
                               isActive && "bg-accent font-medium",
@@ -646,7 +676,7 @@ export default function PropertySearch() {
                             onClick={() => onChangeSearchTab(item.value)}
                           >
                             {item.label}
-                          </span>
+                          </button>
                         </DropdownMenuItem>
                       );
                     })}

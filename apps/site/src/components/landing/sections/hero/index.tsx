@@ -15,7 +15,6 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -77,7 +76,6 @@ const features = [
 const Hero = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isAISearching, setIsAISearching] = useState(false);
   const [propertyType, setPropertyType] = useState("");
   const [listingType, _setListingType] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -130,169 +128,11 @@ const Hero = () => {
   const [_nearPublicTransport, setNearPublicTransport] = useState(false);
   const [floorLevel, setFloorLevel] = useState("all");
 
-  // Placeholder AI search function - to be replaced with actual API call
-  const performAISearch = async (query: string) => {
-    // TODO: Replace with actual AI search API call
-    // This is a placeholder that simulates AI search behavior
-    return new Promise<{
-      searchCriteria: {
-        location?: string;
-        propertyType?: string[];
-        minRooms?: number;
-        maxRooms?: number;
-        minArea?: number;
-        maxArea?: number;
-        minPrice?: number;
-        maxPrice?: number;
-        minBedrooms?: number;
-        minBathrooms?: number;
-        features?: string[];
-        keywords?: string;
-      };
-      message?: string;
-      count?: number;
-    }>((resolve) => {
-      setTimeout(() => {
-        // Simple extraction logic as placeholder
-        const words = query.toLowerCase().split(" ");
-        const criteria: {
-          location?: string;
-          propertyType?: string[];
-          minRooms?: number;
-          maxRooms?: number;
-          minArea?: number;
-          maxArea?: number;
-          minPrice?: number;
-          maxPrice?: number;
-          minBedrooms?: number;
-          minBathrooms?: number;
-          features?: string[];
-          keywords?: string;
-        } = {};
-
-        // Extract location (common Swedish cities)
-        const cities = [
-          "stockholm",
-          "göteborg",
-          "malmö",
-          "uppsala",
-          "västerås",
-        ];
-        for (const city of cities) {
-          if (words.some((w) => w.includes(city))) {
-            criteria.location = city;
-            break;
-          }
-        }
-
-        // Extract property type
-        if (words.some((w) => ["lägenhet", "apartment"].includes(w))) {
-          criteria.propertyType = ["apartment"];
-        } else if (words.some((w) => ["villa", "house"].includes(w))) {
-          criteria.propertyType = ["house"];
-        }
-
-        // Extract rooms
-        const roomMatch = query.match(/(\d+)\s*rum/);
-        if (roomMatch) {
-          const rooms = parseInt(roomMatch[1], 10);
-          criteria.minRooms = rooms;
-          criteria.maxRooms = rooms;
-        }
-
-        // Extract price
-        const priceMatch = query.match(/(\d+)\s*[Mm]iljoner/);
-        if (priceMatch) {
-          const millions = parseInt(priceMatch[1], 10);
-          criteria.maxPrice = millions * 1000000;
-        }
-
-        resolve({
-          searchCriteria: criteria,
-          message: `Hittade matchande bostäder`,
-          count: 0,
-        });
-      }, 1000);
-    });
-  };
 
   const handleSearch = async () => {
-    // Check if the query is a natural language description (more than just a location)
-    const isNaturalLanguage =
-      searchQuery && searchQuery.trim().split(" ").length > 2;
-    if (isNaturalLanguage) {
-      setIsAISearching(true);
-      try {
-        router.push(
-          `/search?aiQuery=${encodeURIComponent(searchQuery)}&aiSearch=true`,
-        );
-        return;
-      } catch (err) {
-        console.error("AI search exception:", err);
-        toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
-        setIsAISearching(false);
-        return;
-      }
-
-      // try {
-      //   const data = await performAISearch(searchQuery);
-      //   if (data?.searchCriteria) {
-      //     toast.success(
-      //       data.message || `Hittade ${data.count} matchande bostäder`,
-      //     );
-
-      //     // Navigate to search page with AI-extracted criteria
-      //     const params = new URLSearchParams();
-      //     const criteria = data.searchCriteria;
-      //     if (criteria.location) params.set("location", criteria.location);
-      //     if (criteria.propertyType && criteria.propertyType.length > 0) {
-      //       params.set("propertyType", criteria.propertyType.join(","));
-      //     }
-      //     if (criteria.minRooms)
-      //       params.set("minRooms", criteria.minRooms.toString());
-      //     if (criteria.maxRooms)
-      //       params.set("maxRooms", criteria.maxRooms.toString());
-      //     if (criteria.minArea)
-      //       params.set("minArea", criteria.minArea.toString());
-      //     if (criteria.maxArea)
-      //       params.set("maxArea", criteria.maxArea.toString());
-      //     if (criteria.minPrice)
-      //       params.set("minPrice", criteria.minPrice.toString());
-      //     if (criteria.maxPrice)
-      //       params.set("maxPrice", criteria.maxPrice.toString());
-      //     if (criteria.minBedrooms)
-      //       params.set("minBedrooms", criteria.minBedrooms.toString());
-      //     if (criteria.minBathrooms)
-      //       params.set("minBathrooms", criteria.minBathrooms.toString());
-
-      //     // Handle features
-      //     if (criteria.features && criteria.features.length > 0) {
-      //       if (criteria.features.includes("balcony"))
-      //         params.set("balcony", "true");
-      //       if (criteria.features.includes("parking"))
-      //         params.set("parking", "true");
-      //       if (criteria.features.includes("elevator"))
-      //         params.set("elevator", "true");
-      //       if (criteria.features.includes("outdoorSpace"))
-      //         params.set("outdoorSpace", "true");
-      //     }
-      //     if (criteria.keywords) params.set("keywords", criteria.keywords);
-      //     params.set("searchQuery", searchQuery);
-      //     setIsAISearching(false);
-      //     router.push(`/search?${params.toString()}&aiSearch=true`);
-      //     return;
-      //   }
-      // } catch (err) {
-      //   console.error("AI search exception:", err);
-      //   toast.error("Kunde inte genomföra AI-sökning. Försök igen.");
-      //   setIsAISearching(false);
-      //   return;
-      // }
-    }
-
     // Standard search (location-based)
     const params = new URLSearchParams();
-    if (searchQuery) params.set("location", searchQuery);
+    if (searchQuery) params.set("query", searchQuery);
     if (propertyType && propertyType !== "all")
       params.set("propertyType", propertyType);
     if (listingType && listingType !== "all")
@@ -311,7 +151,7 @@ const Hero = () => {
     if (maxArea && maxArea !== "none") params.set("maxArea", maxArea);
     if (hasParking) params.set("parking", "true");
     if (hasElevator) params.set("elevator", "true");
-    if (location && location !== "all") params.set("city", location);
+    if (location && location !== "all") params.set("location", location);
     if (energyClass && energyClass !== "all")
       params.set("energyClass", energyClass);
     if (minYear && minYear !== "none") params.set("minYear", minYear);
@@ -320,8 +160,26 @@ const Hero = () => {
       params.set("minBedrooms", minBedrooms);
     if (minBathrooms && minBathrooms !== "none")
       params.set("minBathrooms", minBathrooms);
-    params.set("searchQuery", searchQuery);
-    params.set("query", searchQuery);
+    if (floorLevel && floorLevel !== "all") params.set("floorLevel", floorLevel);
+    if (isNewConstruction && isNewConstruction !== "all")
+      params.set("isNewConstruction", isNewConstruction);
+    if (minBuildYear && minBuildYear !== "none") params.set("minBuildYear", minBuildYear);
+    if (maxBuildYear && maxBuildYear !== "none") params.set("maxBuildYear", maxBuildYear);
+    if (minFee && minFee !== "none") params.set("minFee", minFee);
+    if (maxFee && maxFee !== "none") params.set("maxFee", maxFee);
+    if (daysListed && daysListed !== "all") params.set("daysListed", daysListed);
+    if (viewingTime && viewingTime !== "all") params.set("viewingTime", viewingTime);
+    if (waterDistance && waterDistance !== "all") params.set("waterDistance", waterDistance);
+    if (nearSea) params.set("nearSea", "true");
+    if (minPlotArea && minPlotArea !== "none") params.set("minPlotArea", minPlotArea);
+    if (maxPlotArea && maxPlotArea !== "none") params.set("maxPlotArea", maxPlotArea);
+    if (minPricePerSqm && minPricePerSqm !== "none") params.set("minPricePerSqm", minPricePerSqm);
+    if (maxPricePerSqm && maxPricePerSqm !== "none") params.set("maxPricePerSqm", maxPricePerSqm);
+    if (biddingActive) params.set("biddingActive", "true");
+    if (priceReduced) params.set("priceReduced", "true");
+    if (priceIncreased) params.set("priceIncreased", "true");
+    if (ownership) params.set("ownership", "true");
+
     router.push(`/search?${params.toString()}`);
   };
 
@@ -467,7 +325,6 @@ const Hero = () => {
                             handleSearch();
                           }
                         }}
-                        disabled={isAISearching}
                       />
                     </div>
 
@@ -1436,19 +1293,9 @@ const Hero = () => {
                       onClick={handleSearch}
                       size="lg"
                       className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 h-12"
-                      disabled={isAISearching}
                     >
-                      {isAISearching ? (
-                        <>
-                          <Loader2Icon className="h-5 w-5 mr-2 animate-spin" />
-                          AI tolkar din sökning...
-                        </>
-                      ) : (
-                        <>
-                          <SearchIcon className="h-5 w-5 mr-2" />
-                          Sök bostäder
-                        </>
-                      )}
+                      <SearchIcon className="h-5 w-5 mr-2" />
+                      Sök bostäder
                     </Button>
                   </div>
 
