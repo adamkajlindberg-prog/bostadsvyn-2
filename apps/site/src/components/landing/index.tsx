@@ -8,19 +8,19 @@ import Tutorials from "./sections/tutorials";
 
 const LandingContent = () => {
   return (
-    <div className="@container">
+    <div className="@container w-full overflow-x-hidden">
       <Hero />
       <About />
       <LazyLoadWrapper minHeight={400}>
         <Tutorials />
       </LazyLoadWrapper>
       <LazyLoadWrapper minHeight={600}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 p-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <Feature />
         </div>
       </LazyLoadWrapper>
       <LazyLoadWrapper minHeight={600}>
-        <div className="bg-nordic-ice py-14 @lg:py-16 px-6 @lg:px-8 @8xl:px-0 hidden">
+        <div className="bg-nordic-ice py-14 @lg:py-16 px-4 sm:px-6 @lg:px-8 @8xl:px-0 hidden w-full">
           <Properties />
         </div>
       </LazyLoadWrapper>

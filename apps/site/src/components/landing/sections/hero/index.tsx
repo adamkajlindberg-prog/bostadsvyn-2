@@ -372,7 +372,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-nordic-fjord to-accent">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-nordic-fjord to-accent w-full">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <div className="relative w-full h-full">
@@ -388,7 +388,7 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 p-0 text-center w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
         <div className="space-y-8">
           {/* Main Headline */}
           <h1 className="text-5xl md:text-6xl lg:text-7xl tracking-tight mt-10">
@@ -416,9 +416,9 @@ const Hero = () => {
           </div>
 
           {/* Search Interface */}
-          <div className="max-w-6xl mx-auto mt-8">
-            <Card className="bg-card/40 backdrop-blur-lg border border-primary-foreground/20 shadow-2xl">
-              <CardContent className="p-8">
+          <div className="max-w-6xl mx-auto mt-8 w-full px-4 sm:px-0">
+            <Card className="bg-card/40 backdrop-blur-lg border border-primary-foreground/20 shadow-2xl w-full">
+              <CardContent className="p-4 sm:p-6 lg:p-8">
                 {/* Unified Search Interface */}
                 <div className="bg-accent/10 border border-accent/20 rounded-xl p-6">
                   <div className="mb-5">
@@ -453,12 +453,12 @@ const Hero = () => {
                     </p>
                   </div>
 
-                  <div className="flex gap-4 mb-6">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-6">
                     {/* Main Search Input */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <Input
                         placeholder="Beskriv din önskade bostad eller sök på gata, område, kommun eller stad..."
-                        className="bg-background/80 border-accent/30 text-foreground placeholder:text-muted-foreground focus:border-accent h-12 text-sm md:text-base"
+                        className="bg-background/80 border-accent/30 text-foreground placeholder:text-muted-foreground focus:border-accent h-12 text-sm md:text-base w-full"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => {
@@ -1456,7 +1456,7 @@ const Hero = () => {
                     <p className="text-sm text-primary-foreground/70 mb-3">
                       Populära sökningar:
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1495,8 +1495,8 @@ const Hero = () => {
           </div>
 
           {/* Floating Elements */}
-          <div className="absolute top-20 left-10 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-pulse" />
-          <div className="absolute bottom-40 right-20 w-32 h-32 bg-nordic-aurora/20 rounded-full blur-2xl animate-pulse delay-1000" />
+          <div className="absolute top-20 left-4 sm:left-10 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-pulse pointer-events-none" />
+          <div className="absolute bottom-40 right-4 sm:right-20 w-24 sm:w-32 h-24 sm:h-32 bg-nordic-aurora/20 rounded-full blur-2xl animate-pulse delay-1000 pointer-events-none" />
         </div>
       </div>
     </section>
