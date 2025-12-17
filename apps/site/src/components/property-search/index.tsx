@@ -125,56 +125,40 @@ export default function PropertySearch() {
   const [activeSearchTab, setActiveSearchTab] = useState("");
 
   // Separated filter states
-  const [locationInput, setLocationInput] = useState(filters.location || "");
-  const [minPriceInput, setMinPriceInput] = useState(
-    filters.minPrice?.toString() || "",
-  );
-  const [maxPriceInput, setMaxPriceInput] = useState(
-    filters.maxPrice?.toString() || "",
-  );
+  const [inputValues, setInputValues] = useState({
+    location: filters.location || "",
+    minPrice: filters.minPrice?.toString() || "",
+    maxPrice: filters.maxPrice?.toString() || "",
+  });
 
-  const debouncedLocationUpdate = useDebounce((value: string) => {
+  const debouncedFilterUpdate = useDebounce((key: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
-      location: value,
+      [key]: key === "location"
+        ? value
+        : value ? Number(value) : undefined,
     }));
   }, 1000);
 
-  const debouncedMinPriceUpdate = useDebounce((value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      minPrice: value ? Number(value) : undefined,
-    }));
-  }, 1000);
-
-  const debouncedMaxPriceUpdate = useDebounce((value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      maxPrice: value ? Number(value) : undefined,
-    }));
-  }, 1000);
-
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (key: keyof typeof inputValues) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
-    setLocationInput(value);
-    debouncedLocationUpdate(value);
+    setInputValues((prev) => ({ ...prev, [key]: value }));
+    debouncedFilterUpdate(key, value);
   };
 
-  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setMinPriceInput(value);
-    debouncedMinPriceUpdate(value);
-  };
-
-  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setMaxPriceInput(value);
-    debouncedMaxPriceUpdate(value);
-  };
+  const clearInputValues = () => {
+    setInputValues({
+      location: "",
+      minPrice: "",
+      maxPrice: "",
+    });
+  }
 
   const clearFilters = () => {
     setFilters(getFiltersFromParams(new URLSearchParams()));
-    setLocationInput("");
+    clearInputValues();
     setSelectedLocation(undefined);
   };
 
@@ -233,7 +217,7 @@ export default function PropertySearch() {
         <div>
           <h1 className="text-3xl font-semibold">Sök alla fastigheter</h1>
           <p className="text-muted-foreground">
-            {isFetchingSearchData
+            {isLoadingSearchData || isFetchingSearchData
               ? "Söker fastigheter..."
               : `${totalResults} fastigheter hittades`}
           </p>
@@ -330,8 +314,8 @@ export default function PropertySearch() {
                 />
                 <Input
                   placeholder="T.ex. Stockholm"
-                  value={locationInput}
-                  onChange={handleLocationChange}
+                  value={inputValues.location}
+                  onChange={handleInputChange("location")}
                   className="mt-2"
                 />
               </div>
@@ -378,14 +362,14 @@ export default function PropertySearch() {
                     <Input
                       type="number"
                       placeholder="Från"
-                      value={minPriceInput}
-                      onChange={handleMinPriceChange}
+                      value={inputValues.minPrice}
+                      onChange={handleInputChange("minPrice")}
                     />
                     <Input
                       type="number"
                       placeholder="Till"
-                      value={maxPriceInput}
-                      onChange={handleMaxPriceChange}
+                      value={inputValues.maxPrice}
+                      onChange={handleInputChange("maxPrice")}
                     />
                   </div>
                 </div>
