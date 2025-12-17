@@ -248,5 +248,53 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 450;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+  p, span, div {
+    font-weight: 400;
+  }
+}
+
+/* Google Maps InfoWindow tweaks: remove default inner padding */
+.gm-style .gm-style-iw,
+.gm-style .gm-style-iw-c,
+.gm-style .gm-style-iw-d {
+  padding: 0 !important;
+}
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+}
+/* Remove top cap space completely so content can touch top edge */
+.gm-style .gm-style-iw-t,
+.gm-style .gm-style-iw-tc {
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.gm-style .gm-style-iw-t::after,
+.gm-style .gm-style-iw-tc::after {
+  display: none !important;
+}
+/* Sharper corners and transparent chrome so only our content shows */
+.gm-style .gm-style-iw-c {
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-top: 0 !important;
+}
+/* Keep close button visible */
+.gm-style .gm-style-iw-chr,
+.gm-ui-hover-effect {
+  top: 6px !important;
+  right: 6px !important;
 }

@@ -4,6 +4,8 @@ import {
   BriefcaseIcon,
   Building2Icon,
   CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ChevronsUpDownIcon,
   HelpCircleIcon,
   HomeIcon,
@@ -17,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -98,6 +101,10 @@ const Header = () => {
     isLoading: isLoadingProfiles,
     error: isErrorProfiles,
   } = useGetUserProfiles();
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -183,13 +190,71 @@ const Header = () => {
   const showProBadge = user?.role === "admin";
   const isBroker = user?.role === "broker";
 
+  const updateArrowVisibility = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      setShowLeftArrow(false);
+      setShowRightArrow(false);
+      return;
+    }
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+  }, []);
+
+  const handleScrollLeft = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = container.clientWidth / 2;
+      container.scrollTo({
+        left: container.scrollLeft - scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleScrollRight = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = container.clientWidth / 2;
+      container.scrollTo({
+        left: container.scrollLeft + scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Initial check
+    updateArrowVisibility();
+
+    // Set up scroll listener
+    container.addEventListener("scroll", updateArrowVisibility);
+
+    // Set up resize listener
+    const handleResize = () => {
+      updateArrowVisibility();
+    };
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => {
+      container.removeEventListener("scroll", updateArrowVisibility);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [updateArrowVisibility]);
+
   return (
     <nav
-      className="sticky top-0 z-30 bg-background border-b border-border p-0 md:py-2 md:px-12 transition-all duration-300"
+      className="sticky top-0 z-30 bg-background border-b border-border p-0 md:py-2 md:px-12 transition-all duration-300 w-full overflow-x-hidden"
       aria-label="Huvudnavigering"
     >
-      <div className="px-3 sm:px-4 max-w-full">
-        <div className="flex items-center h-12 md:h-auto flex-nowrap">
+      <div className="px-3 sm:px-4 max-w-full w-full">
+        <div className="flex items-center h-12 md:h-auto flex-nowrap w-full min-w-0">
           {/* Logo */}
           <Link
             href="/"
@@ -208,42 +273,67 @@ const Header = () => {
           </Link>
 
           {/* Navigation Links - Desktop */}
-          <div
-            className="hidden lg:flex items-center space-x-1 ml-3"
-            role="menubar"
-            aria-label="Huvudmeny"
-          >
-            {navMenu.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Button
-                  key={item.title}
-                  variant="ghost"
-                  size="sm"
-                  className="text-foreground hover:text-primary text-sm"
-                  asChild
-                >
-                  <Link href={item.url} role="menuitem">
-                    {Icon && (
-                      <Icon className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
-                    )}
-                    {item.title}
-                    {item.url === "/ai-tools" && showProBadge && (
-                      <Badge
-                        className="ml-1 bg-premium text-premium-foreground text-xs"
-                        aria-label="Premium funktion"
-                      >
-                        Pro
-                      </Badge>
-                    )}
-                  </Link>
-                </Button>
-              );
-            })}
+          <div className="hidden lg:flex items-center ml-3 flex-shrink-0 min-w-0 max-[1450px]:max-w-[65%] max-[1450px]:relative">
+            {showLeftArrow && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute left-0 z-10 h-8 w-8 p-0 bg-background/80 hover:bg-background/90 backdrop-blur-sm max-[1450px]:flex items-center justify-center shadow-sm"
+                onClick={handleScrollLeft}
+                aria-label="Scrolla vänster"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+              </Button>
+            )}
+            <div
+              ref={scrollContainerRef}
+              className="hidden lg:flex items-center space-x-1 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] max-[1450px]:px-8"
+              role="menubar"
+              aria-label="Huvudmeny"
+            >
+              {navMenu.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.title}
+                    variant="ghost"
+                    size="sm"
+                    className="text-foreground hover:text-primary text-sm flex-shrink-0"
+                    asChild
+                  >
+                    <Link href={item.url} role="menuitem">
+                      {Icon && (
+                        <Icon className="h-3.5 w-3.5 mr-1" aria-hidden="true" />
+                      )}
+                      {item.title}
+                      {item.url === "/ai-tools" && showProBadge && (
+                        <Badge
+                          className="ml-1 bg-premium text-premium-foreground text-xs"
+                          aria-label="Premium funktion"
+                        >
+                          Pro
+                        </Badge>
+                      )}
+                    </Link>
+                  </Button>
+                );
+              })}
+            </div>
+            {showRightArrow && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 z-10 h-8 w-8 p-0 bg-background/80 hover:bg-background/90 backdrop-blur-sm max-[1450px]:flex items-center justify-center shadow-sm"
+                onClick={handleScrollRight}
+                aria-label="Scrolla höger"
+              >
+                <ChevronRightIcon className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-2 ml-auto flex-shrink-0">
             {/* Not logged in */}
             {!user && (
               <Button size="sm" className="text-sm" asChild>

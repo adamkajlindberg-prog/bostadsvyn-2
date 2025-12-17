@@ -35,57 +35,19 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDebounce } from "@/hooks/use-debounce";
-import { searchPropertyTabs } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import type { T_Property_Search_Input } from "@/trpc/routes/property-search";
+import {
+  commonFeatures,
+  energyClasses,
+  propertyTypeLabels,
+  searchPropertyTabs,
+  sortOptions,
+} from "@/utils/constants";
 import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
-
-const sortOptions = [
-  { value: "created_desc", label: "Nyast först" },
-  { value: "created_asc", label: "Äldst först" },
-  { value: "price_asc", label: "Billigast först" },
-  { value: "price_desc", label: "Dyrast först" },
-  { value: "living_area_desc", label: "Störst först (m²)" },
-  { value: "living_area_asc", label: "Minst först (m²)" },
-  { value: "plot_area_desc", label: "Tomt – störst först (m²)" },
-  { value: "plot_area_asc", label: "Tomt – minst först (m²)" },
-  { value: "price_sqm_desc", label: "Lägst kvadratmeterpris (kr/m²)" },
-  { value: "price_sqm_asc", label: "Högst kvadratmeterpris (kr/m²)" },
-  { value: "rooms_desc", label: "Flest rum först" },
-  { value: "rooms_asc", label: "Minst antal rum först" },
-  { value: "fee_desc", label: "Lägst avgift (kr/mån)" },
-  { value: "fee_asc", label: "Högst avgift (kr/mån)" },
-  { value: "address_desc", label: "Adress A–Ö" },
-  { value: "address_asc", label: "Adress Ö–A" },
-];
-
-const commonFeatures = [
-  "Balkong",
-  "Balkong/Terrass",
-  "Terrass",
-  "Garage",
-  "Parkering",
-  "Hiss",
-  "Vind",
-  "Källare",
-  "El inkluderat",
-  "Värme inkluderat",
-  "Internet inkluderat",
-];
-
-const energyClasses = ["A", "B", "C", "D", "E", "F", "G"];
-
-const propertyTypeLabels: Record<string, string> = {
-  APARTMENT: "Lägenheter",
-  HOUSE: "Villor",
-  TOWNHOUSE: "Radhus/Parhus/Kedjehus",
-  COTTAGE: "Fritidshus",
-  PLOT: "Tomter",
-  COMMERCIAL: "Kommersiellt",
-};
 
 const getFiltersFromParams = (
   params: URLSearchParams,
@@ -170,7 +132,6 @@ export default function PropertySearch() {
   const [maxPriceInput, setMaxPriceInput] = useState(
     filters.maxPrice?.toString() || "",
   );
-
 
   const debouncedLocationUpdate = useDebounce((value: string) => {
     setFilters((prev) => ({

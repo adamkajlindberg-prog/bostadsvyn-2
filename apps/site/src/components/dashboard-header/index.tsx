@@ -63,26 +63,28 @@ export function DashboardHeader({
   };
 
   return (
-    <div className="flex items-center justify-between mb-8">
-      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
-        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 hidden md:block">
-          <AvatarFallback className="bg-primary text-primary-foreground text-base sm:text-lg">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 text-center sm:text-left">
+        <Avatar className="h-10 w-10 sm:h-14 sm:w-14 md:h-16 md:w-16 shrink-0">
+          <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm md:text-base">
             {getUserInitials()}
           </AvatarFallback>
         </Avatar>
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+        <div className="flex-1 min-w-0 w-full sm:w-auto">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold break-words">
             Välkommen, {user?.name || "Användare"}
           </h1>
-          <div className="flex gap-2 items-center justify-center sm:justify-start flex-wrap mt-1">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 items-center justify-center sm:justify-start mt-1.5 sm:mt-2">
             {user?.role && (
-              <Badge variant="secondary">{getRoleLabel(user.role)}</Badge>
+              <Badge variant="secondary" className="text-xs sm:text-sm">
+                {getRoleLabel(user.role)}
+              </Badge>
             )}
             <Badge
               variant={isPro ? "default" : "outline"}
-              className={
+              className={`text-xs sm:text-sm ${
                 isPro ? "bg-gradient-to-r from-primary to-primary/60" : ""
-              }
+              }`}
             >
               {isPro && <span className="mr-1">👑</span>}
               {getSubscriptionLabel()}-konto
@@ -92,7 +94,7 @@ export function DashboardHeader({
                 asChild
                 size="sm"
                 variant="outline"
-                className="h-6 text-xs"
+                className="h-6 sm:h-7 text-xs sm:text-sm px-2 sm:px-3"
               >
                 <Link href="/upgrade">Uppgradera</Link>
               </Button>

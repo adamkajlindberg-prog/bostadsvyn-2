@@ -19,6 +19,7 @@ import {
 } from "./components";
 import { useConversations, useMessages } from "./hooks";
 import type { ConversationWithDetails } from "./types";
+import { MessageCircle } from "lucide-react";
 
 export function MessagingCenterMobile() {
   const { data: session } = authClient.useSession();
@@ -82,7 +83,12 @@ export function MessagingCenterMobile() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4">
+    <div className="container mx-auto px-4 py-4 ">
+      <div className="fixed bottom-4 right-4 z-50" onClick={() => setIsSheetOpen(true)}>
+        <span className="flex size-full items-center justify-center rounded-full bg-primary text-primary-foreground text-xs w-max p-2 ">
+          <MessageCircle className="h-8 w-8 text-white" />
+        </span>
+      </div>
       <div className="h-[calc(100vh-7rem)]">
         <ConversationList
           conversations={filteredConversations}

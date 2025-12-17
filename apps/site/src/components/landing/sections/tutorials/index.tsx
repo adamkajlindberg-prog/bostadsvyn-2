@@ -54,8 +54,8 @@ const tutorials: Tutorial[] = [
 
 const Tutorials = () => {
   return (
-    <section className="py-12 @lg:py-16 px-6 @lg:px-8 @8xl:px-0 bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto max-w-7xl">
+    <section className="py-12 @lg:py-16 px-4 sm:px-6 @lg:px-8 @8xl:px-0 bg-gradient-to-b from-background to-muted/20 w-full overflow-x-hidden">
+      <div className="container mx-auto max-w-7xl w-full">
         {/* Header */}
         <div className="text-center mb-8 @lg:mb-12">
           <Badge variant="secondary" className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-accent text-accent-foreground hover:bg-accent/80 mb-4">
@@ -152,5 +152,7 @@ const Tutorials = () => {
 };
 
 export default Tutorials;
+
+
 
 

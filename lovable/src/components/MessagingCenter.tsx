@@ -9,10 +9,10 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  MessageCircle, 
-  Send, 
-  Search, 
+import {
+  MessageCircle,
+  Send,
+  Search,
   MoreVertical,
   Phone,
   Video,
@@ -231,7 +231,7 @@ export const MessagingCenter: React.FC = () => {
       // Load sender profile for the new message
       const { data: senderProfile } = await supabase
         .from('profiles')
-        .select('full_name, email')  
+        .select('full_name, email')
         .eq('user_id', user.id)
         .single();
 
@@ -242,7 +242,7 @@ export const MessagingCenter: React.FC = () => {
 
       setMessages(prev => [...prev, messageWithProfile]);
       setNewMessage('');
-      
+
       // Update conversation last_message_at
       await supabase
         .from('conversations')
@@ -299,32 +299,32 @@ export const MessagingCenter: React.FC = () => {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
-      return date.toLocaleTimeString('sv-SE', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      return date.toLocaleTimeString('sv-SE', {
+        hour: '2-digit',
+        minute: '2-digit'
       });
     } else if (diffInHours < 168) { // 7 days
-      return date.toLocaleDateString('sv-SE', { 
+      return date.toLocaleDateString('sv-SE', {
         weekday: 'short',
-        hour: '2-digit', 
-        minute: '2-digit' 
+        hour: '2-digit',
+        minute: '2-digit'
       });
     } else {
-      return date.toLocaleDateString('sv-SE', { 
-        month: 'short', 
+      return date.toLocaleDateString('sv-SE', {
+        month: 'short',
         day: 'numeric',
-        hour: '2-digit', 
-        minute: '2-digit' 
+        hour: '2-digit',
+        minute: '2-digit'
       });
     }
   };
 
   const filteredConversations = conversations.filter(conv => {
     if (!searchTerm) return true;
-    
+
     const otherParticipant = getOtherParticipant(conv);
     const searchLower = searchTerm.toLowerCase();
-    
+
     return (
       conv.property.title.toLowerCase().includes(searchLower) ||
       conv.property.address_street.toLowerCase().includes(searchLower) ||
@@ -367,7 +367,7 @@ export const MessagingCenter: React.FC = () => {
               />
             </div>
           </CardHeader>
-          
+
           <CardContent className="flex-1 p-0">
             <ScrollArea className="h-full">
               {filteredConversations.length === 0 ? (
@@ -382,27 +382,26 @@ export const MessagingCenter: React.FC = () => {
                   {filteredConversations.map((conversation) => {
                     const otherParticipant = getOtherParticipant(conversation);
                     const isSelected = selectedConversation?.id === conversation.id;
-                    const hasUnread = conversation.last_message && 
+                    const hasUnread = conversation.last_message &&
                       conversation.last_message.sender_id !== user?.id;
 
                     return (
                       <div
                         key={conversation.id}
-                        className={`p-3 cursor-pointer hover:bg-muted/50 border-b ${
-                          isSelected ? 'bg-muted' : ''
-                        }`}
+                        className={`p-3 cursor-pointer hover:bg-muted/50 border-b ${isSelected ? 'bg-muted' : ''
+                          }`}
                         onClick={() => setSelectedConversation(conversation)}
                       >
                         <div className="flex items-start gap-3">
                           <Avatar className="h-10 w-10">
                             <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                               {getInitials(
-                                otherParticipant.profile?.full_name, 
+                                otherParticipant.profile?.full_name,
                                 otherParticipant.profile?.email
                               )}
                             </AvatarFallback>
                           </Avatar>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <h4 className="font-semibold text-sm truncate">
@@ -414,7 +413,7 @@ export const MessagingCenter: React.FC = () => {
                                 </span>
                               )}
                             </div>
-                            
+
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="secondary" className="text-xs">
                                 {otherParticipant.role}
@@ -423,11 +422,11 @@ export const MessagingCenter: React.FC = () => {
                                 <div className="w-2 h-2 bg-primary rounded-full"></div>
                               )}
                             </div>
-                            
+
                             <p className="text-xs text-muted-foreground truncate mt-1">
                               {conversation.property.title}
                             </p>
-                            
+
                             {conversation.last_message && (
                               <p className="text-sm text-muted-foreground truncate mt-1">
                                 {conversation.last_message.content}
@@ -469,7 +468,7 @@ export const MessagingCenter: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm">
                       <Phone className="h-4 w-4" />
@@ -493,7 +492,7 @@ export const MessagingCenter: React.FC = () => {
                   <div className="space-y-4">
                     {messages.map((message) => {
                       const isOwn = message.sender_id === user?.id;
-                      
+
                       return (
                         <div
                           key={message.id}
@@ -501,11 +500,10 @@ export const MessagingCenter: React.FC = () => {
                         >
                           <div className={`max-w-[70%] ${isOwn ? 'order-2' : 'order-1'}`}>
                             <div
-                              className={`rounded-lg px-3 py-2 ${
-                                isOwn
+                              className={`rounded-lg px-3 py-2 ${isOwn
                                   ? 'bg-primary text-primary-foreground'
                                   : 'bg-muted'
-                              }`}
+                                }`}
                             >
                               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                             </div>
@@ -536,8 +534,8 @@ export const MessagingCenter: React.FC = () => {
                       disabled={sendingMessage}
                     />
                   </div>
-                  <Button 
-                    onClick={sendMessage} 
+                  <Button
+                    onClick={sendMessage}
                     disabled={!newMessage.trim() || sendingMessage}
                     size="sm"
                   >
