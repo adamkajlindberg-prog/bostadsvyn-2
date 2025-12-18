@@ -1,30 +1,37 @@
 "use client";
 
+import type { Property } from "db";
 import {
+  BarChart3,
+  Eye,
+  Heart,
+  Home,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
+import {
+  type ElementType,
   useCallback,
   useEffect,
   useMemo,
   useState,
   useTransition,
-  type ElementType,
 } from "react";
-import {
-  Plus,
-  Search,
-  Trash2,
-  Pencil,
-  Home,
-  BarChart3,
-  Eye,
-  Heart,
-} from "lucide-react";
-import type { Property } from "db";
+import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import ContainerWrapper from "@/components/common/container-wrapper";
 import PropertyCard from "@/components/property-card";
+import { PropertyForm } from "@/components/property-management/property-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -33,13 +40,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PropertyForm } from "@/components/property-management/property-form";
-import {
-  deleteProperty,
-  listManagedProperties,
-} from "@/lib/actions/property";
+import { deleteProperty, listManagedProperties } from "@/lib/actions/property";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 type Stats = {
   total: number;
@@ -98,13 +100,17 @@ export default function PropertyManagement() {
     favorites: 0,
   });
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<keyof typeof statusLabels>("all");
+  const [statusFilter, setStatusFilter] =
+    useState<keyof typeof statusLabels>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Property | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const canManage = useMemo(() => {
+    // Temporary fix: allow access if user has an active organization
+    if (session?.session?.activeOrganizationId) return true;
+
     const role = session?.user?.role;
     if (!role) return false;
     const bypass =
@@ -118,7 +124,7 @@ export default function PropertyManagement() {
         );
       })();
     return bypass || allowedRoles.includes(role);
-  }, [session?.user?.role]);
+  }, [session?.user?.role, session?.session?.activeOrganizationId]);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -168,7 +174,8 @@ export default function PropertyManagement() {
             <Home className="h-12 w-12 mx-auto text-muted-foreground" />
             <h3 className="text-xl font-semibold">Åtkomst nekad</h3>
             <p className="text-muted-foreground">
-              Du behöver vara säljare, mäklare eller admin för att hantera fastigheter.
+              Du behöver vara säljare, mäklare eller admin för att hantera
+              fastigheter.
             </p>
           </CardContent>
         </Card>
@@ -198,7 +205,12 @@ export default function PropertyManagement() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard title="Totalt" value={stats.total} icon={Home} />
-          <StatCard title="Aktiva" value={stats.active} icon={BarChart3} highlight />
+          <StatCard
+            title="Aktiva"
+            value={stats.active}
+            icon={BarChart3}
+            highlight
+          />
           <StatCard title="Sålda/Uthyrda" value={stats.sold} icon={BarChart3} />
           <StatCard title="Utkast" value={stats.draft} icon={BarChart3} />
           <StatCard title="Visningar" value={stats.views} icon={Eye} />

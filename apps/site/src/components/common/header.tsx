@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BriefcaseIcon,
   Building2Icon,
+  CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronsUpDownIcon,
   HelpCircleIcon,
   HomeIcon,
   LogOutIcon,
@@ -18,6 +19,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +40,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { getOrganizationBroker } from "@/lib/actions/organization";
+import {
+  type T_Profile,
+  useGetUserProfiles,
+} from "../select-profile/hooks/use-get-user-profiles";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Skeleton } from "../ui/skeleton";
 import Logo from "./logo";
 
 const navMenu = [
@@ -85,6 +95,13 @@ const Header = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const router = useRouter();
+
+  const {
+    data: profilesData,
+    isLoading: isLoadingProfiles,
+    error: isErrorProfiles,
+  } = useGetUserProfiles();
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -121,6 +138,51 @@ const Header = () => {
         return "Köpare";
       default:
         return role;
+    }
+  };
+
+  const getActiveProfileName = () => {
+    if (profilesData && profilesData.length > 0) {
+      const activeProfile =
+        profilesData.find(
+          (profile) => session?.session?.activeOrganizationId === profile.id,
+        ) || profilesData[0];
+      return activeProfile.name;
+    }
+  };
+
+  const handleSwitchProfile = async (profile: T_Profile) => {
+    if (profile.type === "private") {
+      // Clear active organization for private accounts
+      await authClient.organization.setActive({
+        organizationId: null,
+        organizationSlug: "",
+      });
+
+      router.push("/dashboard");
+    } else {
+      // Get broker info for organization
+      const broker = await getOrganizationBroker(profile.id);
+
+      if (broker) {
+        await authClient.organization.setActive(
+          {
+            organizationId: profile.id,
+            organizationSlug: profile.slug ?? "",
+          },
+          {
+            onSuccess: () => {
+              router.push(`/maklare/${broker.id}`);
+            },
+            onError: (error) => {
+              console.error("Error setting active organization:", error);
+              toast.error("Kunde inte välja organisation");
+            },
+          },
+        );
+      } else {
+        toast.error("Ingen mäklare hittades för den valda organisationen");
+      }
     }
   };
 
@@ -276,10 +338,7 @@ const Header = () => {
             {!user && (
               <Button size="sm" className="text-sm" asChild>
                 <Link href="/login" aria-label="Logga in på ditt konto">
-                  <UserIcon
-                    className="h-3.5 w-3.5 mr-1.5"
-                    aria-hidden="true"
-                  />
+                  <UserIcon className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
                   <span className="xs:inline">Logga in</span>
                 </Link>
               </Button>
@@ -306,6 +365,42 @@ const Header = () => {
                       Mäklarportalen
                     </Link>
                   </Button>
+                )}
+
+                {/* Profile switcher */}
+                {profilesData && !isLoadingProfiles && !isErrorProfiles ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        size="sm"
+                        className="hidden sm:flex text-sm justify-between"
+                        variant="outline"
+                      >
+                        {getActiveProfileName()}
+                        <ChevronsUpDownIcon className="opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-0.5">
+                      {profilesData?.map((profile, key) => (
+                        <Button
+                          key={`profile-${key}`}
+                          variant="ghost"
+                          className="w-full justify-between rounded-sm"
+                          onClick={() => handleSwitchProfile(profile)}
+                        >
+                          <div className="w-full overflow-hidden truncate text-left">
+                            {profile.name}
+                          </div>
+
+                          {getActiveProfileName() === profile.name && (
+                            <CheckIcon />
+                          )}
+                        </Button>
+                      ))}
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Skeleton className="w-32 h-9" />
                 )}
 
                 {/* My pages button for non-brokers */}

@@ -28,7 +28,7 @@ const SelectProfile = () => {
   const [isContinue, setIsContinue] = useState<boolean>(false);
   const router = useRouter();
 
-  const { data, isLoading, error } = useGetUserProfiles();
+  const { data, isLoading, isFetching, error } = useGetUserProfiles();
 
   const handleContinue = async () => {
     setIsContinue(true);
@@ -76,7 +76,7 @@ const SelectProfile = () => {
             </div>
           )}
 
-          {isLoading && !data && !error
+          {(isLoading || isFetching) && !data && !error
             ? [...Array(3)].map((_, index) => (
               <ProfileSkeleton key={`skeleton-${index}`} />
             ))

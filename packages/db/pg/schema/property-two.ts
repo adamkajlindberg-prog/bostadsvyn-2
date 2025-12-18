@@ -3,7 +3,6 @@ import {
   bigint,
   check,
   decimal,
-  index,
   integer,
   jsonb,
   pgTable,
@@ -14,13 +13,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./user";
 
-export const properties = pgTable(
-  "properties",
+export const propertiesTwo = pgTable(
+  "properties_two",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    objectId: varchar("object_id", { length: 100 }).notNull().unique(),
     title: text("title").notNull(),
     description: text("description"),
     propertyType: varchar("property_type", { length: 50 }).notNull(),
@@ -72,66 +72,33 @@ export const properties = pgTable(
       sql`${table.energyClass} IN ('A', 'B', 'C', 'D', 'E', 'F', 'G') OR ${table.energyClass} IS NULL`,
     ),
     check("ad_tier_check", sql`${table.adTier} IN ('free', 'plus', 'premium')`),
-
-    index("property_search_index").using(
-      "gin",
-      sql`(
-      to_tsvector('swedish', 
-        ${table.title} || ' ' || 
-        COALESCE(${table.description}, '') || ' ' || 
-        ${table.propertyType} || ' ' || 
-        ${table.status} || ' ' ||
-        ${table.price}::text || ' ' ||
-        ${table.addressStreet} || ' ' ||
-        ${table.addressCity} || ' ' ||
-        COALESCE(${table.livingArea}::text, '') || ' ' ||
-        COALESCE(${table.plotArea}::text, '') || ' ' ||
-        COALESCE(${table.rooms}::text, '') || ' ' ||
-        COALESCE(${table.bedrooms}::text, '') || ' ' ||
-        COALESCE(${table.bathrooms}::text, '') || ' ' ||
-        COALESCE(${table.yearBuilt}::text, '') || ' ' ||
-        COALESCE(${table.monthlyFee}::text, '') || ' ' ||
-        COALESCE(array_to_string(${table.features}, ' '), '') || ' ' ||
-        COALESCE(${table.operatingCosts}::text, '') || ' ' ||
-        COALESCE(${table.kitchenDescription}, '') || ' ' ||
-        COALESCE(${table.bathroomDescription}, '') || ' ' ||
-        ${table.adTier}
-      ))`,
-    ),
-    index("property_location_index").using(
-      "gin",
-      sql`(
-          setweight(to_tsvector('swedish', ${table.addressStreet}), 'A') ||
-          setweight(to_tsvector('swedish', ${table.addressCity}), 'B')
-      )`,
-    ),
   ],
 );
 
-export type Property = typeof properties.$inferSelect;
-export type NewProperty = typeof properties.$inferInsert;
+export type PropertyTwo = typeof propertiesTwo.$inferSelect;
+export type NewPropertyTwo = typeof propertiesTwo.$inferInsert;
 
-export const propertyFavorites = pgTable("property_favorites", {
+export const propertyFavoritesTwo = pgTable("property_favorites_two", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   propertyId: uuid("property_id")
     .notNull()
-    .references(() => properties.id, { onDelete: "cascade" }),
+    .references(() => propertiesTwo.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });
 
-export type PropertyFavorite = typeof propertyFavorites.$inferSelect;
-export type NewPropertyFavorite = typeof propertyFavorites.$inferInsert;
+export type PropertyFavoriteTwo = typeof propertyFavoritesTwo.$inferSelect;
+export type NewPropertyFavoriteTwo = typeof propertyFavoritesTwo.$inferInsert;
 
-export const propertyViews = pgTable("property_views", {
+export const propertyViewsTwo = pgTable("property_views_two", {
   id: uuid("id").defaultRandom().primaryKey(),
   propertyId: uuid("property_id")
     .notNull()
-    .references(() => properties.id, { onDelete: "cascade" }),
+    .references(() => propertiesTwo.id, { onDelete: "cascade" }),
   userId: varchar("user_id", { length: 255 }).references(() => user.id, {
     onDelete: "set null",
   }),
@@ -142,5 +109,5 @@ export const propertyViews = pgTable("property_views", {
     .defaultNow(),
 });
 
-export type PropertyView = typeof propertyViews.$inferSelect;
-export type NewPropertyView = typeof propertyViews.$inferInsert;
+export type PropertyViewTwo = typeof propertyViewsTwo.$inferSelect;
+export type NewPropertyViewTwo = typeof propertyViewsTwo.$inferInsert;

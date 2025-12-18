@@ -1,6 +1,8 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { bostadsvyn, getDbClient } from "db";
 import { generateEmbeddings } from "../site/src/lib/ai/embedding";
-import { generateChunks } from "../site/src/lib/ai/generate-chunk";
 
 // Insert data chunks and their embeddings into DB
 const insertData = async (chunks: string[]) => {
@@ -27,8 +29,28 @@ const populateBostadsvynData = async () => {
   try {
     console.log("Processing embeddings...");
 
-    const data = await generateChunks();
-    const dataChunks = data.split("\n").filter(Boolean);
+    // Read and process the file using text-splitter
+    const filePath = join(
+      process.cwd(),
+      "apps",
+      "site",
+      "src",
+      "data",
+      "data.txt",
+    );
+    const content = await readFile(filePath, "utf-8");
+    const normalizedContent = content
+      .replace(/\r\n/g, "\n")
+      .replace(/\n+/g, " ");
+
+    const splitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 100,
+      chunkOverlap: 20,
+      keepSeparator: false,
+      separators: ["\n\n", "\n", ".", ",", ", "],
+    });
+    const dataChunks = await splitter.splitText(normalizedContent);
+
     await insertData(dataChunks);
 
     console.log("Chunks and embeddings generated and saved to DB.");

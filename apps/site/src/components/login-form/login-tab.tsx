@@ -40,7 +40,6 @@ const LoginTab = () => {
         email: email,
         password: password,
         rememberMe: true,
-        // callbackURL: "/dashboard",
       }, {
         onSuccess: async () => {
           const profiles = await getUserProfiles()

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Bostadsvyn - Framtidens bostadsportal | AI-Homestyling & Prisanalys",
 };
 
-export default async function RegisterBrokerLayout({
+export default async function PropertyAddLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
