@@ -23,6 +23,9 @@ export const user = pgTable("user", {
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
   stripeCustomerId: text("stripe_customer_id"),
+  accountType: text("account_type").default("buyer"),
+  companyName: text("company_name"),
+  orgNumber: text("org_number"),
 });
 
 export const account = pgTable("account", {
