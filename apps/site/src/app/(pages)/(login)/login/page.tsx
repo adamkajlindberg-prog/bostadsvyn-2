@@ -16,7 +16,7 @@ const LoginPage = () => {
               aria-hidden="true"
             />
           </div>
-          <h2 className="text-2xl @lg:text-3xl font-semibold">Bostadsvyn.se</h2>
+          <h2 className="text-2xl @lg:text-5xl font-semibold">Bostadsvyn.se</h2>
         </Link>
         <LoginForm />
       </div>
