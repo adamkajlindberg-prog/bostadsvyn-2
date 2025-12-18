@@ -1,39 +1,22 @@
-[HOME_PAGE]
+Bostadsvyn
 
-{HERO_SECTION}
+AI-Rekommendationer: Personliga tips och rekommendationer baserade på din sökhistorik och önskemål.
 
-Välkommen till Bostadsvyn!
+Marknadsanalys: Värderingar och förväntningar baserade på marknadsdata och avancerad AI-teknologi.
 
-AI-Rekommendationer  
-Personliga tips och rekommendationer baserade på din sökhistorik och önskemål.
+Digitala hyreskontrakt: Efter vald hyresbostad hjälper vi med digitala hyreskontrakt och säker signering med BankID.
 
-Marknadsanalys  
-Värderingar och förväntningar baserade på marknadsdata och avancerad AI-teknologi.
+Brett utbud av bostäder: Första portalen i Sverige som erbjuder alla typer av bostäder på en och samma plattform.
 
-Digitala hyreskontrakt  
-Efter vald hyresbostad hjälper vi med digitala hyreskontrakt och säker signering med BankID.
+Smart bostadssökning (Beta): Med hjälp av vår unika AI-sökning kan du enkelt skriva en liten text om vad du söker, vilka attribut som den nya bostaden ska ha och vilken gata, område eller kommun som önskas. Vår AI kommer sen att matcha de bostäderna i vårt system som bäst passar dina önskemål.
 
-Brett utbud av bostäder  
-Första portalen i Sverige som erbjuder alla typer av bostäder på en och samma plattform.
-
-Smart bostadssökning (Beta)  
-Med hjälp av vår unika AI-sökning kan du enkelt skriva en liten text om vad du söker, vilka attribut som den nya bostaden ska ha och vilken gata, område eller kommun som önskas. Vår AI kommer sen att matcha de bostäderna i vårt system som bäst passar dina önskemål.
-
-Sökfält:  
-Beskriv din önskade bostad eller sök på gata, område, kommun eller stad...
+Sökfält: Beskriv din önskade bostad eller sök på gata, område, kommun eller stad...
 
 Sök bostäder-knapp
 
 Filter-knapp
 
-Populära sökningar:  
-- 3 rum Stockholm under 5M  
-- Lägenhet nära tunnelbana Göteborg  
-- Villa med trädgård Malmö
-
-{ABOUT_SECTION}
-
-Bostadsvyn
+Populära sökningar: 3 rum Stockholm under 5M, Lägenhet nära tunnelbana Göteborg, Villa med trädgård Malmö
 
 Välkommen till framtidens bostadsportal med det bredaste utbudet av bostäder i Sverige. Hos oss hittar du allt från villor, gårdar, lägenheter, tomter och fritidshus till radhus, kedjehus, parhus, hyresbostäder, nyproduktion och kommersiella fastigheter – allt på samma plattform.
 
@@ -63,40 +46,38 @@ Vårt AI-verktyg låter dig enkelt lägga till eller ta bort element från fasti
 - Ta bort eller ändra befintliga element
 - Visa renoveringspotential i olika stilar
 
-{FEATURES_SECTION}
-
-AI-Homestyling  
-Transformera tomma rum till inredda drömhem med vår avancerade AI-teknik.  
-- Fotorealistiska resultat  
-- Olika stilar  
+AI-Homestyling
+Transformera tomma rum till inredda drömhem med vår avancerade AI-teknik.
+- Fotorealistiska resultat
+- Olika stilar
 - Snabb rendering
 
-Prisanalys & Prognoser  
-Få exakta värderingar och framtida prisförutsägelser baserat på marknadsdata.  
-- Realtidsdata  
-- Konfidensintervall  
+Prisanalys & Prognoser
+Få exakta värderingar och framtida prisförutsägelser baserat på marknadsdata.
+- Realtidsdata
+- Konfidensintervall
 - Områdesanalys
 
-Virtuella Visningar  
-360° visningar och 3D-modeller för immersiva bostadsupplevelser.  
-- 360° tours  
-- 3D-modeller  
+Virtuella Visningar
+360° visningar och 3D-modeller för immersiva bostadsupplevelser.
+- 360° tours
+- 3D-modeller
 - AR-visning
 
-Digitala Hyreskontrakt  
-Säkra signeringar med BankID och automatiserade juridiska dokument.  
-- BankID-integration  
-- Automatisering  
+Digitala Hyreskontrakt
+Säkra signeringar med BankID och automatiserade juridiska dokument.
+- BankID-integration
+- Automatisering
 - Juridisk säkerhet
 
-Kostnadskalkylator  
-Beräkna totala kostnader inklusive skatter, avgifter och låneinformation.  
+Kostnadskalkylator
+Beräkna totala kostnader inklusive skatter, avgifter och låneinformation.
 - Lånekalkyler  
-- Skatteinfo  
+- Skatteinfo
 - Månadsbudget
 
-AI Sökassistent  
-Personliga tips och lärandealgoritm för bostadssökning. Endast för medlemmar.  
-- Personliga tips  
-- Lärandealgoritm  
+AI Sökassistent
+Personliga tips och lärandealgoritm för bostadssökning. Endast för medlemmar.
+- Personliga tips
+- Lärandealgoritm
 - Endast för medlemmar
