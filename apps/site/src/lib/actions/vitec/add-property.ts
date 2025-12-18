@@ -1,11 +1,15 @@
-"use server"
+"use server";
 
-import { getServerSession } from "@/auth/server-session";
 import { getDbClient, propertiesTwo } from "db";
+import { getServerSession } from "@/auth/server-session";
 
-export const propertyAdd = async (title: string, objectId: string) => {
+export const addProperty = async (
+  title: string,
+  type: string,
+  objectId: string,
+) => {
   const session = await getServerSession();
-  
+
   if (!session?.user?.id) {
     return {
       success: false,
@@ -13,14 +17,41 @@ export const propertyAdd = async (title: string, objectId: string) => {
     };
   }
 
-  if (!title || !objectId) {
+  if (!title || !type || !objectId) {
     return {
       success: false,
       error: "Missing required fields.",
     };
   }
 
-  const url = `https://connect-qa.maklare.vitec.net/PublicAdvertising/HousingCooperative/${process.env.VITEC_DEMO_CUSTOMER_ID}/${objectId}`;
+  let endpointType: string;
+  switch (type) {
+    case "APARTMENT":
+      endpointType = "HousingCooperative";
+      break;
+    case "HOUSE":
+      endpointType = "House";
+      break;
+    case "COTTAGE":
+      endpointType = "Cottage";
+      break;
+    case "PLOT":
+      endpointType = "Plot";
+      break;
+    case "FARM":
+      endpointType = "Farm";
+      break;
+    case "COMMERCIAL":
+      endpointType = "CommercialProperty";
+      break;
+    default:
+      return {
+        success: false,
+        error: "Unsupported property type",
+      };
+  }
+
+  const url = `https://connect-qa.maklare.vitec.net/PublicAdvertising/${endpointType}/${process.env.VITEC_DEMO_CUSTOMER_ID}/${objectId}`;
   const auth = process.env.VITEC_DEMO_AUTH_TOKEN;
 
   const res = await fetch(url, {
@@ -33,7 +64,7 @@ export const propertyAdd = async (title: string, objectId: string) => {
   if (!res.ok) {
     return {
       success: false,
-      error: "Failed to fetch from Vitec",
+      error: "Property not found in Vitec system",
     };
   }
 
@@ -65,7 +96,7 @@ export const propertyAdd = async (title: string, objectId: string) => {
       objectId,
       title,
       description: data?.texts?.saleDescription,
-      propertyType: data?.type?.toUpperCase(),
+      propertyType: type,
       status,
       price: data?.price?.swedishCurrency,
       addressStreet: data?.address?.streetAddress,
@@ -73,6 +104,7 @@ export const propertyAdd = async (title: string, objectId: string) => {
       addressCity: data?.address?.city,
       addressCountry: data?.address?.countryCode,
       livingArea: data?.building?.livingSpace,
+      plotArea: data?.plotInfo?.plotSize,
       rooms: data?.building?.numberOfRooms,
       yearBuilt: data?.building?.yearBuilt,
       energyClass: data?.energyDeclaration?.energyClass,
@@ -82,7 +114,7 @@ export const propertyAdd = async (title: string, objectId: string) => {
       longitude: data?.address?.wgs84Coordinate?.longitude,
       operatingCosts: data?.expenses?.operatingCosts,
     });
-    
+
     return {
       success: true,
       message: "Property added successfully",

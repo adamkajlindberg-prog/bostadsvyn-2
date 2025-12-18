@@ -1,13 +1,21 @@
-"use client"
+"use client";
 
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { propertyAdd } from "@/lib/actions/vitec/property-add";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Spinner from "@/components/ui/spinner";
+import { addProperty } from "@/lib/actions/vitec/add-property";
 
 const propertyTypes = [
   { value: "APARTMENT", label: "Apartment" },
@@ -16,11 +24,11 @@ const propertyTypes = [
   { value: "PLOT", label: "Plot" },
   { value: "FARM", label: "Farm" },
   { value: "COMMERCIAL", label: "Commercial" },
-]
+];
 
 type T_Form_Input = {
   title: string;
-  propertyType: string;
+  type: string;
   objectId: string;
 };
 
@@ -28,15 +36,18 @@ const PropertyAddPage = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isSubmitting },
-  } = useForm<T_Form_Input>();
+  } = useForm<T_Form_Input>({
+    defaultValues: {
+      type: "APARTMENT",
+    },
+  });
 
   const onSubmit: SubmitHandler<T_Form_Input> = async (formData) => {
-    const { title, propertyType, objectId } = formData
+    const { title, type, objectId } = formData;
 
-    const res = await propertyAdd(title, objectId);
-
-    console.log("RES:", res)
+    const res = await addProperty(title, type, objectId);
 
     if (!res.success) {
       toast.error("Failed to add property", {
@@ -45,8 +56,8 @@ const PropertyAddPage = () => {
       return;
     }
 
-    toast.success(res.message)
-  }
+    toast.success(res.message);
+  };
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 @container">
@@ -66,27 +77,41 @@ const PropertyAddPage = () => {
                 </Field>
                 <Field>
                   <FieldLabel>Property Type</FieldLabel>
-                  <Select defaultValue="APARTMENT">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {propertyTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
+                  <Controller
+                    name="type"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {propertyTypes.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </Field>
                 <Field>
                   <FieldLabel>Object ID (from Vitec)</FieldLabel>
-                  <Input {...register("objectId", { required: true })} required />
+                  <Input
+                    {...register("objectId", { required: true })}
+                    required
+                  />
                 </Field>
                 <Field>
                   <Button type="submit" disabled={isSubmitting}>
-                    Create
+                    {isSubmitting ? <Spinner /> : "Create"}
                   </Button>
                 </Field>
               </FieldGroup>
