@@ -298,7 +298,7 @@ const Header = () => {
                     key={item.title}
                     variant="ghost"
                     size="sm"
-                    className="text-foreground hover:text-primary text-sm flex-shrink-0"
+                    className="text-foreground hover:text-white text-sm flex-shrink-0"
                     asChild
                   >
                     <Link href={item.url} role="menuitem">
