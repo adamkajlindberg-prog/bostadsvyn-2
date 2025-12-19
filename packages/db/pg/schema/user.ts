@@ -13,6 +13,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  phone: text("phone"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -75,3 +76,25 @@ export const subscription = pgTable("subscription", {
   cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
   seats: integer("seats"),
 });
+
+export const userPreferences = pgTable("user_preferences", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  emailNotifications: boolean("email_notifications").default(true).notNull(),
+  smsNotifications: boolean("sms_notifications").default(false).notNull(),
+  marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  preferredCurrency: text("preferred_currency").default("SEK").notNull(),
+  preferredLanguage: text("preferred_language").default("sv").notNull(),
+  theme: text("theme").default("system").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type NewUserPreferences = typeof userPreferences.$inferInsert;
