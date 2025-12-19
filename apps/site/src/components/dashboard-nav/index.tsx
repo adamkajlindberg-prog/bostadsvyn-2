@@ -104,15 +104,18 @@ export function DashboardNav() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
+            const isGroup = item.href === "/dashboard/gruppkonton";
+            const isDisabled = isGroup
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={isDisabled ? "#" : item.href}
                 className={cn(
                   "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   isActive
                     ? "bg-background text-foreground shadow-sm"
                     : "hover:bg-background/50 hover:text-foreground",
+                  isDisabled && "opacity-50 cursor-not-allowed",
                 )}
               >
                 {Icon && <Icon className="h-4 w-4 mr-1.5" />}
