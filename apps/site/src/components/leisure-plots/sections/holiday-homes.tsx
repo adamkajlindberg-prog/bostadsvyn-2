@@ -3,7 +3,7 @@ import ProjectCard, {
 } from "@/components/new-production/project-card";
 import bgImage from "@/images/bg-image.webp";
 
-const homes: Project[] = [
+const HOMES: Project[] = [
   {
     image: bgImage,
     badgeOneText: "Havsnära",
@@ -51,25 +51,23 @@ const homes: Project[] = [
   },
 ];
 
-const HolidayHomes = () => {
-  return (
-    <>
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
-        <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">
-          Utvalda fritidsboenden
-        </h3>
-        <div className="text-xs text-center font-semibold rounded-full border px-3 py-1">
-          Handplockade av våra experter
-        </div>
+const HolidayHomes = () => (
+  <>
+    <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
+      <h3 className="text-xl @lg:text-2xl font-semibold tracking-tight">
+        Utvalda fritidsboenden
+      </h3>
+      <div className="text-xs text-center font-semibold rounded-full border px-3 py-1">
+        Handplockade av våra experter
       </div>
+    </div>
 
-      <div className="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-6 mb-12">
-        {homes.map((home) => (
-          <ProjectCard key={home.name} project={home} />
-        ))}
-      </div>
-    </>
-  );
-};
+    <div className="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-6 mb-12">
+      {HOMES.map((home) => (
+        <ProjectCard key={home.name} project={home} />
+      ))}
+    </div>
+  </>
+);
 
 export default HolidayHomes;

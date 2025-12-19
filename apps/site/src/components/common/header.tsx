@@ -254,7 +254,7 @@ const Header = () => {
       aria-label="Huvudnavigering"
     >
       <div className="px-3 sm:px-4 max-w-full w-full">
-        <div className="flex items-center h-12 md:h-auto flex-nowrap w-full min-w-0">
+        <div className="gap-2 flex items-center h-12 md:h-auto flex-nowrap w-full min-w-0">
           {/* Logo */}
           <Link
             href="/"
@@ -273,7 +273,7 @@ const Header = () => {
           </Link>
 
           {/* Navigation Links - Desktop */}
-          <div className="hidden lg:flex items-center ml-3 flex-shrink-0 min-w-0 max-[1450px]:max-w-[65%] max-[1450px]:relative">
+          <div className="hidden lg:flex items-center flex-shrink-0 min-w-0 max-[1450px]:max-w-[65%] max-[1450px]:relative">
             {showLeftArrow && (
               <Button
                 variant="ghost"
@@ -287,7 +287,7 @@ const Header = () => {
             )}
             <div
               ref={scrollContainerRef}
-              className="hidden lg:flex items-center space-x-1 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] max-[1450px]:px-8"
+              className="hidden lg:flex items-center space-x-1 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] "
               role="menubar"
               aria-label="Huvudmeny"
             >
@@ -373,11 +373,13 @@ const Header = () => {
                     <PopoverTrigger asChild>
                       <Button
                         size="sm"
-                        className="hidden sm:flex text-sm justify-between"
+                        className="hidden sm:flex text-sm justify-between min-w-0 max-w-[100px]"
                         variant="outline"
                       >
-                        {getActiveProfileName()}
-                        <ChevronsUpDownIcon className="opacity-50" />
+                        <span className="truncate min-w-0 flex-1 mr-2">
+                          {getActiveProfileName()}
+                        </span>
+                        <ChevronsUpDownIcon className="opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-56 p-0.5">
