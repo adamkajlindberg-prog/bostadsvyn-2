@@ -104,7 +104,8 @@ export default function PropertyManagement() {
           params.get("bypass") === "true"
         );
       })();
-    return bypass || allowedRoles.includes(role);
+    const ALLOWED_ROLES = ["admin", "broker", "org-admin"];
+    return bypass || (role ? ALLOWED_ROLES.includes(role) : false);
   }, [session?.user?.role, session?.session?.activeOrganizationId]);
 
   const load = useCallback(async () => {
