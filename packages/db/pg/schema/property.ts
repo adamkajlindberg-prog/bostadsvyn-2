@@ -21,6 +21,7 @@ export const properties = pgTable(
     userId: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    objectId: varchar("object_id", { length: 100 }).notNull().unique(),
     title: text("title").notNull(),
     description: text("description"),
     propertyType: varchar("property_type", { length: 50 }).notNull(),
@@ -73,38 +74,38 @@ export const properties = pgTable(
     ),
     check("ad_tier_check", sql`${table.adTier} IN ('free', 'plus', 'premium')`),
 
-    index("property_search_index").using(
-      "gin",
-      sql`(
-      to_tsvector('swedish', 
-        ${table.title} || ' ' || 
-        COALESCE(${table.description}, '') || ' ' || 
-        ${table.propertyType} || ' ' || 
-        ${table.status} || ' ' ||
-        ${table.price}::text || ' ' ||
-        ${table.addressStreet} || ' ' ||
-        ${table.addressCity} || ' ' ||
-        COALESCE(${table.livingArea}::text, '') || ' ' ||
-        COALESCE(${table.plotArea}::text, '') || ' ' ||
-        COALESCE(${table.rooms}::text, '') || ' ' ||
-        COALESCE(${table.bedrooms}::text, '') || ' ' ||
-        COALESCE(${table.bathrooms}::text, '') || ' ' ||
-        COALESCE(${table.yearBuilt}::text, '') || ' ' ||
-        COALESCE(${table.monthlyFee}::text, '') || ' ' ||
-        COALESCE(array_to_string(${table.features}, ' '), '') || ' ' ||
-        COALESCE(${table.operatingCosts}::text, '') || ' ' ||
-        COALESCE(${table.kitchenDescription}, '') || ' ' ||
-        COALESCE(${table.bathroomDescription}, '') || ' ' ||
-        ${table.adTier}
-      ))`,
-    ),
-    index("property_location_index").using(
-      "gin",
-      sql`(
-          setweight(to_tsvector('swedish', ${table.addressStreet}), 'A') ||
-          setweight(to_tsvector('swedish', ${table.addressCity}), 'B')
-      )`,
-    ),
+    // index("property_search_index").using(
+    //   "gin",
+    //   sql`(
+    //   to_tsvector('swedish',
+    //     ${table.title} || ' ' ||
+    //     COALESCE(${table.description}, '') || ' ' ||
+    //     ${table.propertyType} || ' ' ||
+    //     ${table.status} || ' ' ||
+    //     ${table.price}::text || ' ' ||
+    //     ${table.addressStreet} || ' ' ||
+    //     ${table.addressCity} || ' ' ||
+    //     COALESCE(${table.livingArea}::text, '') || ' ' ||
+    //     COALESCE(${table.plotArea}::text, '') || ' ' ||
+    //     COALESCE(${table.rooms}::text, '') || ' ' ||
+    //     COALESCE(${table.bedrooms}::text, '') || ' ' ||
+    //     COALESCE(${table.bathrooms}::text, '') || ' ' ||
+    //     COALESCE(${table.yearBuilt}::text, '') || ' ' ||
+    //     COALESCE(${table.monthlyFee}::text, '') || ' ' ||
+    //     COALESCE(array_to_string(${table.features}, ' '), '') || ' ' ||
+    //     COALESCE(${table.operatingCosts}::text, '') || ' ' ||
+    //     COALESCE(${table.kitchenDescription}, '') || ' ' ||
+    //     COALESCE(${table.bathroomDescription}, '') || ' ' ||
+    //     ${table.adTier}
+    //   ))`,
+    // ),
+    // index("property_location_index").using(
+    //   "gin",
+    //   sql`(
+    //       setweight(to_tsvector('swedish', ${table.addressStreet}), 'A') ||
+    //       setweight(to_tsvector('swedish', ${table.addressCity}), 'B')
+    //   )`,
+    // ),
   ],
 );
 

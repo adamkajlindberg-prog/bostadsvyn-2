@@ -1,6 +1,7 @@
 "use server";
 
-import { getDbClient, propertiesTwo } from "db";
+import { DrizzleQueryError, getDbClient, properties } from "db";
+import { DatabaseError } from "pg";
 import { getServerSession } from "@/auth/server-session";
 
 export const addProperty = async (
@@ -91,7 +92,7 @@ export const addProperty = async (
   }
 
   try {
-    await db.insert(propertiesTwo).values({
+    await db.insert(properties).values({
       userId: session.user.id,
       objectId,
       title,
@@ -107,7 +108,7 @@ export const addProperty = async (
       plotArea: data?.plotInfo?.plotSize,
       rooms: data?.building?.numberOfRooms,
       yearBuilt: data?.building?.yearBuilt,
-      energyClass: data?.energyDeclaration?.energyClass,
+      energyClass: data?.energyDeclaration?.energyClass || null,
       monthlyFee: data?.expenses?.monthlyFee,
       images: data?.images?.map((img: { id: string }) => img.id) || [],
       latitude: data?.address?.wgs84Coordinate?.latitude,
@@ -120,9 +121,20 @@ export const addProperty = async (
       message: "Property added successfully",
     };
   } catch (error) {
+    if (error instanceof DrizzleQueryError) {
+      if (error.cause instanceof DatabaseError) {
+        if (error.cause.code === "23505") {
+          return {
+            success: false,
+            error: "Property with this Object ID already exists.",
+          };
+        }
+      }
+    }
+
     return {
       success: false,
-      error: "Failed to insert property",
+      error: "Something went wrong. Please try again later.",
       details: (error as Error).message,
     };
   }
