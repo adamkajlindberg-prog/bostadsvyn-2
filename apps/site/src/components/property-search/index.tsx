@@ -123,6 +123,11 @@ export default function PropertySearch() {
   >(undefined);
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
   const [activeSearchTab, setActiveSearchTab] = useState("");
+  
+  // Hide filter checkboxes
+  const [hideRental, setHideRental] = useState(false);
+  const [hideCommercial, setHideCommercial] = useState(false);
+  const [hideNyproduktion, setHideNyproduktion] = useState(false);
 
   // Separated filter states
   const [inputValues, setInputValues] = useState({
@@ -160,6 +165,9 @@ export default function PropertySearch() {
     setFilters(getFiltersFromParams(new URLSearchParams()));
     clearInputValues();
     setSelectedLocation(undefined);
+    setHideRental(false);
+    setHideCommercial(false);
+    setHideNyproduktion(false);
   };
 
   const trpc = useTRPC();
@@ -170,8 +178,17 @@ export default function PropertySearch() {
     isFetching: isFetchingSearchData,
   } = useQuery(trpc.propertySearch.search.queryOptions(filters));
 
-  const properties: Property[] = searchData?.properties ?? [];
-  const totalResults = searchData?.total ?? 0;
+  const allProperties: Property[] = searchData?.properties ?? [];
+  
+  // Filter properties based on hide checkboxes
+  const properties: Property[] = allProperties.filter((property) => {
+    if (hideRental && property.status === "FOR_RENT") return false;
+    if (hideCommercial && property.status === "COMMERCIAL") return false;
+    if (hideNyproduktion && property.status === "NYPRODUKTION") return false;
+    return true;
+  });
+  
+  const totalResults = properties.length;
 
   const handleNaturalSearch = () => {
     if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
@@ -629,32 +646,64 @@ export default function PropertySearch() {
                 </DropdownMenu>
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="gap-2">
-                    <ArrowUpDown className="h-4 w-4" />
-                    Sortera efter
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          sortBy: option.value,
-                        }))
-                      }
-                      className={
-                        filters.sortBy === option.value ? "bg-accent" : ""
-                      }
-                    >
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideRental" 
+                    checked={hideRental} 
+                    onCheckedChange={(checked) => setHideRental(checked === true)} 
+                  />
+                  <Label htmlFor="hideRental" className="text-sm cursor-pointer">
+                    Visa ej hyresbostäder
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideCommercial" 
+                    checked={hideCommercial} 
+                    onCheckedChange={(checked) => setHideCommercial(checked === true)} 
+                  />
+                  <Label htmlFor="hideCommercial" className="text-sm cursor-pointer">
+                    Visa ej kommersiellt
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideNyproduktion" 
+                    checked={hideNyproduktion} 
+                    onCheckedChange={(checked) => setHideNyproduktion(checked === true)} 
+                  />
+                  <Label htmlFor="hideNyproduktion" className="text-sm cursor-pointer">
+                    Visa ej nyproduktion
+                  </Label>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="gap-2">
+                      <ArrowUpDown className="h-4 w-4" />
+                      Sortera efter
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {sortOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onClick={() =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            sortBy: option.value,
+                          }))
+                        }
+                        className={
+                          filters.sortBy === option.value ? "bg-accent" : ""
+                        }
+                      >
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
 
