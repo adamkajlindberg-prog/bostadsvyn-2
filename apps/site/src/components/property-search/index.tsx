@@ -123,6 +123,11 @@ export default function PropertySearch() {
   >(undefined);
   const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
   const [activeSearchTab, setActiveSearchTab] = useState("");
+  
+  // Hide filter checkboxes
+  const [hideRental, setHideRental] = useState(false);
+  const [hideCommercial, setHideCommercial] = useState(false);
+  const [hideNyproduktion, setHideNyproduktion] = useState(false);
 
   // Separated filter states
   const [inputValues, setInputValues] = useState({
@@ -160,6 +165,9 @@ export default function PropertySearch() {
     setFilters(getFiltersFromParams(new URLSearchParams()));
     clearInputValues();
     setSelectedLocation(undefined);
+    setHideRental(false);
+    setHideCommercial(false);
+    setHideNyproduktion(false);
   };
 
   const trpc = useTRPC();
@@ -170,8 +178,105 @@ export default function PropertySearch() {
     isFetching: isFetchingSearchData,
   } = useQuery(trpc.propertySearch.search.queryOptions(filters));
 
-  const properties: Property[] = searchData?.properties ?? [];
-  const totalResults = searchData?.total ?? 0;
+  const allProperties: Property[] = searchData?.properties ?? [];
+  
+  // Filter properties based on hide checkboxes
+  const properties: Property[] = allProperties.filter((property) => {
+    if (hideRental && property.status === "FOR_RENT") return false;
+    if (hideCommercial && property.status === "COMMERCIAL") return false;
+    if (hideNyproduktion && property.status === "NYPRODUKTION") return false;
+    return true;
+  });
+  
+  const totalResults = properties.length;
+
+  // Group properties by days since creation
+  const groupPropertiesByDays = (propertiesToGroup: Property[]) => {
+    const groups: {
+      [key: string]: Property[];
+    } = {};
+    const now = new Date();
+    
+    propertiesToGroup.forEach((property) => {
+      if (!property.createdAt) return;
+      
+      const createdDate = new Date(property.createdAt);
+      const diffTime = Math.abs(now.getTime() - createdDate.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      let groupKey: string;
+      if (diffDays === 0) {
+        groupKey = "Idag";
+      } else if (diffDays === 1) {
+        groupKey = "Igår";
+      } else if (diffDays >= 2 && diffDays <= 7) {
+        groupKey = `${diffDays} dagar`;
+      } else if (diffDays > 7 && diffDays <= 28) {
+        const weeks = Math.floor(diffDays / 7);
+        groupKey = `${weeks} ${weeks === 1 ? "vecka" : "veckor"}`;
+      } else {
+        const weeks = Math.floor(diffDays / 7);
+        groupKey = `${weeks} veckor`;
+      }
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(property);
+    });
+
+    // Sort groups by time (newest first)
+    const sortedGroups: {
+      label: string;
+      properties: Property[];
+    }[] = [];
+
+    // Add "Idag" first
+    if (groups["Idag"]) {
+      sortedGroups.push({
+        label: "Idag",
+        properties: groups["Idag"],
+      });
+    }
+
+    // Add "Igår" second
+    if (groups["Igår"]) {
+      sortedGroups.push({
+        label: "Igår",
+        properties: groups["Igår"],
+      });
+    }
+
+    // Add day groups (2-7 days)
+    for (let i = 2; i <= 7; i++) {
+      const key = `${i} dagar`;
+      if (groups[key]) {
+        sortedGroups.push({
+          label: key,
+          properties: groups[key],
+        });
+      }
+    }
+
+    // Add week groups
+    const weekKeys = Object.keys(groups).filter(
+      (k) => k.includes("vecka") || k.includes("veckor"),
+    );
+    weekKeys
+      .sort((a, b) => {
+        const aNum = parseInt(a);
+        const bNum = parseInt(b);
+        return aNum - bNum;
+      })
+      .forEach((key) => {
+        sortedGroups.push({
+          label: key,
+          properties: groups[key],
+        });
+      });
+
+    return sortedGroups;
+  };
 
   const handleNaturalSearch = () => {
     if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
@@ -629,32 +734,64 @@ export default function PropertySearch() {
                 </DropdownMenu>
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="gap-2">
-                    <ArrowUpDown className="h-4 w-4" />
-                    Sortera efter
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {sortOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          sortBy: option.value,
-                        }))
-                      }
-                      className={
-                        filters.sortBy === option.value ? "bg-accent" : ""
-                      }
-                    >
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideRental" 
+                    checked={hideRental} 
+                    onCheckedChange={(checked) => setHideRental(checked === true)} 
+                  />
+                  <Label htmlFor="hideRental" className="text-sm cursor-pointer">
+                    Visa ej hyresbostäder
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideCommercial" 
+                    checked={hideCommercial} 
+                    onCheckedChange={(checked) => setHideCommercial(checked === true)} 
+                  />
+                  <Label htmlFor="hideCommercial" className="text-sm cursor-pointer">
+                    Visa ej kommersiellt
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="hideNyproduktion" 
+                    checked={hideNyproduktion} 
+                    onCheckedChange={(checked) => setHideNyproduktion(checked === true)} 
+                  />
+                  <Label htmlFor="hideNyproduktion" className="text-sm cursor-pointer">
+                    Visa ej nyproduktion
+                  </Label>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="gap-2">
+                      <ArrowUpDown className="h-4 w-4" />
+                      Sortera efter
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {sortOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onClick={() =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            sortBy: option.value,
+                          }))
+                        }
+                        className={
+                          filters.sortBy === option.value ? "bg-accent" : ""
+                        }
+                      >
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
 
@@ -675,9 +812,20 @@ export default function PropertySearch() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-6">
-                {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+              <div className="mx-auto space-y-8">
+                {groupPropertiesByDays(properties).map((group) => (
+                  <div key={group.label} className="space-y-4">
+                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 border-b">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {group.label}
+                      </h3>
+                    </div>
+                    <div className="space-y-6">
+                      {group.properties.map((property) => (
+                        <PropertyCard key={property.id} property={property} />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             ))}
