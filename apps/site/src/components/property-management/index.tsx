@@ -89,7 +89,7 @@ function StatCard({
 }
 
 export default function PropertyManagement() {
-  const { data: session, isLoading: sessionLoading } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [properties, setProperties] = useState<Property[]>([]);
   const [stats, setStats] = useState<Stats>({
     total: 0,
@@ -143,13 +143,12 @@ export default function PropertyManagement() {
   }, [search, statusFilter]);
 
   useEffect(() => {
-    if (sessionLoading) return;
     if (!canManage) {
       setIsLoading(false);
       return;
     }
     load();
-  }, [canManage, load, sessionLoading]);
+  }, [canManage, load]);
 
   const handleDelete = (id: string) => {
     if (!confirm("Är du säker på att du vill ta bort fastigheten?")) return;
@@ -166,7 +165,7 @@ export default function PropertyManagement() {
 
   const filteredProperties = properties;
 
-  if (!canManage && !sessionLoading) {
+  if (!canManage) {
     return (
       <ContainerWrapper className="py-12">
         <Card>
