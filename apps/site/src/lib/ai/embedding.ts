@@ -13,7 +13,7 @@ import {
 const generateChunks = async (input: string): Promise<string[]> => {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 100,
-    chunkOverlap: 20,
+    chunkOverlap: 0,
     keepSeparator: false,
     separators: ["\n\n", "\n", ".", ",", ", "],
   });

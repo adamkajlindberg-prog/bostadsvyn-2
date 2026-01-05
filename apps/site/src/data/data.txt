@@ -26,7 +26,7 @@ Smarta verktyg för modern fastighetshantering
 
 AI-drivna lösningar som gör bostadsprocessen enklare och mer transparent.
 
-1. AI-Homestyling
+1 - AI-Homestyling
 
 Se potentialen i varje rum
 
@@ -36,7 +36,7 @@ AI-teknik som transformerar rum till den stil du önskar – visualisera din fra
 - Olika inredningsstilar
 - Automatisk anpassning
 
-2. AI Bildredigering
+2 - AI Bildredigering
 
 Visualisera renoveringar, förändringar och tillbyggnader
 
