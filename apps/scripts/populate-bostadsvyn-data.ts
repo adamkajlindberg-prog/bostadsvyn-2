@@ -1,27 +1,23 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { bostadsvyn, getDbClient } from "db";
 import { generateEmbeddings } from "../site/src/lib/ai/embedding";
 
 // Insert data chunks and their embeddings into DB
-const insertData = async (chunks: string[]) => {
+const insertData = async (content: string) => {
   const db = getDbClient();
 
-  for (const content of chunks) {
-    if (!content.trim()) continue;
-    // Generate embeddings for the chunk
-    const embeddingQuery = await generateEmbeddings(content);
+  if (!content.trim()) return;
 
-    // Save embeddings to embedding table
-    await db.insert(bostadsvyn).values(
-      embeddingQuery.map((embedding) => ({
-        ...embedding,
-      })),
-    );
+  // Generate embeddings for the content (this will chunk it internally)
+  const embeddingQuery = await generateEmbeddings(content);
 
-    console.log(`Saved chunk and embeddings: ${content.slice(0, 40)}...`);
-  }
+  // Save embeddings to embedding table
+  await db.insert(bostadsvyn).values(
+    embeddingQuery.map((embedding) => ({
+      ...embedding,
+    })),
+  );
 };
 
 // Main function to populate Bostadsvyn data
@@ -43,15 +39,7 @@ const populateBostadsvynData = async () => {
       .replace(/\r\n/g, "\n")
       .replace(/\n+/g, " ");
 
-    const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 100,
-      chunkOverlap: 20,
-      keepSeparator: false,
-      separators: ["\n\n", "\n", ".", ",", ", "],
-    });
-    const dataChunks = await splitter.splitText(normalizedContent);
-
-    await insertData(dataChunks);
+    await insertData(normalizedContent);
 
     console.log("Chunks and embeddings generated and saved to DB.");
   } catch (error) {
