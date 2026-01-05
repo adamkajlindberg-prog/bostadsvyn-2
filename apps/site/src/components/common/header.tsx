@@ -388,8 +388,13 @@ const Header = () => {
                           className="w-full justify-between rounded-sm"
                           onClick={() => handleSwitchProfile(profile)}
                         >
-                          <div className="w-full overflow-hidden truncate text-left">
-                            {profile.name}
+                          <div className="flex flex-col gap-0.5 text-left overflow-hidden truncate">
+                            <div className="text-sm font-medium line-clamp-1">
+                              {profile.name}
+                            </div>
+                            <div className="text-xs text-foreground/60 line-clamp-1 capitalize">
+                              {profile.type}
+                            </div>
                           </div>
 
                           {getActiveProfileName() === profile.name && (
