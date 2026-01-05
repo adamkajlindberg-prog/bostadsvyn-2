@@ -5,6 +5,7 @@ import type { Property } from "db";
 const baseProperty: Omit<Property, "adTier"> = {
   id: "550e8400-e29b-41d4-a716-446655440001",
   userId: "test-user",
+  objectId: "mock-object-id-001",
   title: "Exklusiv villa med havsutsikt",
   description:
     "Magnifik villa i absolut toppskick med panoramautsikt över havet. Genomgående exklusiva materialval, rymliga sällskapsytor och perfekt planlösning för familjen som värdesätter kvalitet och komfort.",

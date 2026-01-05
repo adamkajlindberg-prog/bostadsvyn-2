@@ -123,29 +123,54 @@ export async function createProperty(
     const db = getDbClient();
     const uploaded = await uploadPropertyImages(images, session.user.id);
 
-    await db.insert(properties).values({
-      id: parsed.id,
+    // Build insert object with required fields
+    const insertData: typeof properties.$inferInsert = {
       userId: session.user.id,
+      objectId: parsed.id ?? randomUUID(),
       title: parsed.title,
-      description: parsed.description,
       propertyType: parsed.propertyType,
       status: parsed.status,
       price: parsed.price,
       addressStreet: parsed.addressStreet,
       addressPostalCode: parsed.addressPostalCode,
       addressCity: parsed.addressCity,
-      livingArea: parsed.livingArea,
-      plotArea: parsed.plotArea,
-      rooms: parsed.rooms,
-      bedrooms: parsed.bedrooms,
-      bathrooms: parsed.bathrooms,
-      yearBuilt: parsed.yearBuilt,
-      monthlyFee: parsed.monthlyFee,
-      energyClass: parsed.energyClass,
-      features: parsed.features,
       images: [...(parsed.images || []), ...uploaded],
       adTier: parsed.adTier,
-    });
+    };
+
+    // Add optional fields only if defined
+    if (parsed.description !== undefined) {
+      insertData.description = parsed.description;
+    }
+    if (parsed.livingArea !== undefined) {
+      insertData.livingArea = parsed.livingArea;
+    }
+    if (parsed.plotArea !== undefined) {
+      insertData.plotArea = parsed.plotArea;
+    }
+    if (parsed.rooms !== undefined) {
+      insertData.rooms = parsed.rooms;
+    }
+    if (parsed.bedrooms !== undefined) {
+      insertData.bedrooms = parsed.bedrooms;
+    }
+    if (parsed.bathrooms !== undefined) {
+      insertData.bathrooms = parsed.bathrooms;
+    }
+    if (parsed.yearBuilt !== undefined) {
+      insertData.yearBuilt = parsed.yearBuilt;
+    }
+    if (parsed.monthlyFee !== undefined) {
+      insertData.monthlyFee = parsed.monthlyFee;
+    }
+    if (parsed.energyClass !== undefined) {
+      insertData.energyClass = parsed.energyClass;
+    }
+    if (parsed.features !== undefined) {
+      insertData.features = parsed.features;
+    }
+
+    await db.insert(properties).values(insertData);
 
     return { success: true };
   } catch (error) {

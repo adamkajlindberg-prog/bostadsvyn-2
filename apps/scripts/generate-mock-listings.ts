@@ -589,6 +589,7 @@ async function generateMockProperties() {
       const propertyValues = {
         id: propertyId,
         userId,
+        objectId: propertyId, 
         title: propertyData.title,
         description: propertyData.description,
         propertyType: propertyData.propertyType,
@@ -618,6 +619,7 @@ async function generateMockProperties() {
           target: properties.id,
           set: {
             userId: propertyValues.userId,
+            objectId: propertyValues.objectId,
             title: propertyValues.title,
             description: propertyValues.description,
             propertyType: propertyValues.propertyType,
