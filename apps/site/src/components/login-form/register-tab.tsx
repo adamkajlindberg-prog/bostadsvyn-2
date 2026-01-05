@@ -1,5 +1,6 @@
 "use client";
 import {
+  Building2,
   FilePenIcon,
   HeartIcon,
   HouseIcon,
@@ -27,11 +28,16 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { updateUserAccountType } from "@/lib/actions/user";
 
 const RegisterTab = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accountType, setAccountType] = useState<"buyer" | "company">("buyer");
+  const [companyName, setCompanyName] = useState("");
+  const [orgNumber, setOrgNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [bankIdLoading, setBankIdLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -52,7 +58,25 @@ const RegisterTab = () => {
           password: password,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            // Update account type and company info after successful signup
+            const updateResult = await updateUserAccountType({
+              accountType,
+              companyName: accountType === "company" ? companyName : undefined,
+              orgNumber: accountType === "company" ? orgNumber : undefined,
+            });
+
+            if (!updateResult.success) {
+              console.error(
+                "Failed to update account type:",
+                updateResult.error,
+              );
+              toast.error("Varning", {
+                description:
+                  "Kontot skapades men kontotypen kunde inte sparas. Kontakta support.",
+              });
+            }
+
             router.push("/dashboard");
           },
         },
@@ -74,6 +98,8 @@ const RegisterTab = () => {
         setFullName("");
         setEmail("");
         setPassword("");
+        setCompanyName("");
+        setOrgNumber("");
       }
     } catch (err) {
       const message =
@@ -197,12 +223,93 @@ const RegisterTab = () => {
       <form onSubmit={handleSubmit}>
         <FieldGroup className="gap-y-6 mb-4">
           <Field>
-            <FieldLabel htmlFor="fullName">Fullständigt namn</FieldLabel>
+            <FieldLabel className="text-sm font-medium">Kontotyp</FieldLabel>
+            <div className="inline-flex h-12 items-center justify-center rounded-lg bg-background shadow-sm p-1.5 gap-2 w-full border">
+              <button
+                type="button"
+                onClick={() => setAccountType("buyer")}
+                disabled={loading || bankIdLoading || googleLoading}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold ring-offset-background transition-all border-2 flex-1",
+                  accountType === "buyer"
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-transparent text-foreground border-border hover:border-primary/50",
+                )}
+              >
+                <UserIcon className="w-4 h-4 mr-2" />
+                Privatperson
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccountType("company")}
+                disabled={loading || bankIdLoading || googleLoading}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold ring-offset-background transition-all border-2 flex-1",
+                  accountType === "company"
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-transparent text-foreground border-border hover:border-primary/50",
+                )}
+              >
+                <Building2 className="w-4 h-4 mr-2" />
+                Företag
+              </button>
+            </div>
+          </Field>
+
+          {accountType === "company" && (
+            <>
+              <Field>
+                <FieldLabel htmlFor="companyName">Företagsnamn</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    id="companyName"
+                    type="text"
+                    placeholder="Företagets namn"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required={accountType === "company"}
+                    disabled={loading || bankIdLoading || googleLoading}
+                  />
+                  <InputGroupAddon>
+                    <Building2 />
+                  </InputGroupAddon>
+                </InputGroup>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="orgNumber">Organisationsnummer</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    id="orgNumber"
+                    type="text"
+                    placeholder="XXXXXX-XXXX"
+                    value={orgNumber}
+                    onChange={(e) => setOrgNumber(e.target.value)}
+                    required={accountType === "company"}
+                    disabled={loading || bankIdLoading || googleLoading}
+                  />
+                  <InputGroupAddon>
+                    <Building2 />
+                  </InputGroupAddon>
+                </InputGroup>
+              </Field>
+            </>
+          )}
+
+          <Field>
+            <FieldLabel htmlFor="fullName">
+              {accountType === "company"
+                ? "Kontaktperson"
+                : "Fullständigt namn"}
+            </FieldLabel>
             <InputGroup>
               <InputGroupInput
                 id="fullName"
                 type="text"
-                placeholder="Ditt fullständiga namn"
+                placeholder={
+                  accountType === "company"
+                    ? "Namn på kontaktperson"
+                    : "Ditt fullständiga namn"
+                }
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required

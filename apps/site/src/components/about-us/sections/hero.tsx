@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { heroContent, missionVisionCards } from "@/utils/constants";
 import { getIcon } from "../utils/icon-map";
+import FounderStory from "./founder-story";
 
 const Hero = () => {
   return (
@@ -17,7 +18,7 @@ const Hero = () => {
           {heroContent.description}
         </p>
       </header>
-
+      <FounderStory />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
         {missionVisionCards.map((card) => {
           const IconComponent = getIcon(card.iconName);

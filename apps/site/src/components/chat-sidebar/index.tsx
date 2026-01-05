@@ -83,7 +83,7 @@ const ChatSidebar = () => {
   };
 
   return (
-    <div>
+    <div className="shadow-xl" id="chat-sidebar">
       <Sidebar collapsible="icon" className="border-r border-neutral-200">
         <SidebarContent className="flex flex-col h-full">
           <SidebarGroup className="px-0 pt-5 flex flex-col flex-1">
@@ -244,7 +244,10 @@ const ChatSidebar = () => {
       </Sidebar>
 
       <div
-        className={`${open ? "hidden" : "hidden sm:inline-flex"} ml-1 sticky top-1/2 -translate-y-0.5 z-40 bg-muted bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full p-2.5 ring-2 ring-primary/20`}
+        className={`${open ? "hidden" : "hidden sm:inline-flex"} fixed top-1/2 -translate-y-1/2 z-40 bg-muted bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-full p-2.5 ring-2 ring-primary/20`}
+        style={{
+          left: "5px",
+        }}
       >
         <span className="absolute inset-0 flex items-center justify-center -z-10">
           <span className="inline-flex h-2/3 w-2/3 rounded-full bg-primary opacity-60 animate-ping"></span>
@@ -257,7 +260,10 @@ const ChatSidebar = () => {
         type="button"
         aria-label="Toggle sidebar"
         onClick={toggleSidebar}
-        className="hidden sm:block sticky top-1/2 left-full -mr-5 z-40 bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary-light shadow-lg cursor-pointer opacity-90"
+        className="hidden sm:block fixed top-1/2 -translate-y-1/2 z-40 bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary-light shadow-lg cursor-pointer opacity-90 transition-all duration-300"
+        style={{
+          left: open ? "var(--sidebar-width, 15rem)" : "30px",
+        }}
       >
         {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>

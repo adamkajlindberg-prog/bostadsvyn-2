@@ -165,7 +165,7 @@ const About = () => {
           {highlights.map((highlight) => (
             <Card
               key={highlight.badgeText}
-              className="overflow-hidden shadow-elevated bg-card/40 backdrop-blur-lg border border-primary-foreground/20"
+              className="overflow-hidden shadow-elevated bg-card/40 backdrop-blur-lg border border-primary-foreground/20 p-0"
             >
               <div className="p-8 lg:p-12">
                 <Badge variant="accent" className="mb-4">

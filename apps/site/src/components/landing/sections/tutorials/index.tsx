@@ -79,7 +79,7 @@ const Tutorials = () => {
             return (
               <Card
                 key={`tutorial-${index}`}
-                className="group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-card/60 backdrop-blur-lg border border-border/50 overflow-hidden"
+                className="p-0 group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-card/60 backdrop-blur-lg border border-border/50 overflow-hidden"
               >
                 {/* Video Thumbnail Area */}
                 <div className="relative aspect-video bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center">
