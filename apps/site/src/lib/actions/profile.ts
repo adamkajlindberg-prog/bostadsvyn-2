@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { eq, getDbClient, user } from "db";
+import { and, eq, getDbClient, user, account, userPreferences } from "db";
 import { getServerSession } from "@/auth/server-session";
 import { getImageClient, getImageUrl } from "@/image";
 import type { Session } from "@/auth/config";
@@ -119,11 +119,250 @@ export async function uploadAvatarAction(file: File): Promise<UploadAvatarResult
 export async function updatePreferencesAction(
   input: UpdatePreferencesInput,
 ): Promise<void> {
-  // Note: Preferences table doesn't exist in the schema yet
-  // This is a stub implementation that will need to be completed
-  // when a user_preferences table is added to the database
-  throw new Error(
-    "Inställningar är inte implementerade än. En user_preferences tabell behöver läggas till i databasen.",
-  );
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // Upsert user preferences
+    // First check if preferences exist
+    const existing = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing preferences
+      await db
+        .update(userPreferences)
+        .set({
+          emailNotifications: input.emailNotifications,
+          smsNotifications: input.smsNotifications,
+          marketingEmails: input.marketingEmails,
+          preferredCurrency: input.preferredCurrency,
+          preferredLanguage: input.preferredLanguage,
+          theme: input.theme,
+          updatedAt: new Date(),
+        })
+        .where(eq(userPreferences.userId, session.user.id));
+    } else {
+      // Insert new preferences
+      await db.insert(userPreferences).values({
+        id: randomUUID(),
+        userId: session.user.id,
+        emailNotifications: input.emailNotifications,
+        smsNotifications: input.smsNotifications,
+        marketingEmails: input.marketingEmails,
+        preferredCurrency: input.preferredCurrency,
+        preferredLanguage: input.preferredLanguage,
+        theme: input.theme,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating preferences:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Kunde inte uppdatera inställningar",
+    );
+  }
+}
+
+export async function checkBankIDStatus(): Promise<{
+  success: boolean;
+  isVerified: boolean;
+}> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // Check if user has an account with provider "idura" (BankID)
+    const bankIdAccount = await db
+      .select()
+      .from(account)
+      .where(
+        and(
+          eq(account.userId, session.user.id),
+          eq(account.providerId, "idura"),
+        ),
+      )
+      .limit(1);
+
+    return {
+      success: true,
+      isVerified: bankIdAccount.length > 0,
+    };
+  } catch (error) {
+    console.error("Error checking BankID status:", error);
+    return {
+      success: false,
+      isVerified: false,
+    };
+  }
+}
+
+export async function deleteUserAccount(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // Delete user - cascade deletes will handle related data
+    // (userPreferences, account, etc. all have onDelete: cascade)
+    await db.delete(user).where(eq(user.id, session.user.id));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting user account:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte radera kontot",
+    };
+  }
+}
+
+export async function getUserPreferences(): Promise<{
+  success: boolean;
+  preferences?: UpdatePreferencesInput;
+}> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    const prefs = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    if (prefs.length === 0) {
+      // Return defaults if no preferences exist
+      return {
+        success: true,
+        preferences: {
+          emailNotifications: true,
+          smsNotifications: false,
+          marketingEmails: false,
+          preferredCurrency: "SEK",
+          preferredLanguage: "sv",
+          theme: "system",
+        },
+      };
+    }
+
+    const pref = prefs[0];
+    return {
+      success: true,
+      preferences: {
+        emailNotifications: pref.emailNotifications,
+        smsNotifications: pref.smsNotifications,
+        marketingEmails: pref.marketingEmails,
+        preferredCurrency:
+          (pref.preferredCurrency as "SEK" | "EUR" | "USD") || "SEK",
+        preferredLanguage:
+          (pref.preferredLanguage as "sv" | "en") || "sv",
+        theme: (pref.theme as "system" | "light" | "dark") || "system",
+      },
+    };
+  } catch (error) {
+    console.error("Error getting user preferences:", error);
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function updateUserPreferences(
+  input: UpdatePreferencesInput,
+): Promise<{ success: boolean; error?: string }> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // Upsert user preferences
+    // First check if preferences exist
+    const existing = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing preferences
+      await db
+        .update(userPreferences)
+        .set({
+          emailNotifications: input.emailNotifications,
+          smsNotifications: input.smsNotifications,
+          marketingEmails: input.marketingEmails,
+          preferredCurrency: input.preferredCurrency,
+          preferredLanguage: input.preferredLanguage,
+          theme: input.theme,
+          updatedAt: new Date(),
+        })
+        .where(eq(userPreferences.userId, session.user.id));
+    } else {
+      // Insert new preferences
+      await db.insert(userPreferences).values({
+        id: randomUUID(),
+        userId: session.user.id,
+        emailNotifications: input.emailNotifications,
+        smsNotifications: input.smsNotifications,
+        marketingEmails: input.marketingEmails,
+        preferredCurrency: input.preferredCurrency,
+        preferredLanguage: input.preferredLanguage,
+        theme: input.theme,
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte uppdatera inställningar",
+    };
+  }
+}
+
+export async function updateUserProfile(input: {
+  name: string;
+  phone?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    await db
+      .update(user)
+      .set({
+        name: input.name,
+        phone: input.phone || null,
+      })
+      .where(eq(user.id, session.user.id));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte uppdatera profilen",
+    };
+  }
 }
 

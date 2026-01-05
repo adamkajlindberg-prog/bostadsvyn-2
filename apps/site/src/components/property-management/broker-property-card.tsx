@@ -130,7 +130,10 @@ export default function BrokerPropertyCard({
     });
   };
 
-  const tierConfig = tierBadgeConfig[property.adTier || "free"];
+  const tierConfig =
+    tierBadgeConfig[
+      (property.adTier || "free") as keyof typeof tierBadgeConfig
+    ];
   const TierIcon = tierConfig.icon;
   const images = (property.images || []).filter(Boolean);
   const currentImage = images.length > 0 ? getPropertyImageUrl(images[0]) : null;
