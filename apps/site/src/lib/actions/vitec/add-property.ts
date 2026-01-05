@@ -3,12 +3,16 @@
 import { DrizzleQueryError, getDbClient, properties } from "db";
 import { DatabaseError } from "pg";
 import { getServerSession } from "@/auth/server-session";
+import { uploadPropertyImage } from "@/lib/actions/images/upload-property-image";
 
 export const addProperty = async (
   title: string,
   type: string,
   objectId: string,
 ) => {
+  const customerId = process.env.VITEC_DEMO_CUSTOMER_ID;
+  const authToken = process.env.VITEC_DEMO_AUTH_TOKEN;
+
   const session = await getServerSession();
 
   if (!session?.user?.id) {
@@ -22,6 +26,13 @@ export const addProperty = async (
     return {
       success: false,
       error: "Missing required fields.",
+    };
+  }
+
+  if (!authToken) {
+    return {
+      success: false,
+      error: "Vitec authentication token is not configured.",
     };
   }
 
@@ -52,12 +63,11 @@ export const addProperty = async (
       };
   }
 
-  const url = `https://connect-qa.maklare.vitec.net/PublicAdvertising/${endpointType}/${process.env.VITEC_DEMO_CUSTOMER_ID}/${objectId}`;
-  const auth = process.env.VITEC_DEMO_AUTH_TOKEN;
+  const url = `https://connect-qa.maklare.vitec.net/PublicAdvertising/${endpointType}/${customerId}/${objectId}`;
 
   const res = await fetch(url, {
     headers: {
-      Authorization: `Basic ${auth}`,
+      Authorization: `Basic ${authToken}`,
       Accept: "application/json",
     },
   });
@@ -70,6 +80,21 @@ export const addProperty = async (
   }
 
   const data = await res.json();
+
+  // Fetch and upload images to R2
+  const imageIds = data?.images?.map((img: { id: string }) => img.id) || [];
+  const images: string[] = [];
+
+  if (imageIds.length > 0 && customerId) {
+    for (const imageId of imageIds) {
+      const uploadedPath = await uploadPropertyImage(imageId, type);
+
+      if (uploadedPath) {
+        images.push(uploadedPath);
+      }
+    }
+  }
+
   const db = getDbClient();
 
   let status: string;
@@ -110,7 +135,7 @@ export const addProperty = async (
       yearBuilt: data?.building?.yearBuilt,
       energyClass: data?.energyDeclaration?.energyClass || null,
       monthlyFee: data?.expenses?.monthlyFee,
-      images: data?.images?.map((img: { id: string }) => img.id) || [],
+      images,
       latitude: data?.address?.wgs84Coordinate?.latitude,
       longitude: data?.address?.wgs84Coordinate?.longitude,
       operatingCosts: data?.expenses?.operatingCosts,
