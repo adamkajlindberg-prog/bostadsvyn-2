@@ -1,193 +1,183 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import {
-  account,
-  and,
-  eq,
-  getDbClient,
-  type UserPreferences,
-  user,
-  userPreferences,
-} from "db";
-import { z } from "zod";
+import { and, eq, getDbClient, user, account, userPreferences } from "db";
 import { getServerSession } from "@/auth/server-session";
+import { getImageClient, getImageUrl } from "@/image";
+import type { Session } from "@/auth/config";
 
-const profileUpdateSchema = z.object({
-  name: z.string().min(2, "Namn måste vara minst 2 tecken"),
-  phone: z.string().optional(),
-});
+export interface ProfileData {
+  user: {
+    id: string;
+    email: string;
+    image: string | undefined;
+    name: string | undefined;
+  };
+  profile: {
+    fullName: string | undefined;
+    phone: string | undefined;
+    bio: string | undefined;
+    companyName: string | undefined;
+    avatarUrl: string | undefined;
+  };
+  preferences: {
+    emailNotifications: boolean;
+    smsNotifications: boolean;
+    marketingEmails: boolean;
+    preferredCurrency: "SEK" | "EUR" | "USD";
+    preferredLanguage: "sv" | "en";
+    theme: "system" | "light" | "dark";
+  };
+  roles: string[];
+}
 
-const userPreferencesSchema = z.object({
-  emailNotifications: z.boolean(),
-  smsNotifications: z.boolean(),
-  marketingEmails: z.boolean(),
-  preferredCurrency: z.string(),
-  preferredLanguage: z.string(),
-  theme: z.string(),
-});
-
-export async function updateUserProfile(input: {
-  name: string;
+export interface UpdateProfileInput {
+  fullName: string;
   phone?: string;
-}) {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return { success: false, error: "Inte autentiserad" };
-    }
+  bio?: string;
+  companyName?: string;
+}
 
-    const parsed = profileUpdateSchema.parse(input);
+export interface UpdatePreferencesInput {
+  emailNotifications: boolean;
+  smsNotifications: boolean;
+  marketingEmails: boolean;
+  preferredCurrency: "SEK" | "EUR" | "USD";
+  preferredLanguage: "sv" | "en";
+  theme: "system" | "light" | "dark";
+}
+
+export interface UploadAvatarResult {
+  url: string;
+}
+
+function assertSession(session: Session | null): Session {
+  if (!session?.user?.id) {
+    throw new Error("Du måste vara inloggad");
+  }
+  return session;
+}
+
+export async function updateProfileAction(input: UpdateProfileInput): Promise<void> {
+  const session = assertSession(await getServerSession());
+
+  try {
     const db = getDbClient();
 
+    // Update user.name (maps to fullName)
+    // Note: phone, bio, and companyName fields don't exist in user table yet
+    // These will need to be added to the schema in the future
     await db
       .update(user)
       .set({
-        name: parsed.name,
-        phone: parsed.phone || null,
+        name: input.fullName,
+      })
+      .where(eq(user.id, session.user.id));
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Kunde inte uppdatera profilen",
+    );
+  }
+}
+
+export async function uploadAvatarAction(file: File): Promise<UploadAvatarResult> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const client = getImageClient();
+    const arrayBuffer = await file.arrayBuffer();
+    const ext = file.name?.split(".").pop() || "jpg";
+    const key = `avatars/${session.user.id}/${randomUUID()}.${ext}`;
+
+    await client.upload({
+      id: key,
+      body: arrayBuffer,
+      mimeType: file.type || "image/jpeg",
+    });
+
+    const imageUrl = getImageUrl(key);
+
+    // Update user.image field with the new avatar URL
+    const db = getDbClient();
+    await db
+      .update(user)
+      .set({
+        image: imageUrl,
       })
       .where(eq(user.id, session.user.id));
 
-    return { success: true };
+    return { url: imageUrl };
   } catch (error) {
-    console.error("Error updating user profile:", error);
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.errors[0]?.message || "Ogiltig data",
-      };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Kunde inte uppdatera profilen",
-    };
+    console.error("Error uploading avatar:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Kunde inte ladda upp bild",
+    );
   }
 }
 
-export async function getUserPreferences(): Promise<
-  | { success: true; preferences: UserPreferences }
-  | { success: false; error: string }
-> {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return { success: false, error: "Inte autentiserad" };
-    }
+export async function updatePreferencesAction(
+  input: UpdatePreferencesInput,
+): Promise<void> {
+  const session = assertSession(await getServerSession());
 
+  try {
     const db = getDbClient();
-    const [prefs] = await db
+
+    // Upsert user preferences
+    // First check if preferences exist
+    const existing = await db
       .select()
       .from(userPreferences)
       .where(eq(userPreferences.userId, session.user.id))
       .limit(1);
 
-    if (prefs) {
-      return { success: true, preferences: prefs };
-    }
-
-    // Create default preferences if none exist
-    const defaultPrefs: Omit<UserPreferences, "id" | "createdAt" | "updatedAt"> = {
-      userId: session.user.id,
-      emailNotifications: true,
-      smsNotifications: false,
-      marketingEmails: false,
-      preferredCurrency: "SEK",
-      preferredLanguage: "sv",
-      theme: "system",
-    };
-
-    const [newPrefs] = await db
-      .insert(userPreferences)
-      .values({
-        id: randomUUID(),
-        ...defaultPrefs,
-      })
-      .returning();
-
-    return { success: true, preferences: newPrefs };
-  } catch (error) {
-    console.error("Error getting user preferences:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Kunde inte hämta inställningar",
-    };
-  }
-}
-
-export async function updateUserPreferences(
-  input: z.infer<typeof userPreferencesSchema>,
-) {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return { success: false, error: "Inte autentiserad" };
-    }
-
-    const parsed = userPreferencesSchema.parse(input);
-    const db = getDbClient();
-
-    // Check if preferences exist
-    const [existing] = await db
-      .select()
-      .from(userPreferences)
-      .where(eq(userPreferences.userId, session.user.id))
-      .limit(1);
-
-    if (existing) {
+    if (existing.length > 0) {
       // Update existing preferences
       await db
         .update(userPreferences)
         .set({
-          emailNotifications: parsed.emailNotifications,
-          smsNotifications: parsed.smsNotifications,
-          marketingEmails: parsed.marketingEmails,
-          preferredCurrency: parsed.preferredCurrency,
-          preferredLanguage: parsed.preferredLanguage,
-          theme: parsed.theme,
+          emailNotifications: input.emailNotifications,
+          smsNotifications: input.smsNotifications,
+          marketingEmails: input.marketingEmails,
+          preferredCurrency: input.preferredCurrency,
+          preferredLanguage: input.preferredLanguage,
+          theme: input.theme,
+          updatedAt: new Date(),
         })
         .where(eq(userPreferences.userId, session.user.id));
     } else {
-      // Create new preferences
+      // Insert new preferences
       await db.insert(userPreferences).values({
         id: randomUUID(),
         userId: session.user.id,
-        emailNotifications: parsed.emailNotifications,
-        smsNotifications: parsed.smsNotifications,
-        marketingEmails: parsed.marketingEmails,
-        preferredCurrency: parsed.preferredCurrency,
-        preferredLanguage: parsed.preferredLanguage,
-        theme: parsed.theme,
+        emailNotifications: input.emailNotifications,
+        smsNotifications: input.smsNotifications,
+        marketingEmails: input.marketingEmails,
+        preferredCurrency: input.preferredCurrency,
+        preferredLanguage: input.preferredLanguage,
+        theme: input.theme,
       });
     }
-
-    return { success: true };
   } catch (error) {
-    console.error("Error updating user preferences:", error);
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.errors[0]?.message || "Ogiltig data",
-      };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Kunde inte spara inställningar",
-    };
+    console.error("Error updating preferences:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Kunde inte uppdatera inställningar",
+    );
   }
 }
 
-export async function checkBankIDStatus(): Promise<
-  | { success: true; isVerified: boolean }
-  | { success: false; error: string }
-> {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return { success: false, error: "Inte autentiserad" };
-    }
+export async function checkBankIDStatus(): Promise<{
+  success: boolean;
+  isVerified: boolean;
+}> {
+  const session = assertSession(await getServerSession());
 
+  try {
     const db = getDbClient();
-    const [bankIdAccount] = await db
+
+    // Check if user has an account with provider "idura" (BankID)
+    const bankIdAccount = await db
       .select()
       .from(account)
       .where(
@@ -198,28 +188,30 @@ export async function checkBankIDStatus(): Promise<
       )
       .limit(1);
 
-    return { success: true, isVerified: !!bankIdAccount };
+    return {
+      success: true,
+      isVerified: bankIdAccount.length > 0,
+    };
   } catch (error) {
     console.error("Error checking BankID status:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Kunde inte kontrollera BankID-status",
+      isVerified: false,
     };
   }
 }
 
-export async function deleteUserAccount(): Promise<
-  | { success: true }
-  | { success: false; error: string }
-> {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return { success: false, error: "Inte autentiserad" };
-    }
+export async function deleteUserAccount(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  const session = assertSession(await getServerSession());
 
+  try {
     const db = getDbClient();
-    // Delete user - this will cascade delete related data via database constraints
+
+    // Delete user - cascade deletes will handle related data
+    // (userPreferences, account, etc. all have onDelete: cascade)
     await db.delete(user).where(eq(user.id, session.user.id));
 
     return { success: true };
@@ -227,7 +219,149 @@ export async function deleteUserAccount(): Promise<
     console.error("Error deleting user account:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Kunde inte radera kontot",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte radera kontot",
+    };
+  }
+}
+
+export async function getUserPreferences(): Promise<{
+  success: boolean;
+  preferences?: UpdatePreferencesInput;
+}> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    const prefs = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    if (prefs.length === 0) {
+      // Return defaults if no preferences exist
+      return {
+        success: true,
+        preferences: {
+          emailNotifications: true,
+          smsNotifications: false,
+          marketingEmails: false,
+          preferredCurrency: "SEK",
+          preferredLanguage: "sv",
+          theme: "system",
+        },
+      };
+    }
+
+    const pref = prefs[0];
+    return {
+      success: true,
+      preferences: {
+        emailNotifications: pref.emailNotifications,
+        smsNotifications: pref.smsNotifications,
+        marketingEmails: pref.marketingEmails,
+        preferredCurrency:
+          (pref.preferredCurrency as "SEK" | "EUR" | "USD") || "SEK",
+        preferredLanguage:
+          (pref.preferredLanguage as "sv" | "en") || "sv",
+        theme: (pref.theme as "system" | "light" | "dark") || "system",
+      },
+    };
+  } catch (error) {
+    console.error("Error getting user preferences:", error);
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function updateUserPreferences(
+  input: UpdatePreferencesInput,
+): Promise<{ success: boolean; error?: string }> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // Upsert user preferences
+    // First check if preferences exist
+    const existing = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing preferences
+      await db
+        .update(userPreferences)
+        .set({
+          emailNotifications: input.emailNotifications,
+          smsNotifications: input.smsNotifications,
+          marketingEmails: input.marketingEmails,
+          preferredCurrency: input.preferredCurrency,
+          preferredLanguage: input.preferredLanguage,
+          theme: input.theme,
+          updatedAt: new Date(),
+        })
+        .where(eq(userPreferences.userId, session.user.id));
+    } else {
+      // Insert new preferences
+      await db.insert(userPreferences).values({
+        id: randomUUID(),
+        userId: session.user.id,
+        emailNotifications: input.emailNotifications,
+        smsNotifications: input.smsNotifications,
+        marketingEmails: input.marketingEmails,
+        preferredCurrency: input.preferredCurrency,
+        preferredLanguage: input.preferredLanguage,
+        theme: input.theme,
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte uppdatera inställningar",
+    };
+  }
+}
+
+export async function updateUserProfile(input: {
+  name: string;
+  phone?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    await db
+      .update(user)
+      .set({
+        name: input.name,
+        phone: input.phone || null,
+      })
+      .where(eq(user.id, session.user.id));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte uppdatera profilen",
     };
   }
 }

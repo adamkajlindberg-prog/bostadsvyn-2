@@ -161,11 +161,12 @@ export async function createRentalProperty(
 
     await db.insert(properties).values({
       userId: session.user.id,
+      objectId: randomUUID(),
       title: data.title,
       description: data.description,
       propertyType: propertyType,
       status: "FOR_RENT",
-      price: BigInt(data.rent),
+      price: Number(data.rent),
       addressStreet: data.address_street,
       addressPostalCode: data.address_postal_code,
       addressCity: data.address_city,
@@ -244,7 +245,7 @@ export async function updateRentalProperty(
       .set({
         title: data.title,
         description: data.description,
-        price: BigInt(data.rent),
+        price: Number(data.rent),
         addressStreet: data.address_street,
         addressPostalCode: data.address_postal_code,
         addressCity: data.address_city,

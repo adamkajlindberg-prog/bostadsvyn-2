@@ -130,13 +130,12 @@ export default function PropertyManagement() {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (!session) return;
     if (!canManage) {
       setIsLoading(false);
       return;
     }
     load();
-  }, [canManage, load, session]);
+  }, [canManage, load]);
 
   // Filter properties client-side based on search query
   const filteredProperties = useMemo(() => {
@@ -152,7 +151,7 @@ export default function PropertyManagement() {
     );
   }, [properties, searchQuery]);
 
-  if (!canManage && session !== undefined) {
+  if (!canManage) {
     return (
       <ContainerWrapper className="py-12">
         <Card>

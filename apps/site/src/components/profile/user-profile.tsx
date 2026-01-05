@@ -116,7 +116,7 @@ export function UserProfile() {
       setPreferencesLoading(true);
       const result = await getUserPreferences();
 
-      if (result.success) {
+      if (result.success && result.preferences) {
         preferencesForm.reset({
           emailNotifications: result.preferences.emailNotifications,
           smsNotifications: result.preferences.smsNotifications,
@@ -167,7 +167,14 @@ export function UserProfile() {
 
     try {
       setLoading(true);
-      const result = await updateUserPreferences(data);
+      const result = await updateUserPreferences({
+        emailNotifications: data.emailNotifications,
+        smsNotifications: data.smsNotifications,
+        marketingEmails: data.marketingEmails,
+        preferredCurrency: data.preferredCurrency as "SEK" | "EUR" | "USD",
+        preferredLanguage: data.preferredLanguage as "sv" | "en",
+        theme: data.theme as "system" | "light" | "dark",
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Kunde inte spara inställningar");

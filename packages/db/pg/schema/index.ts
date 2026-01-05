@@ -24,4 +24,3 @@ export * from "./scb";
 export * from "./school-units";
 export * from "./traffic-situations";
 export * from "./user";
-export * from "./property-two"

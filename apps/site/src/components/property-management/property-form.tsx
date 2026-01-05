@@ -119,8 +119,8 @@ export function PropertyForm({
     () => ({
       title: property?.title ?? "",
       description: property?.description ?? "",
-      propertyType: property?.propertyType ?? "HOUSE",
-      status: property?.status ?? "DRAFT",
+      propertyType: (property?.propertyType as FormValues["propertyType"]) ?? "HOUSE",
+      status: (property?.status as FormValues["status"]) ?? "DRAFT",
       price: property?.price ?? 0,
       addressStreet: property?.addressStreet ?? "",
       addressPostalCode: property?.addressPostalCode ?? "",
@@ -132,16 +132,16 @@ export function PropertyForm({
       bathrooms: property?.bathrooms ?? undefined,
       yearBuilt: property?.yearBuilt ?? undefined,
       monthlyFee: property?.monthlyFee ?? undefined,
-      energyClass: property?.energyClass ?? undefined,
+      energyClass: (property?.energyClass as FormValues["energyClass"]) ?? undefined,
       features: property?.features ?? [],
-      adTier: property?.adTier ?? "free",
+      adTier: (property?.adTier as FormValues["adTier"]) ?? "free",
       images: property?.images ?? [],
     }),
     [property],
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues,
   });
 

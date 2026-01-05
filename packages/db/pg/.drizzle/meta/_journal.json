@@ -36,6 +36,20 @@
       "when": 1764662384415,
       "tag": "0004_unique_property_embedding",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1766114918469,
+      "tag": "0005_property_search_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1766115970792,
+      "tag": "0006_property_location_index",
+      "breakpoints": true
     }
   ]
 }

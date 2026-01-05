@@ -4,7 +4,7 @@ export const rentalFormSchema = z.object({
   title: z.string().min(1, "Titel krävs"),
   description: z.string().min(20, "Beskrivning måste vara minst 20 tecken"),
   contract_type: z.enum(["first_hand", "second_hand"], {
-    required_error: "Kontraktstyp krävs",
+    message: "Kontraktstyp krävs",
   }),
   rooms: z.number().min(1, "Antal rum krävs"),
   is_shared: z.boolean(),
