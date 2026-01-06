@@ -15,7 +15,7 @@ const generateChunks = async (input: string): Promise<string[]> => {
     chunkSize: 100,
     chunkOverlap: 0,
     keepSeparator: false,
-    separators: ["\n\n", "\n", ".", ",", ", "],
+    separators: ["\n\n", "\n", ".", ", "],
   });
 
   return await splitter.splitText(input.trim());

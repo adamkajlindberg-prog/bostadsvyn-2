@@ -35,14 +35,14 @@ export async function uploadPropertyImage(
     const contentType = imageRes.headers.get("content-type");
 
     // Determine MIME type and extension
-    let mimeType: ImageMimeType = "image/jpeg";
-    let extension = "jpg";
+    let mimeType: ImageMimeType = "image/webp";
+    let extension = "webp";
 
     if (contentType) {
       if (imageMimeTypes.includes(contentType as ImageMimeType)) {
         mimeType = contentType as ImageMimeType;
         const extensions = imageMimeTypeMap[mimeType];
-        extension = extensions[0]?.replace(".", "") || "jpg";
+        extension = extensions[0]?.replace(".", "") || "webp";
       } else if (!contentType.includes("image/")) {
         console.warn(`Image has unsupported content type: ${contentType}`);
         return null;
@@ -51,9 +51,8 @@ export async function uploadPropertyImage(
 
     // Convert response to ArrayBuffer and generate timestamp-based filename
     const arrayBuffer = await imageRes.arrayBuffer();
-    const timestamp = Date.now();
     const filePath = propertyType.toLowerCase();
-    const fileName = `${timestamp}.${extension}`;
+    const fileName = `${imageId}.${extension}`;
     const file = `${filePath}/${fileName}`;
 
     // Upload to R2
