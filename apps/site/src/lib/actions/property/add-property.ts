@@ -182,24 +182,24 @@ export const addProperty = async (
         })
         .returning();
 
-      // // Generate property embeddings
-      // const input = buildEmbeddingInput(property);
-      // const embeddingQuery = await generateEmbeddings(input);
+      // Generate property embeddings
+      const input = buildEmbeddingInput(property);
+      const embeddingQuery = await generateEmbeddings(input);
 
-      // // Store property embeddings
-      // await tx
-      //   .insert(propertyEmbeddings)
-      //   .values({
-      //     propertyId: property.id,
-      //     embedding: embeddingQuery?.[0]?.embedding ?? [],
-      //   })
-      //   .onConflictDoUpdate({
-      //     target: propertyEmbeddings.propertyId,
-      //     set: {
-      //       embedding: embeddingQuery?.[0]?.embedding ?? [],
-      //       updatedAt: new Date(),
-      //     },
-      //   });
+      // Store property embeddings
+      await tx
+        .insert(propertyEmbeddings)
+        .values({
+          propertyId: property.id,
+          embedding: embeddingQuery?.[0]?.embedding ?? [],
+        })
+        .onConflictDoUpdate({
+          target: propertyEmbeddings.propertyId,
+          set: {
+            embedding: embeddingQuery?.[0]?.embedding ?? [],
+            updatedAt: new Date(),
+          },
+        });
     });
 
     return {

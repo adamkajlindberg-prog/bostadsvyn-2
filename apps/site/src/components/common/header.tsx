@@ -382,7 +382,7 @@ const Header = () => {
                         <ChevronsUpDownIcon className="opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-56 p-0.5">
+                    <PopoverContent className="w-56 px-0.5 py-2">
                       {profilesData?.map((profile, key) => (
                         <Button
                           key={`profile-${key}`}
@@ -394,7 +394,7 @@ const Header = () => {
                             <div className="text-sm font-medium line-clamp-1">
                               {profile.name}
                             </div>
-                            <div className="text-xs text-foreground/60 line-clamp-1 capitalize">
+                            <div className="text-xs line-clamp-1 capitalize">
                               {profile.type}
                             </div>
                           </div>
