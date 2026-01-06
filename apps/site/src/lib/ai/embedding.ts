@@ -1,86 +1,103 @@
-import { bostadsvyn, getDbClient } from "../../../../../packages/db";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { embed, embedMany } from "ai";
 import { cosineDistance, desc, gt, sql } from "drizzle-orm";
-import { google, openai, GEMINI_EMBEDDING_MODEL, OPENAI_EMBEDDING_MODEL } from "./utils";
 import { env } from "@/env";
+import { bostadsvyn, getDbClient } from "../../../../../packages/db";
+import {
+  GEMINI_EMBEDDING_MODEL,
+  google,
+  OPENAI_EMBEDDING_MODEL,
+  openai,
+} from "./utils";
 
-const generateChunks = (input: string): string[] => {
-	return input
-		.trim()
-		.split(".")
-		.filter((i) => i !== "");
+const generateChunks = async (input: string): Promise<string[]> => {
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 100,
+    chunkOverlap: 0,
+    keepSeparator: false,
+    separators: ["\n\n", "\n", ".", " ", ""],
+  });
+
+  return await splitter.splitText(input.trim());
 };
 
 export const generateEmbeddings = async (
-	value: string,
+  value: string,
 ): Promise<Array<{ embedding: number[]; content: string }>> => {
-    const embeddingModel = env.AI_CHAT_AGENT === "GEMINI" ? google.textEmbedding(GEMINI_EMBEDDING_MODEL) : openai.textEmbedding(OPENAI_EMBEDDING_MODEL);
+  const embeddingModel =
+    env.AI_CHAT_AGENT === "GEMINI"
+      ? google.textEmbedding(GEMINI_EMBEDDING_MODEL)
+      : openai.textEmbedding(OPENAI_EMBEDDING_MODEL);
 
-	const chunks = generateChunks(value);
-	const { embeddings } = await embedMany({
-		model: embeddingModel,
-		providerOptions: 
-            env.AI_CHAT_AGENT === "GEMINI"
-                ? {
-                    google: {
-                        outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
-                    },
-                }
-				: {
-					openai: {
-						outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
-					}
-				},
-		values: chunks,
-	});
+  const chunks = await generateChunks(value);
 
-	return embeddings.map((e, i) => ({
-		content: chunks[i] ?? "",
-		embedding: e,
-	}));
+  const { embeddings } = await embedMany({
+    model: embeddingModel,
+    providerOptions:
+      env.AI_CHAT_AGENT === "GEMINI"
+        ? {
+            google: {
+              outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
+            },
+          }
+        : {
+            openai: {
+              outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
+            },
+          },
+    values: chunks,
+  });
+
+  return embeddings.map((e, i) => ({
+    content: chunks[i] ?? "",
+    embedding: e,
+  }));
 };
 
 export const generateEmbedding = async (value: string): Promise<number[]> => {
-    const embeddingModel = env.AI_CHAT_AGENT === "GEMINI" ? google.textEmbedding(GEMINI_EMBEDDING_MODEL) : openai.textEmbedding(OPENAI_EMBEDDING_MODEL);
+  const embeddingModel =
+    env.AI_CHAT_AGENT === "GEMINI"
+      ? google.textEmbedding(GEMINI_EMBEDDING_MODEL)
+      : openai.textEmbedding(OPENAI_EMBEDDING_MODEL);
 
-	const input = value.replaceAll("\\n", " ");
+  const input = value.replaceAll("\\n", " ");
 
-	const { embedding } = await embed({
-		model: embeddingModel,
-		providerOptions: 
-			env.AI_CHAT_AGENT === "GEMINI"
-                ? {
-                    google: {
-                        outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
-                    },
-                }
-				: {
-					openai: {
-						outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
-					}
-				},
-		value: input,
-	});
+  const { embedding } = await embed({
+    model: embeddingModel,
+    providerOptions:
+      env.AI_CHAT_AGENT === "GEMINI"
+        ? {
+            google: {
+              outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
+            },
+          }
+        : {
+            openai: {
+              outputDimensionality: env.EMBEDDING_DIMENSIONALITY,
+            },
+          },
+    value: input,
+  });
 
-	return embedding;
+  return embedding;
 };
 
 export const findRelevantContent = async (userQuery: string) => {
-	const db = getDbClient();
+  const db = getDbClient();
 
-	const userQueryEmbedded = await generateEmbedding(userQuery);
+  const userQueryEmbedded = await generateEmbedding(userQuery);
 
-	const similarity = sql<number>`1 - (${cosineDistance(
-		bostadsvyn.embedding,
-		userQueryEmbedded,
-	)})`;
+  const similarity = sql<number>`1 - (${cosineDistance(
+    bostadsvyn.embedding,
+    userQueryEmbedded,
+  )})`;
 
-	const similarGuides = await db
-		.select({ name: bostadsvyn.content, similarity })
-		.from(bostadsvyn)
-		.where(gt(similarity, 0.5))
-		.orderBy((t) => desc(t.similarity))
-		.limit(4);
+  const similarGuides = await db
+    .select({ name: bostadsvyn.content, similarity })
+    .from(bostadsvyn)
+    .where(gt(similarity, 0.5))
+    .orderBy((t) => desc(t.similarity))
+    .limit(4);
 
-	return similarGuides;
+  return similarGuides;
 };

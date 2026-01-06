@@ -589,7 +589,7 @@ async function generateMockProperties() {
       const propertyValues = {
         id: propertyId,
         userId,
-        objectId: propertyId, 
+        objectId: propertyId,
         title: propertyData.title,
         description: propertyData.description,
         propertyType: propertyData.propertyType,
