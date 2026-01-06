@@ -3,7 +3,6 @@ import {
   bigint,
   check,
   decimal,
-  index,
   integer,
   jsonb,
   pgTable,

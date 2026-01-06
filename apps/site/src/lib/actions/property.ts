@@ -8,8 +8,11 @@ import {
   desc,
   eq,
   getDbClient,
+  gte,
   inArray,
   ilike,
+  lt,
+  ne,
   or,
   organization,
   type Property,
@@ -123,29 +126,54 @@ export async function createProperty(
     const db = getDbClient();
     const uploaded = await uploadPropertyImages(images, session.user.id);
 
-    await db.insert(properties).values({
-      id: parsed.id,
+    // Build insert object with required fields
+    const insertData: typeof properties.$inferInsert = {
       userId: session.user.id,
+      objectId: parsed.id ?? randomUUID(),
       title: parsed.title,
-      description: parsed.description,
       propertyType: parsed.propertyType,
       status: parsed.status,
       price: parsed.price,
       addressStreet: parsed.addressStreet,
       addressPostalCode: parsed.addressPostalCode,
       addressCity: parsed.addressCity,
-      livingArea: parsed.livingArea,
-      plotArea: parsed.plotArea,
-      rooms: parsed.rooms,
-      bedrooms: parsed.bedrooms,
-      bathrooms: parsed.bathrooms,
-      yearBuilt: parsed.yearBuilt,
-      monthlyFee: parsed.monthlyFee,
-      energyClass: parsed.energyClass,
-      features: parsed.features,
       images: [...(parsed.images || []), ...uploaded],
       adTier: parsed.adTier,
-    });
+    };
+
+    // Add optional fields only if defined
+    if (parsed.description !== undefined) {
+      insertData.description = parsed.description;
+    }
+    if (parsed.livingArea !== undefined) {
+      insertData.livingArea = parsed.livingArea;
+    }
+    if (parsed.plotArea !== undefined) {
+      insertData.plotArea = parsed.plotArea;
+    }
+    if (parsed.rooms !== undefined) {
+      insertData.rooms = parsed.rooms;
+    }
+    if (parsed.bedrooms !== undefined) {
+      insertData.bedrooms = parsed.bedrooms;
+    }
+    if (parsed.bathrooms !== undefined) {
+      insertData.bathrooms = parsed.bathrooms;
+    }
+    if (parsed.yearBuilt !== undefined) {
+      insertData.yearBuilt = parsed.yearBuilt;
+    }
+    if (parsed.monthlyFee !== undefined) {
+      insertData.monthlyFee = parsed.monthlyFee;
+    }
+    if (parsed.energyClass !== undefined) {
+      insertData.energyClass = parsed.energyClass;
+    }
+    if (parsed.features !== undefined) {
+      insertData.features = parsed.features;
+    }
+
+    await db.insert(properties).values(insertData);
 
     return { success: true };
   } catch (error) {
@@ -252,6 +280,10 @@ export async function listManagedProperties(params?: {
     if (!isPrivileged(session)) {
       filters.push(eq(properties.userId, session.user.id));
     }
+
+    // Exclude rental properties (FOR_RENT) from broker portal
+    // This matches the lovable behavior
+    filters.push(ne(properties.status, "FOR_RENT"));
 
     if (params?.status && params.status !== "all") {
       filters.push(eq(properties.status, params.status));
@@ -478,4 +510,78 @@ export async function toggleFavorite(propertyId: string): Promise<{
       error: "Kunde inte uppdatera favorit",
     };
   }
+}
+
+// Property statistics functions for broker dashboard
+export async function getPropertyViewsStats(propertyId: string): Promise<{
+  viewsToday: number;
+  viewsThisWeek: number;
+  viewsTotal: number;
+}> {
+  try {
+    const db = getDbClient();
+    const now = new Date();
+    
+    // Start of today
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Start of week (Monday)
+    const dayOfWeek = now.getDay();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Get all views
+    const allViews = await db
+      .select()
+      .from(propertyViews)
+      .where(eq(propertyViews.propertyId, propertyId));
+
+    const viewsToday = allViews.filter(
+      (v) => v.createdAt && new Date(v.createdAt) >= todayStart
+    ).length;
+
+    const viewsThisWeek = allViews.filter(
+      (v) => v.createdAt && new Date(v.createdAt) >= weekStart
+    ).length;
+
+    return {
+      viewsToday,
+      viewsThisWeek,
+      viewsTotal: allViews.length,
+    };
+  } catch (error) {
+    console.error("Error fetching property views stats:", error);
+    return { viewsToday: 0, viewsThisWeek: 0, viewsTotal: 0 };
+  }
+}
+
+export async function getPropertyFavoritesCount(propertyId: string): Promise<number> {
+  try {
+    const db = getDbClient();
+    const [result] = await db
+      .select({ count: count() })
+      .from(propertyFavorites)
+      .where(eq(propertyFavorites.propertyId, propertyId));
+
+    return result?.count || 0;
+  } catch (error) {
+    console.error("Error fetching favorites count:", error);
+    return 0;
+  }
+}
+
+export async function getPropertyFinalPriceInterest(propertyId: string): Promise<number> {
+  // TODO: Implement when final price interest table is added
+  // For now, return 0
+  return 0;
+}
+
+export async function getPropertyAIEditStats(propertyId: string): Promise<{
+  aiEditUsers: number;
+  aiEditTotal: number;
+}> {
+  // TODO: Implement when AI edits table is added
+  // For now, return 0
+  return { aiEditUsers: 0, aiEditTotal: 0 };
 }

@@ -2,14 +2,11 @@
 
 import type { Property } from "db";
 import {
-  BarChart3,
-  Eye,
-  Heart,
+  Calendar,
+  DollarSign,
   Home,
-  Pencil,
   Plus,
   Search,
-  Trash2,
 } from "lucide-react";
 import {
   type ElementType,
@@ -22,10 +19,10 @@ import {
 import { toast } from "sonner";
 import { authClient } from "@/auth/client";
 import ContainerWrapper from "@/components/common/container-wrapper";
-import PropertyCard from "@/components/property-card";
+import BrokerPropertyCard from "@/components/property-management/broker-property-card";
 import { PropertyForm } from "@/components/property-management/property-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -33,14 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { deleteProperty, listManagedProperties } from "@/lib/actions/property";
+import { listManagedProperties } from "@/lib/actions/property";
 import { cn } from "@/lib/utils";
 
 type Stats = {
@@ -48,21 +38,7 @@ type Stats = {
   active: number;
   sold: number;
   draft: number;
-  views: number;
-  favorites: number;
 };
-
-const statusLabels: Record<string, string> = {
-  all: "Alla",
-  FOR_SALE: "Till salu",
-  FOR_RENT: "Till uthyrning",
-  COMING_SOON: "Kommer snart",
-  SOLD: "Såld",
-  RENTED: "Uthyrd",
-  DRAFT: "Utkast",
-};
-
-const allowedRoles = ["seller", "broker", "admin"];
 
 function StatCard({
   title,
@@ -76,36 +52,41 @@ function StatCard({
   highlight?: boolean;
 }) {
   return (
-    <Card className={cn(highlight && "border-primary/50")}>
-      <CardContent className="p-5 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <p className={cn("text-2xl font-bold", highlight && "text-success")}>
+              {value}
+            </p>
+          </div>
+          <Icon
+            className={cn(
+              "h-8 w-8",
+              highlight ? "text-success" : "text-muted-foreground",
+            )}
+          />
         </div>
-        <Icon className="h-8 w-8 text-muted-foreground" />
       </CardContent>
     </Card>
   );
 }
 
 export default function PropertyManagement() {
-  const { data: session, isLoading: sessionLoading } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [properties, setProperties] = useState<Property[]>([]);
   const [stats, setStats] = useState<Stats>({
     total: 0,
     active: 0,
     sold: 0,
     draft: 0,
-    views: 0,
-    favorites: 0,
   });
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState<keyof typeof statusLabels>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Property | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending] = useTransition();
 
   const canManage = useMemo(() => {
     // Temporary fix: allow access if user has an active organization
@@ -123,50 +104,54 @@ export default function PropertyManagement() {
           params.get("bypass") === "true"
         );
       })();
-    return bypass || allowedRoles.includes(role);
+    const ALLOWED_ROLES = ["admin", "broker", "org-admin"];
+    return bypass || (role ? ALLOWED_ROLES.includes(role) : false);
   }, [session?.user?.role, session?.session?.activeOrganizationId]);
 
   const load = useCallback(async () => {
     setIsLoading(true);
     const res = await listManagedProperties({
-      search,
-      status: statusFilter,
+      search: searchQuery,
+      status: "all",
     });
 
     if (res.success) {
       setProperties(res.properties);
-      setStats(res.stats);
+      setStats({
+        total: res.stats.total,
+        active: res.stats.active,
+        sold: res.stats.sold,
+        draft: res.stats.draft,
+      });
     } else {
       toast.error(res.error || "Kunde inte ladda fastigheter");
     }
     setIsLoading(false);
-  }, [search, statusFilter]);
+  }, [searchQuery]);
 
   useEffect(() => {
-    if (sessionLoading) return;
     if (!canManage) {
       setIsLoading(false);
       return;
     }
     load();
-  }, [canManage, load, sessionLoading]);
+  }, [canManage, load]);
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Är du säker på att du vill ta bort fastigheten?")) return;
-    startTransition(async () => {
-      const res = await deleteProperty(id);
-      if (res.success) {
-        toast.success("Fastighet borttagen");
-        load();
-      } else {
-        toast.error(res.error || "Kunde inte ta bort fastighet");
-      }
-    });
-  };
+  // Filter properties client-side based on search query
+  const filteredProperties = useMemo(() => {
+    if (!searchQuery.trim()) return properties;
 
-  const filteredProperties = properties;
+    const query = searchQuery.toLowerCase();
+    return properties.filter(
+      (property) =>
+        property.title.toLowerCase().includes(query) ||
+        property.addressStreet.toLowerCase().includes(query) ||
+        property.addressCity.toLowerCase().includes(query) ||
+        property.id.toLowerCase().includes(query),
+    );
+  }, [properties, searchQuery]);
 
-  if (!canManage && !sessionLoading) {
+  if (!canManage) {
     return (
       <ContainerWrapper className="py-12">
         <Card>
@@ -184,90 +169,66 @@ export default function PropertyManagement() {
   }
 
   return (
-    <ContainerWrapper className="py-10">
-      <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <p className="text-sm text-muted-foreground">Annonshantering</p>
-            <h1 className="text-3xl font-bold">Fastighetshantering</h1>
-          </div>
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setDialogOpen(true);
-            }}
-            disabled={isPending}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Skapa annons
-          </Button>
-        </div>
+    <ContainerWrapper className="py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">
+          Annonshantering för fastighetsmäklare
+        </h1>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard title="Totalt" value={stats.total} icon={Home} />
-          <StatCard
-            title="Aktiva"
-            value={stats.active}
-            icon={BarChart3}
-            highlight
-          />
-          <StatCard title="Sålda/Uthyrda" value={stats.sold} icon={BarChart3} />
-          <StatCard title="Utkast" value={stats.draft} icon={BarChart3} />
-          <StatCard title="Visningar" value={stats.views} icon={Eye} />
-          <StatCard title="Favoriter" value={stats.favorites} icon={Heart} />
-        </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <StatCard title="Totalt" value={stats.total} icon={Home} />
+        <StatCard
+          title="Aktiva"
+          value={stats.active}
+          icon={DollarSign}
+          highlight
+        />
+        <StatCard title="Sålda" value={stats.sold} icon={Calendar} />
+        <StatCard title="Utkast" value={stats.draft} icon={Home} />
+      </div>
 
-        <Card>
-          <CardContent className="p-5 flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                className="pl-10"
-                placeholder="Sök på titel eller adress..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Sök objekt via adress eller annonsID..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-            <Select
-              value={statusFilter}
-              onValueChange={(val) =>
-                setStatusFilter(val as keyof typeof statusLabels)
-              }
-            >
-              <SelectTrigger className="w-full md:w-52">
-                <SelectValue placeholder="Filtrera på status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(statusLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={load} disabled={isPending}>
-              Uppdatera
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {isLoading ? (
-          <Card>
-            <CardContent className="py-10 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-              <p className="text-muted-foreground">Laddar fastigheter...</p>
-            </CardContent>
-          </Card>
-        ) : filteredProperties.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center space-y-3">
-              <Home className="h-12 w-12 mx-auto text-muted-foreground" />
-              <h3 className="text-lg font-semibold">Inga fastigheter</h3>
-              <p className="text-muted-foreground">
-                {properties.length === 0
-                  ? "Du har inte skapat några fastigheter ännu."
-                  : "Inga fastigheter matchar din sökning."}
-              </p>
+      {/* Properties List */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+            <p>Laddar fastigheter...</p>
+          </div>
+        </div>
+      ) : filteredProperties.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-8">
+            <Home className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">
+              Inga fastigheter hittades
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              {properties.length === 0
+                ? "Du har inte skapat några fastigheter än."
+                : "Inga fastigheter matchar dina sökkriterier."}
+            </p>
+            {properties.length === 0 && (
               <Button
                 onClick={() => {
                   setEditing(null);
@@ -277,66 +238,16 @@ export default function PropertyManagement() {
                 <Plus className="h-4 w-4 mr-2" />
                 Skapa din första fastighet
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {filteredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden">
-                <CardContent className="p-4 flex flex-col gap-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="px-3 py-1 rounded-full bg-secondary text-xs">
-                        {statusLabels[property.status] || property.status}
-                      </div>
-                      <div className="px-3 py-1 rounded-full border text-xs">
-                        {property.adTier === "premium"
-                          ? "Exklusiv"
-                          : property.adTier === "plus"
-                            ? "Plus"
-                            : "Grund"}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setEditing(property);
-                          setDialogOpen(true);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Redigera
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(property.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Ta bort
-                      </Button>
-                    </div>
-                  </div>
-                  <PropertyCard
-                    property={property}
-                    managementMode
-                    disableClick
-                    size={
-                      property.adTier === "premium"
-                        ? "large"
-                        : property.adTier === "plus"
-                          ? "medium"
-                          : "small"
-                    }
-                  />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {filteredProperties.map((property) => (
+            <BrokerPropertyCard key={property.id} property={property} />
+          ))}
+        </div>
+      )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-3xl">

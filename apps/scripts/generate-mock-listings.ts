@@ -619,6 +619,7 @@ async function generateMockProperties() {
           target: properties.id,
           set: {
             userId: propertyValues.userId,
+            objectId: propertyValues.objectId,
             title: propertyValues.title,
             description: propertyValues.description,
             propertyType: propertyValues.propertyType,
