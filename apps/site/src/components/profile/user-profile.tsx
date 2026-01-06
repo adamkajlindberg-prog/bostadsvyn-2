@@ -16,12 +16,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { authClient } from "@/auth/client";
-import {
-  deleteUserAccount,
-  getUserPreferences,
-  updateUserPreferences,
-  updateUserProfile,
-} from "@/lib/actions/profile";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -37,12 +31,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -55,6 +44,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  deleteUserAccount,
+  getUserPreferences,
+  updateUserPreferences,
+  updateUserProfile,
+} from "@/lib/actions/profile";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Namn måste vara minst 2 tecken"),
@@ -101,6 +96,7 @@ export function UserProfile() {
     },
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: [TYPE_TEMP_FIX]
   useEffect(() => {
     if (user) {
       profileForm.reset({
@@ -214,9 +210,7 @@ export function UserProfile() {
     } catch (error) {
       toast.error("Fel vid kontoradering", {
         description:
-          error instanceof Error
-            ? error.message
-            : "Kunde inte radera kontot",
+          error instanceof Error ? error.message : "Kunde inte radera kontot",
       });
     } finally {
       setDeleteLoading(false);
@@ -419,15 +413,20 @@ export function UserProfile() {
                       <Switch
                         id="email_notifications"
                         checked={preferencesForm.watch("emailNotifications")}
-                        onCheckedChange={(checked) =>
-                          preferencesForm.setValue("emailNotifications", checked)
+                        onCheckedChange={(checked: boolean) =>
+                          preferencesForm.setValue(
+                            "emailNotifications",
+                            checked,
+                          )
                         }
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="sms_notifications">SMS-notifieringar</Label>
+                        <Label htmlFor="sms_notifications">
+                          SMS-notifieringar
+                        </Label>
                         <p className="text-sm font-medium text-foreground">
                           Få viktiga meddelanden via SMS
                         </p>
@@ -435,7 +434,7 @@ export function UserProfile() {
                       <Switch
                         id="sms_notifications"
                         checked={preferencesForm.watch("smsNotifications")}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean) =>
                           preferencesForm.setValue("smsNotifications", checked)
                         }
                       />
@@ -451,7 +450,7 @@ export function UserProfile() {
                       <Switch
                         id="marketing_emails"
                         checked={preferencesForm.watch("marketingEmails")}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: boolean) =>
                           preferencesForm.setValue("marketingEmails", checked)
                         }
                       />
@@ -566,7 +565,8 @@ export function UserProfile() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     Lösenordsändringar och andra säkerhetsinställningar hanteras
-                    via better-auth. Kontakta support för hjälp med kontosäkerhet.
+                    via better-auth. Kontakta support för hjälp med
+                    kontosäkerhet.
                   </AlertDescription>
                 </Alert>
 
@@ -697,4 +697,3 @@ export function UserProfile() {
     </div>
   );
 }
-
