@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   // 	If no relevant information is found, reply: "Tyvärr har jag ingen information om det."
   // 	Always reply in Swedish.`;
 
-  const systemPrompt = `You are a helpful assistant for Bostadsvyn, a housing portal website for Sweden and abroad. When answering questions, you should primarily use information from your tools and Bostadsvyn's knowledge base. If you cannot find relevant information, answer: "Unfortunately, I have no information about it." Always translate the response to Swedish if the user's language is not Swedish.`;
+  const systemPrompt = `You are a helpful assistant for Bostadsvyn, a housing portal website for Sweden and abroad. When answering questions, you should primarily use information from your tools and Bostadsvyn's knowledge base. If you cannot find relevant information, answer: "Unfortunately, I have no information about it." Always answer in Swedish.`;
 
   const result = streamText({
     messages: convertToModelMessages(messages),
@@ -126,8 +126,14 @@ export async function POST(req: NextRequest) {
       findBrokers: tool({
         description:
           "get broker or real estate agent information from your knowledge base to answer questions.",
-        execute: async ({ question }) => findBrokers(question),
-        inputSchema: questionSchema,
+        execute: async ({ location }) => findBrokers(location),
+        inputSchema: z.object({
+          location: z
+            .string()
+            .describe(
+              "the county or locality location to search for brokers or real estate agents",
+            ),
+        }),
       }),
     },
   });
