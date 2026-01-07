@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,14 +88,16 @@ const quickQuestions = [
 
 export function AIPropertyAdvisor() {
   const { messages, sendMessage, status } = useChat({
-    api: "/api/ai/chat",
+    transport: new DefaultChatTransport({
+      api: "/api/ai/chat",
+    }),
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
   const isMobile = useIsMobile();
 
   const handleQuickQuestion = (question: string) => {
-    sendMessage({ content: question });
+    sendMessage({ text: question });
     setSelectedQuestion(""); // Reset select after sending
   };
 
@@ -275,10 +278,24 @@ export function AIPropertyAdvisor() {
                           <Message key={message.id} from={message.role}>
                             <MessageContent variant="contained">
                               {message.role === "user" ? (
-                                <p>{message.content}</p>
+                                <p>
+                                  {message.parts
+                                    .filter((part): part is { type: "text"; text: string } =>
+                                      part.type === "text"
+                                    )
+                                    .map((part) => part.text)
+                                    .join("")}
+                                </p>
                               ) : (
                                 <div className="prose prose-sm max-w-none dark:prose-invert">
-                                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                                  <ReactMarkdown>
+                                    {message.parts
+                                      .filter((part): part is { type: "text"; text: string } =>
+                                        part.type === "text"
+                                      )
+                                      .map((part) => part.text)
+                                      .join("")}
+                                  </ReactMarkdown>
                                 </div>
                               )}
                             </MessageContent>
@@ -320,7 +337,7 @@ export function AIPropertyAdvisor() {
                           e.preventDefault();
                           const input = e.currentTarget;
                           if (input.value.trim()) {
-                            sendMessage({ content: input.value });
+                            sendMessage({ text: input.value });
                             input.value = "";
                           }
                         }
@@ -332,7 +349,7 @@ export function AIPropertyAdvisor() {
                           "chat-input",
                         ) as HTMLInputElement;
                         if (input?.value.trim()) {
-                          sendMessage({ content: input.value });
+                          sendMessage({ text: input.value });
                           input.value = "";
                         }
                       }}

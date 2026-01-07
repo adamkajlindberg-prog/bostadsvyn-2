@@ -35,7 +35,7 @@ function CommandDialog({
   className,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof Dialog> & {
+}: Omit<React.ComponentProps<typeof Dialog>, "title" | "description" | "className" | "showCloseButton"> & {
   title?: string;
   description?: string;
   className?: string;
