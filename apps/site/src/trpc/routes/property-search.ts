@@ -34,6 +34,7 @@ const Z_Property_Search_Input = z.object({
   maxMonthlyFee: z.number().optional(),
   minPlotArea: z.number().optional(),
   maxPlotArea: z.number().optional(),
+  ai: z.boolean().optional(),
 });
 
 export type T_Property_Search_Input = z.infer<typeof Z_Property_Search_Input>;
@@ -162,6 +163,40 @@ const searchProperties = async (
   input: T_Property_Search_Input,
 ) => {
   const conditions = filterConditions(input);
+
+  // Use AI search if ai parameter is true
+  if (input.ai) {
+    console.log("USED AI SEARCH");
+    const queryEmbedded = await generateEmbedding(query);
+
+    const similarity = sql<number>`1 - (${cosineDistance(
+      propertyEmbeddings.embedding,
+      queryEmbedded,
+    )})`;
+
+    const aiData = await db
+      .select({
+        property: properties,
+        similarity,
+      })
+      .from(propertyEmbeddings)
+      .innerJoin(properties, eq(propertyEmbeddings.propertyId, properties.id))
+      .where(
+        conditions.length > 0
+          ? and(gt(similarity, 0.9), ...conditions)
+          : gt(similarity, 0.9),
+      )
+      .orderBy((t) => desc(t.similarity));
+
+    const aiProperties = aiData.map((r) => r.property);
+
+    return {
+      properties: aiProperties,
+      total: aiProperties.length,
+    };
+  }
+
+  // Otherwise use full-text search
   const textSearchCondition = sql`to_tsvector('swedish', 
             ${properties.title} || ' ' || 
             COALESCE(${properties.description}, '') || ' ' || 
@@ -187,59 +222,18 @@ const searchProperties = async (
             ${properties.adTier}
           ) @@ websearch_to_tsquery('swedish', ${query})`;
 
-  // Combine text search with filter conditions
   const allConditions = [...conditions, textSearchCondition];
 
-  // Always perform full-text search first
   const fullTextData = await db
     .select()
     .from(properties)
     .where(and(...allConditions))
     .orderBy(getSortOrder(input.sortBy));
 
-  let finalData = fullTextData;
-
-  // Check if query has more than 3 words for AI search
-  const queryWords = query.trim().split(/\s+/) || [];
-  const shouldUseAiSearch = queryWords.length > 3;
-
-  if (shouldUseAiSearch) {
-    // Also use AI semantic search
-    const queryEmbedded = await generateEmbedding(query);
-
-    const similarity = sql<number>`1 - (${cosineDistance(
-      propertyEmbeddings.embedding,
-      queryEmbedded,
-    )})`;
-
-    const aiData = await db
-      .select({
-        property: properties,
-        similarity,
-      })
-      .from(propertyEmbeddings)
-      .innerJoin(properties, eq(propertyEmbeddings.propertyId, properties.id))
-      .where(
-        conditions.length > 0
-          ? and(gt(similarity, 0.9), ...conditions)
-          : gt(similarity, 0.9),
-      )
-      .orderBy((t) => desc(t.similarity));
-
-    // Merge results with AI results prioritized
-    const aiProperties = aiData.map((r) => r.property);
-
-    // Add full-text results that aren't already in AI results
-    const uniqueFullTextResults = fullTextData.filter(
-      (item) => !aiProperties.some((property) => property.id === item.id),
-    );
-
-    finalData = [...aiProperties, ...uniqueFullTextResults];
-  }
-
+  console.log("USED FULL TEXT SEARCH");
   return {
-    properties: finalData,
-    total: finalData.length,
+    properties: fullTextData,
+    total: fullTextData.length,
   };
 };
 
@@ -262,7 +256,7 @@ const propertySearch = createTRPCRouter({
       const query = input.query?.trim();
 
       if (!query) return await allProperties(input); // Return all properties if no query
-      return await searchProperties(query, input); // Search properties based on query (full-text + AI semantic search)
+      return await searchProperties(query, input); // Search properties based on query (AI search if ai=true, otherwise full-text search)
     }),
 });
 

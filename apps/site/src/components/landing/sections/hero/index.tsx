@@ -133,6 +133,15 @@ const Hero = () => {
     // Standard search (location-based)
     const params = new URLSearchParams();
     if (searchQuery) params.set("query", searchQuery);
+
+    // Add AI parameter if query has more than 3 words
+    if (searchQuery) {
+      const wordCount = searchQuery.trim().split(/\s+/).filter(word => word.length > 0).length;
+      if (wordCount > 3) {
+        params.set("ai", "true");
+      }
+    }
+
     if (propertyType && propertyType !== "all")
       params.set("propertyType", propertyType);
     if (listingType && listingType !== "all")

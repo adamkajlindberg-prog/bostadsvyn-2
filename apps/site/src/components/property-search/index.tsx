@@ -14,10 +14,9 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
-import { LocationAutocomplete } from "@/components/location-autocomplete";
+// import { toast } from "sonner";
 import PropertyCard from "@/components/property-card";
 import PropertyMap from "@/components/property-map";
 import { Button } from "@/components/ui/button";
@@ -88,11 +87,15 @@ const getFiltersFromParams = (
     maxPlotArea: params.get("maxPlotArea")
       ? Number(params.get("maxPlotArea"))
       : undefined,
+    ai: params.get("ai") === "true" ? true : undefined,
   };
 };
 
 export default function PropertySearch() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams.toString());
 
   const [filters, setFilters] = useState<T_Property_Search_Input>(
     getFiltersFromParams(searchParams),
@@ -121,9 +124,11 @@ export default function PropertySearch() {
     }
     | undefined
   >(undefined);
-  const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
+  // const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
   const [activeSearchTab, setActiveSearchTab] = useState("");
-  
+  const [basicSearch, setBasicSearch] = useState<string>(!filters.ai ? filters.query || "" : "");
+  const [aiSearch, setAiSearch] = useState<string>(filters.ai ? filters.query || "" : "");
+
   // Hide filter checkboxes
   const [hideRental, setHideRental] = useState(false);
   const [hideCommercial, setHideCommercial] = useState(false);
@@ -143,6 +148,10 @@ export default function PropertySearch() {
         ? value
         : value ? Number(value) : undefined,
     }));
+  }, 1000);
+
+  const debouncedBasicSearch = useDebounce((value: string) => {
+    handleSearch(value, 'basic');
   }, 1000);
 
   const handleInputChange = (key: keyof typeof inputValues) => (
@@ -179,7 +188,7 @@ export default function PropertySearch() {
   } = useQuery(trpc.propertySearch.search.queryOptions(filters));
 
   const allProperties: Property[] = searchData?.properties ?? [];
-  
+
   // Filter properties based on hide checkboxes
   const properties: Property[] = allProperties.filter((property) => {
     if (hideRental && property.status === "FOR_RENT") return false;
@@ -187,7 +196,7 @@ export default function PropertySearch() {
     if (hideNyproduktion && property.status === "NYPRODUKTION") return false;
     return true;
   });
-  
+
   const totalResults = properties.length;
 
   // Group properties by days since creation
@@ -196,14 +205,14 @@ export default function PropertySearch() {
       [key: string]: Property[];
     } = {};
     const now = new Date();
-    
+
     propertiesToGroup.forEach((property) => {
       if (!property.createdAt) return;
-      
+
       const createdDate = new Date(property.createdAt);
       const diffTime = Math.abs(now.getTime() - createdDate.getTime());
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      
+
       let groupKey: string;
       if (diffDays === 0) {
         groupKey = "Idag";
@@ -218,7 +227,7 @@ export default function PropertySearch() {
         const weeks = Math.floor(diffDays / 7);
         groupKey = `${weeks} veckor`;
       }
-      
+
       if (!groups[groupKey]) {
         groups[groupKey] = [];
       }
@@ -278,14 +287,20 @@ export default function PropertySearch() {
     return sortedGroups;
   };
 
-  const handleNaturalSearch = () => {
-    if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
-      toast.error("Ange en sökfras eller plats");
-      return;
-    }
+  // const handleNaturalSearch = () => {
+  //   if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
+  //     toast.error("Ange en sökfras eller plats");
+  //     return;
+  //   }
 
-    setFilters((prev) => ({ ...prev, query: naturalSearchQuery }));
-  };
+  //   setFilters((prev) => ({
+  //     ...prev,
+  //     query: naturalSearchQuery,
+  //     ai: true,
+  //   }));
+  //   // Sync to basic search input
+  //   setInputValues((prev) => ({ ...prev, query: naturalSearchQuery }));
+  // };
 
   const onChangeSearchTab = (value: string) => {
     setActiveSearchTab(value);
@@ -314,6 +329,35 @@ export default function PropertySearch() {
       </div>
     );
   }
+
+  const handleSearch = (value: string, type: 'basic' | 'ai') => {
+    setFilters((prev) => ({
+      ...prev,
+      query: value,
+    }));
+
+    if (value.trim()) {
+      params.set("query", value);
+    } else {
+      params.delete("query");
+    }
+
+    if (type === 'ai') {
+      params.set("ai", "true");
+    } else {
+      params.delete("ai");
+    }
+
+    const queryString = params.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    });
+  }
+
+  const handleBasicSearch = (value: string) => {
+    setBasicSearch(value);
+    debouncedBasicSearch(value);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -372,21 +416,16 @@ export default function PropertySearch() {
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Beskriv din drömbostad i naturligt språk.
+                  Beskriv din drömbostad i naturligt språk. Vår AI tolkar automatiskt dina önskemål.
                 </p>
                 <div className="flex gap-2">
                   <Input
                     placeholder="T.ex. '3 rum lägenhet i Stockholm'"
-                    value={naturalSearchQuery}
-                    onChange={(e) => setNaturalSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleNaturalSearch();
-                      }
-                    }}
-                    className="text-sm"
+                    value={aiSearch}
+                    onChange={(e) => setAiSearch(e.target.value)}
+                    className="text-sm py-[19px] bg-background shadow-none"
                   />
-                  <Button onClick={handleNaturalSearch} size="sm">
+                  <Button onClick={() => handleSearch(aiSearch, 'ai')}>
                     <Sparkles className="h-4 w-4" />
                   </Button>
                 </div>
@@ -394,34 +433,27 @@ export default function PropertySearch() {
 
               <Separator />
 
-              {/* Search */}
+              {/* Basic Search */}
+              <div>
+                <Label>Söka</Label>
+                <Input
+                  value={basicSearch}
+                  onChange={(e) => handleBasicSearch(e.target.value)}
+                  placeholder="T.ex. Villa i Stockholm"
+                  className="mt-3 py-[19px]"
+                />
+              </div>
+
+              <Separator />
+
+              {/* Location Search */}
               <div>
                 <Label>Sök plats</Label>
-                <LocationAutocomplete
-                  placeholder="Ange stad, kommun eller område"
-                  value={filters.location}
-                  onChange={(value) =>
-                    setFilters((prev) => ({ ...prev, query: value }))
-                  }
-                  onSelect={(location) => {
-                    setFilters((prev) => ({
-                      ...prev,
-                      query: location.fullName,
-                    }));
-                    setSelectedLocation({
-                      center_lat: location.center_lat,
-                      center_lng: location.center_lng,
-                      name: location.fullName,
-                      type: location.type,
-                    });
-                  }}
-                  className="mt-2"
-                />
                 <Input
                   placeholder="T.ex. Stockholm"
                   value={inputValues.location}
                   onChange={handleInputChange("location")}
-                  className="mt-2"
+                  className="mt-3 py-[19px]"
                 />
               </div>
 
@@ -736,30 +768,30 @@ export default function PropertySearch() {
 
               <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="hideRental" 
-                    checked={hideRental} 
-                    onCheckedChange={(checked) => setHideRental(checked === true)} 
+                  <Checkbox
+                    id="hideRental"
+                    checked={hideRental}
+                    onCheckedChange={(checked) => setHideRental(checked === true)}
                   />
                   <Label htmlFor="hideRental" className="text-sm cursor-pointer">
                     Visa ej hyresbostäder
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="hideCommercial" 
-                    checked={hideCommercial} 
-                    onCheckedChange={(checked) => setHideCommercial(checked === true)} 
+                  <Checkbox
+                    id="hideCommercial"
+                    checked={hideCommercial}
+                    onCheckedChange={(checked) => setHideCommercial(checked === true)}
                   />
                   <Label htmlFor="hideCommercial" className="text-sm cursor-pointer">
                     Visa ej kommersiellt
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Checkbox 
-                    id="hideNyproduktion" 
-                    checked={hideNyproduktion} 
-                    onCheckedChange={(checked) => setHideNyproduktion(checked === true)} 
+                  <Checkbox
+                    id="hideNyproduktion"
+                    checked={hideNyproduktion}
+                    onCheckedChange={(checked) => setHideNyproduktion(checked === true)}
                   />
                   <Label htmlFor="hideNyproduktion" className="text-sm cursor-pointer">
                     Visa ej nyproduktion
