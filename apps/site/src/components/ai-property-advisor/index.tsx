@@ -10,6 +10,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Bot,
   Send,
   TrendingUp,
@@ -33,6 +40,7 @@ import { Conversation, ConversationContent } from "@/components/ai-elements/conv
 import { Message, MessageContent } from "@/components/ai-elements/message";
 import ReactMarkdown from "react-markdown";
 import { PersonalizationPanel } from "./personalization-panel";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const quickQuestions = [
   {
@@ -82,9 +90,12 @@ export function AIPropertyAdvisor() {
     api: "/api/ai/chat",
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<string>("");
+  const isMobile = useIsMobile();
 
   const handleQuickQuestion = (question: string) => {
     sendMessage({ content: question });
+    setSelectedQuestion(""); // Reset select after sending
   };
 
   return (
@@ -109,6 +120,46 @@ export function AIPropertyAdvisor() {
             {/* Sidebar */}
             {!sidebarCollapsed && (
               <div className="lg:col-span-1 space-y-4">
+                {/* Mobile: Snabbfrågor Dropdown (first) */}
+                {isMobile && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                      <Sparkles className="h-3 w-3 text-primary" />
+                      Snabbfrågor
+                    </label>
+                    <Select
+                      value={selectedQuestion}
+                      onValueChange={(value) => {
+                        setSelectedQuestion(value);
+                        handleQuickQuestion(value);
+                      }}
+                      disabled={status === "submitted" || status === "streaming"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Välj en snabbstartfråga..." />
+                      </SelectTrigger>
+                      <SelectContent
+                        position="popper"
+                        align="start"
+                        sideOffset={4}
+                        className="max-w-[calc(100vw-2rem)] w-[var(--radix-select-trigger-width)]"
+                      >
+                        {quickQuestions.map((q, index) => {
+                          const Icon = q.icon;
+                          return (
+                            <SelectItem key={index} value={q.text}>
+                              <div className="flex items-start gap-2 w-full">
+                                <Icon className="h-3 w-3 mt-0.5 flex-shrink-0 text-primary" />
+                                <span className="line-clamp-2 text-left break-words">{q.text}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 {/* Konversationer Card */}
                 <Card>
                   <CardHeader className="pb-3">
@@ -137,41 +188,43 @@ export function AIPropertyAdvisor() {
                   </CardContent>
                 </Card>
 
-                {/* Snabbfrågor Card */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      Snabbfrågor
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ScrollArea className="h-80">
-                      <div className="space-y-2">
-                        {quickQuestions.map((q, index) => {
-                          const Icon = q.icon;
-                          return (
-                            <Button
-                              key={index}
-                              variant="ghost"
-                              className="w-full justify-start h-auto p-2 text-left text-xs"
-                              onClick={() => handleQuickQuestion(q.text)}
-                              disabled={
-                                status === "submitted" ||
-                                status === "streaming"
-                              }
-                            >
-                              <div className="flex items-start gap-2">
-                                <Icon className="h-3 w-3 mt-0.5 flex-shrink-0 text-primary" />
-                                <span className="truncate">{q.text}</span>
-                              </div>
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
+                {/* Desktop: Snabbfrågor Card (below Konversationer) */}
+                {!isMobile && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Snabbfrågor
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <ScrollArea className="h-80">
+                        <div className="space-y-2">
+                          {quickQuestions.map((q, index) => {
+                            const Icon = q.icon;
+                            return (
+                              <Button
+                                key={index}
+                                variant="ghost"
+                                className="w-full justify-start h-auto p-2 text-left text-xs"
+                                onClick={() => handleQuickQuestion(q.text)}
+                                disabled={
+                                  status === "submitted" ||
+                                  status === "streaming"
+                                }
+                              >
+                                <div className="flex items-start gap-2">
+                                  <Icon className="h-3 w-3 mt-0.5 flex-shrink-0 text-primary" />
+                                  <span className="truncate">{q.text}</span>
+                                </div>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 
