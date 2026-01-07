@@ -126,8 +126,14 @@ export async function POST(req: NextRequest) {
       findBrokers: tool({
         description:
           "get broker or real estate agent information from your knowledge base to answer questions.",
-        execute: async ({ question }) => findBrokers(question),
-        inputSchema: questionSchema,
+        execute: async ({ location }) => findBrokers(location),
+        inputSchema: z.object({
+          location: z
+            .string()
+            .describe(
+              "the location to search for brokers or real estate agents",
+            ),
+        }),
       }),
     },
   });
