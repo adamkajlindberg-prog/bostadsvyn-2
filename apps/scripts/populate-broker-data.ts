@@ -1,6 +1,5 @@
 import { eq, getDbClient, hittaMaklare } from "db";
 import puppeteer from "puppeteer";
-import { generateEmbeddings } from "@/lib/ai/embedding";
 import { setTimeoutDelay } from "@/utils/set-timeout-delay";
 
 type T_Broker_Data = {
@@ -293,16 +292,7 @@ const extractData = async (brokers: string[]) => {
 
 // Insert broker data into DB
 const insertData = async (brokerData: T_Broker_Data) => {
-  const dataToEmbed = [brokerData.county, brokerData.locality]
-    .filter(Boolean)
-    .join(", ");
-
-  const embeddingQuery = await generateEmbeddings(dataToEmbed);
-
-  await db.insert(hittaMaklare).values({
-    ...brokerData,
-    embedding: embeddingQuery?.[0]?.embedding ?? [],
-  });
+  await db.insert(hittaMaklare).values(brokerData);
 };
 
 // Main function to populate broker data
