@@ -47,6 +47,30 @@ export interface UpdatePreferencesInput {
   theme: "system" | "light" | "dark";
 }
 
+export interface AIPreferences {
+  interestedAreas: string[];
+  budgetRange: { min: number | null; max: number | null };
+  preferredPropertyTypes: string[];
+  investmentGoals: string[];
+  notifications: {
+    priceAlerts: boolean;
+    marketUpdates: boolean;
+    newListings: boolean;
+  };
+}
+
+export interface UpdateAIPreferencesInput {
+  interestedAreas?: string[];
+  budgetRange?: { min: number | null; max: number | null };
+  preferredPropertyTypes?: string[];
+  investmentGoals?: string[];
+  notifications?: {
+    priceAlerts?: boolean;
+    marketUpdates?: boolean;
+    newListings?: boolean;
+  };
+}
+
 export interface UploadAvatarResult {
   url: string;
 }
@@ -362,6 +386,187 @@ export async function updateUserProfile(input: {
         error instanceof Error
           ? error.message
           : "Kunde inte uppdatera profilen",
+    };
+  }
+}
+
+export async function getAIPreferences(): Promise<{
+  success: boolean;
+  preferences?: AIPreferences;
+}> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    const prefs = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    const defaults: AIPreferences = {
+      interestedAreas: [],
+      budgetRange: { min: null, max: null },
+      preferredPropertyTypes: [],
+      investmentGoals: [],
+      notifications: {
+        priceAlerts: false,
+        marketUpdates: false,
+        newListings: false,
+      },
+    };
+
+    if (prefs.length === 0) {
+      return {
+        success: true,
+        preferences: defaults,
+      };
+    }
+
+    const pref = prefs[0];
+    return {
+      success: true,
+      preferences: {
+        interestedAreas: (pref.aiInterestedAreas as string[]) || [],
+        budgetRange:
+          (pref.aiBudgetRange as { min: number | null; max: number | null }) ||
+          { min: null, max: null },
+        preferredPropertyTypes:
+          (pref.aiPreferredPropertyTypes as string[]) || [],
+        investmentGoals: (pref.aiInvestmentGoals as string[]) || [],
+        notifications:
+          (pref.aiNotifications as {
+            priceAlerts: boolean;
+            marketUpdates: boolean;
+            newListings: boolean;
+          }) || {
+            priceAlerts: false,
+            marketUpdates: false,
+            newListings: false,
+          },
+      },
+    };
+  } catch (error) {
+    console.error("Error getting AI preferences:", error);
+    return {
+      success: false,
+    };
+  }
+}
+
+export async function updateAIPreferences(
+  input: UpdateAIPreferencesInput,
+): Promise<{ success: boolean; error?: string }> {
+  const session = assertSession(await getServerSession());
+
+  try {
+    const db = getDbClient();
+
+    // First get existing preferences to merge
+    const existing = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, session.user.id))
+      .limit(1);
+
+    const defaults: AIPreferences = {
+      interestedAreas: [],
+      budgetRange: { min: null, max: null },
+      preferredPropertyTypes: [],
+      investmentGoals: [],
+      notifications: {
+        priceAlerts: false,
+        marketUpdates: false,
+        newListings: false,
+      },
+    };
+
+    const currentPreferences: AIPreferences =
+      existing.length > 0
+        ? {
+            interestedAreas:
+              (existing[0].aiInterestedAreas as string[]) || [],
+            budgetRange:
+              (existing[0].aiBudgetRange as {
+                min: number | null;
+                max: number | null;
+              }) || { min: null, max: null },
+            preferredPropertyTypes:
+              (existing[0].aiPreferredPropertyTypes as string[]) || [],
+            investmentGoals:
+              (existing[0].aiInvestmentGoals as string[]) || [],
+            notifications:
+              (existing[0].aiNotifications as {
+                priceAlerts: boolean;
+                marketUpdates: boolean;
+                newListings: boolean;
+              }) || {
+                priceAlerts: false,
+                marketUpdates: false,
+                newListings: false,
+              },
+          }
+        : defaults;
+
+    // Merge input with current preferences
+    const updatedPreferences: AIPreferences = {
+      interestedAreas:
+        input.interestedAreas ?? currentPreferences.interestedAreas,
+      budgetRange: input.budgetRange ?? currentPreferences.budgetRange,
+      preferredPropertyTypes:
+        input.preferredPropertyTypes ?? currentPreferences.preferredPropertyTypes,
+      investmentGoals:
+        input.investmentGoals ?? currentPreferences.investmentGoals,
+      notifications: input.notifications
+        ? {
+            ...currentPreferences.notifications,
+            ...input.notifications,
+          }
+        : currentPreferences.notifications,
+    };
+
+    if (existing.length > 0) {
+      // Update existing preferences
+      await db
+        .update(userPreferences)
+        .set({
+          aiInterestedAreas: updatedPreferences.interestedAreas,
+          aiBudgetRange: updatedPreferences.budgetRange,
+          aiPreferredPropertyTypes: updatedPreferences.preferredPropertyTypes,
+          aiInvestmentGoals: updatedPreferences.investmentGoals,
+          aiNotifications: updatedPreferences.notifications,
+          updatedAt: new Date(),
+        })
+        .where(eq(userPreferences.userId, session.user.id));
+    } else {
+      // Insert new preferences (user preferences must exist first)
+      await db.insert(userPreferences).values({
+        id: randomUUID(),
+        userId: session.user.id,
+        emailNotifications: true,
+        smsNotifications: false,
+        marketingEmails: false,
+        preferredCurrency: "SEK",
+        preferredLanguage: "sv",
+        theme: "system",
+        aiInterestedAreas: updatedPreferences.interestedAreas,
+        aiBudgetRange: updatedPreferences.budgetRange,
+        aiPreferredPropertyTypes: updatedPreferences.preferredPropertyTypes,
+        aiInvestmentGoals: updatedPreferences.investmentGoals,
+        aiNotifications: updatedPreferences.notifications,
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating AI preferences:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Kunde inte uppdatera AI-inställningar",
     };
   }
 }

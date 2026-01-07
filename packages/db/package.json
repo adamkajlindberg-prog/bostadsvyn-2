@@ -4,7 +4,8 @@
   "exports": {
     ".": {
       "default": "./index.ts"
-    }
+    },
+    "./pg/schema": "./pg/schema/index.ts"
   },
   "scripts": {
     "push": "with-env drizzle-kit push",
