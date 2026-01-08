@@ -99,10 +99,8 @@ export function AIHomestyling() {
 
   const generateStyledImage = async () => {
     if (!selectedFile || !selectedStyle || !selectedRoom) {
-      toast({
-        title: "Komplettera uppgifterna",
+      toast.error("Komplettera uppgifterna", {
         description: "Välj bild, stil och rumstyp för att fortsätta.",
-        variant: "destructive",
       });
       return;
     }
@@ -148,8 +146,7 @@ export function AIHomestyling() {
         }
 
         setStyledImage(data.image_url);
-        toast({
-          title: "Homestyling klar!",
+        toast.success("Homestyling klar!", {
           description: "Din inredningsvisualisering är redo.",
         });
       };
@@ -157,10 +154,8 @@ export function AIHomestyling() {
       reader.readAsDataURL(selectedFile);
     } catch (error) {
       console.error("Error styling image:", error);
-      toast({
-        title: "Fel vid homestyling",
+      toast.error("Fel vid homestyling", {
         description: "Något gick fel. Försök igen.",
-        variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
