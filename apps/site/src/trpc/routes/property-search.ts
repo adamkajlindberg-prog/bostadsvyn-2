@@ -1,4 +1,4 @@
-import { getDbClient, properties, propertyEmbeddings, sql } from "db";
+import { count, getDbClient, properties, propertyEmbeddings, sql } from "db";
 import {
   and,
   asc,
@@ -9,7 +9,9 @@ import {
   gte,
   inArray,
   lte,
+  type SQL,
 } from "drizzle-orm";
+import type { PgColumn } from "drizzle-orm/pg-core";
 import z from "zod/v4";
 import { generateEmbedding } from "@/lib/ai/embedding";
 import { createTRPCRouter, publicProcedure } from "@/trpc/init";
@@ -41,8 +43,27 @@ export type T_Property_Search_Input = z.infer<typeof Z_Property_Search_Input>;
 
 const db = getDbClient();
 
-const filterConditions = (input: T_Property_Search_Input) => {
-  const conditions = [];
+// Helper function to add range filters
+const addRangeFilter = (
+  conditions: SQL[],
+  column: PgColumn,
+  min?: number,
+  max?: number,
+) => {
+  if (min !== undefined && min > 0) {
+    conditions.push(gte(column, min));
+  }
+  if (max !== undefined && max > 0) {
+    conditions.push(lte(column, max));
+  }
+};
+
+// Unified filter conditions function
+const filterConditions = (
+  input: T_Property_Search_Input,
+  includeListingType = true,
+): SQL[] => {
+  const conditions: SQL[] = [];
 
   // Location filter (using full-text search on address fields)
   if (input.location) {
@@ -62,49 +83,31 @@ const filterConditions = (input: T_Property_Search_Input) => {
   }
 
   // Listing type (status) filter
-  if (input.listingType) {
+  if (includeListingType && input.listingType && input.listingType !== "ALL") {
     conditions.push(eq(properties.status, input.listingType.toUpperCase()));
   }
 
-  // Price range filters
-  if (input.minPrice !== undefined && input.minPrice > 0) {
-    conditions.push(gte(properties.price, input.minPrice));
-  }
-  if (input.maxPrice !== undefined && input.maxPrice > 0) {
-    conditions.push(lte(properties.price, input.maxPrice));
-  }
-
-  // Living area filters
-  if (input.minArea !== undefined && input.minArea > 0) {
-    conditions.push(gte(properties.livingArea, input.minArea));
-  }
-  if (input.maxArea !== undefined && input.maxArea > 0) {
-    conditions.push(lte(properties.livingArea, input.maxArea));
-  }
-
-  // Rooms filters
-  if (input.minRooms !== undefined && input.minRooms > 0) {
-    conditions.push(gte(properties.rooms, input.minRooms));
-  }
-  if (input.maxRooms !== undefined && input.maxRooms > 0) {
-    conditions.push(lte(properties.rooms, input.maxRooms));
-  }
-
-  // Monthly fee filters
-  if (input.minMonthlyFee !== undefined && input.minMonthlyFee > 0) {
-    conditions.push(gte(properties.monthlyFee, input.minMonthlyFee));
-  }
-  if (input.maxMonthlyFee !== undefined && input.maxMonthlyFee > 0) {
-    conditions.push(lte(properties.monthlyFee, input.maxMonthlyFee));
-  }
-
-  // Plot area filters
-  if (input.minPlotArea !== undefined && input.minPlotArea > 0) {
-    conditions.push(gte(properties.plotArea, input.minPlotArea));
-  }
-  if (input.maxPlotArea !== undefined && input.maxPlotArea > 0) {
-    conditions.push(lte(properties.plotArea, input.maxPlotArea));
-  }
+  // Range filters using helper function
+  addRangeFilter(conditions, properties.price, input.minPrice, input.maxPrice);
+  addRangeFilter(
+    conditions,
+    properties.livingArea,
+    input.minArea,
+    input.maxArea,
+  );
+  addRangeFilter(conditions, properties.rooms, input.minRooms, input.maxRooms);
+  addRangeFilter(
+    conditions,
+    properties.monthlyFee,
+    input.minMonthlyFee,
+    input.maxMonthlyFee,
+  );
+  addRangeFilter(
+    conditions,
+    properties.plotArea,
+    input.minPlotArea,
+    input.maxPlotArea,
+  );
 
   // Energy class filter
   if (input.energyClass && input.energyClass.length > 0) {
@@ -117,6 +120,109 @@ const filterConditions = (input: T_Property_Search_Input) => {
   }
 
   return conditions;
+};
+
+// Calculate counts for all listing types using a single query with conditional aggregation
+const calculateListingTypeCounts = async (
+  input: T_Property_Search_Input,
+  textSearchCondition?: SQL,
+) => {
+  const baseConditions = filterConditions(input, false);
+  const allConditions = textSearchCondition
+    ? [...baseConditions, textSearchCondition]
+    : baseConditions;
+
+  const whereClause =
+    allConditions.length > 0 ? and(...allConditions) : undefined;
+
+  // Single query with conditional aggregation for all counts
+  const countsResult = await db
+    .select({
+      all: count(),
+      forSale: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'FOR_SALE')`,
+      forRent: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'FOR_RENT')`,
+      comingSoon: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'COMING_SOON')`,
+      sold: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'SOLD')`,
+      nyproduktion: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'NYPRODUKTION')`,
+      commercial: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'COMMERCIAL')`,
+    })
+    .from(properties)
+    .where(whereClause);
+
+  const result = countsResult[0] ?? {
+    all: 0,
+    forSale: 0,
+    forRent: 0,
+    comingSoon: 0,
+    sold: 0,
+    nyproduktion: 0,
+    commercial: 0,
+  };
+
+  return {
+    ALL: Number(result.all),
+    FOR_SALE: Number(result.forSale),
+    FOR_RENT: Number(result.forRent),
+    COMING_SOON: Number(result.comingSoon),
+    SOLD: Number(result.sold),
+    NYPRODUKTION: Number(result.nyproduktion),
+    COMMERCIAL: Number(result.commercial),
+  };
+};
+
+// Calculate counts for AI search using a single query with conditional aggregation
+const calculateListingTypeCountsForAI = async (
+  input: T_Property_Search_Input,
+  queryEmbedded: number[],
+) => {
+  const baseConditions = filterConditions(input, false);
+
+  const similarity = sql<number>`1 - (${cosineDistance(
+    propertyEmbeddings.embedding,
+    queryEmbedded,
+  )})`;
+
+  const similarityCondition = gt(similarity, 0.8);
+
+  const allConditions =
+    baseConditions.length > 0
+      ? and(similarityCondition, ...baseConditions)
+      : similarityCondition;
+
+  // Single query with conditional aggregation for all counts
+  const countsResult = await db
+    .select({
+      all: count(),
+      forSale: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'FOR_SALE')`,
+      forRent: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'FOR_RENT')`,
+      comingSoon: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'COMING_SOON')`,
+      sold: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'SOLD')`,
+      nyproduktion: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'NYPRODUKTION')`,
+      commercial: sql<number>`COUNT(*) FILTER (WHERE ${properties.status} = 'COMMERCIAL')`,
+    })
+    .from(propertyEmbeddings)
+    .innerJoin(properties, eq(propertyEmbeddings.propertyId, properties.id))
+    .where(allConditions);
+
+  const result = countsResult[0] ?? {
+    all: 0,
+    forSale: 0,
+    forRent: 0,
+    comingSoon: 0,
+    sold: 0,
+    nyproduktion: 0,
+    commercial: 0,
+  };
+
+  return {
+    ALL: Number(result.all),
+    FOR_SALE: Number(result.forSale),
+    FOR_RENT: Number(result.forRent),
+    COMING_SOON: Number(result.comingSoon),
+    SOLD: Number(result.sold),
+    NYPRODUKTION: Number(result.nyproduktion),
+    COMMERCIAL: Number(result.commercial),
+  };
 };
 
 const getSortOrder = (sortBy?: string) => {
@@ -166,13 +272,14 @@ const searchProperties = async (
 
   // Use AI search if ai parameter is true
   if (input.ai) {
-    console.log("USED AI SEARCH");
     const queryEmbedded = await generateEmbedding(query);
 
     const similarity = sql<number>`1 - (${cosineDistance(
       propertyEmbeddings.embedding,
       queryEmbedded,
     )})`;
+
+    const similarityCondition = gt(similarity, 0.8);
 
     const aiData = await db
       .select({
@@ -183,44 +290,45 @@ const searchProperties = async (
       .innerJoin(properties, eq(propertyEmbeddings.propertyId, properties.id))
       .where(
         conditions.length > 0
-          ? and(gt(similarity, 0.9), ...conditions)
-          : gt(similarity, 0.9),
+          ? and(similarityCondition, ...conditions)
+          : similarityCondition,
       )
       .orderBy((t) => desc(t.similarity));
 
     const aiProperties = aiData.map((r) => r.property);
 
+    // Calculate counts for AI search (using similarity condition)
+    const counts = await calculateListingTypeCountsForAI(input, queryEmbedded);
+
     return {
       properties: aiProperties,
       total: aiProperties.length,
+      counts,
     };
   }
 
-  // Otherwise use full-text search
-  const textSearchCondition = sql`to_tsvector('swedish', 
-            ${properties.title} || ' ' || 
-            COALESCE(${properties.description}, '') || ' ' || 
-            ${properties.propertyType} || ' ' || 
-            ${properties.status} || ' ' ||
-            ${properties.price}::text || ' ' ||
-            ${properties.addressStreet} || ' ' ||
-            ${properties.addressCity} || ' ' ||
-            ${properties.addressPostalCode} || ' ' ||
-            ${properties.addressCountry} || ' ' ||
-            COALESCE(${properties.livingArea}::text, '') || ' ' ||
-            COALESCE(${properties.plotArea}::text, '') || ' ' ||
-            COALESCE(${properties.rooms}::text, '') || ' ' ||
-            COALESCE(${properties.bedrooms}::text, '') || ' ' ||
-            COALESCE(${properties.bathrooms}::text, '') || ' ' ||
-            COALESCE(${properties.yearBuilt}::text, '') || ' ' ||
-            COALESCE(${properties.energyClass}, '') || ' ' ||
-            COALESCE(${properties.monthlyFee}::text, '') || ' ' ||
-            COALESCE(array_to_string(${properties.features}, ' '), '') || ' ' ||
-            COALESCE(${properties.operatingCosts}::text, '') || ' ' ||
-            COALESCE(${properties.kitchenDescription}, '') || ' ' ||
-            COALESCE(${properties.bathroomDescription}, '') || ' ' ||
-            ${properties.adTier}
-          ) @@ websearch_to_tsquery('swedish', ${query})`;
+  // Use optimized database function for full-text search
+  const textSearchCondition = sql`property_search_vector(
+    ${properties.title},
+    ${properties.description},
+    ${properties.propertyType},
+    ${properties.status},
+    ${properties.price},
+    ${properties.addressStreet},
+    ${properties.addressCity},
+    ${properties.livingArea},
+    ${properties.plotArea},
+    ${properties.rooms},
+    ${properties.bedrooms},
+    ${properties.bathrooms},
+    ${properties.yearBuilt},
+    ${properties.monthlyFee},
+    ${properties.features},
+    ${properties.operatingCosts},
+    ${properties.kitchenDescription},
+    ${properties.bathroomDescription},
+    ${properties.adTier}
+  ) @@ websearch_to_tsquery('swedish', ${query})`;
 
   const allConditions = [...conditions, textSearchCondition];
 
@@ -230,10 +338,13 @@ const searchProperties = async (
     .where(and(...allConditions))
     .orderBy(getSortOrder(input.sortBy));
 
-  console.log("USED FULL TEXT SEARCH");
+  // Calculate counts for full-text search
+  const counts = await calculateListingTypeCounts(input, textSearchCondition);
+
   return {
     properties: fullTextData,
     total: fullTextData.length,
+    counts,
   };
 };
 
@@ -246,7 +357,10 @@ const allProperties = async (input: T_Property_Search_Input) => {
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(getSortOrder(input.sortBy));
 
-  return { properties: data, total: data.length };
+  // Calculate counts (no text search condition for all properties)
+  const counts = await calculateListingTypeCounts(input);
+
+  return { properties: data, total: data.length, counts };
 };
 
 const propertySearch = createTRPCRouter({

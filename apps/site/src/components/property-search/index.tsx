@@ -43,7 +43,6 @@ import {
   searchPropertyTabs,
   sortOptions,
 } from "@/utils/constants";
-import { getCount } from "@/utils/objects";
 
 type ViewMode = "grid" | "map";
 
@@ -206,7 +205,7 @@ export default function PropertySearch() {
       params.delete("query");
     }
 
-    if (type === "ai") {
+    if (type === "ai" && value.trim()) {
       setInputValues((prev) => ({ ...prev, basicSearch: "" }));
       params.set("ai", "true");
     } else {
@@ -832,31 +831,31 @@ export default function PropertySearch() {
               >
                 <TabsList className="grid grid-cols-7">
                   <TabsTrigger value="ALL">
-                    Alla {`(${getCount(searchData?.properties ?? [])})`}
+                    Alla {`(${searchData?.counts?.ALL ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="FOR_SALE">
                     Till salu{" "}
-                    {`(${getCount(searchData?.properties ?? [], "FOR_SALE", "status")})`}
+                    {`(${searchData?.counts?.FOR_SALE ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="COMING_SOON">
                     Snart till salu{" "}
-                    {`(${getCount(searchData?.properties ?? [], "COMING_SOON", "status")})`}
+                    {`(${searchData?.counts?.COMING_SOON ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="SOLD">
                     Slutpriser{" "}
-                    {`(${getCount(searchData?.properties ?? [], "SOLD", "status")})`}
+                    {`(${searchData?.counts?.SOLD ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="FOR_RENT">
                     Uthyrning{" "}
-                    {`(${getCount(searchData?.properties ?? [], "FOR_RENT", "status")})`}
+                    {`(${searchData?.counts?.FOR_RENT ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="NYPRODUKTION">
                     Nyproduktion{" "}
-                    {`(${getCount(searchData?.properties ?? [], "NYPRODUKTION", "status")})`}
+                    {`(${searchData?.counts?.NYPRODUKTION ?? 0})`}
                   </TabsTrigger>
                   <TabsTrigger value="COMMERCIAL">
                     Kommersiellt{" "}
-                    {`(${getCount(searchData?.properties ?? [], "COMMERCIAL", "status")})`}
+                    {`(${searchData?.counts?.COMMERCIAL ?? 0})`}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
