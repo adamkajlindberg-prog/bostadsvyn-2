@@ -1,6 +1,5 @@
-import type { Property } from "db";
 import PropertyCard from "@/components/property-card";
-import type { PropertyGroup } from "../../utils/property-grouping";
+import type { PropertyGroup } from "../utils/property-grouping";
 
 interface PropertyListProps {
   groups: PropertyGroup[];
@@ -26,4 +25,3 @@ export const PropertyList = ({ groups }: PropertyListProps) => {
     </div>
   );
 };
-
