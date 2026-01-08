@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-// import { toast } from "sonner";
 import PropertyCard from "@/components/property-card";
 import PropertyMap from "@/components/property-map";
 import { Button } from "@/components/ui/button";
@@ -124,7 +123,6 @@ export default function PropertySearch() {
     }
     | undefined
   >(undefined);
-  // const [naturalSearchQuery, setNaturalSearchQuery] = useState("");
   const [activeSearchTab, setActiveSearchTab] = useState("");
   const [basicSearch, setBasicSearch] = useState<string>(!filters.ai ? filters.query || "" : "");
   const [aiSearch, setAiSearch] = useState<string>(filters.ai ? filters.query || "" : "");
@@ -153,6 +151,58 @@ export default function PropertySearch() {
   const debouncedBasicSearch = useDebounce((value: string) => {
     handleSearch(value, 'basic');
   }, 1000);
+
+  const handleSearch = (value: string, type: 'basic' | 'ai') => {
+    setFilters((prev) => ({
+      ...prev,
+      query: value,
+    }));
+
+    if (value.trim()) {
+      params.set("query", value);
+    } else {
+      params.delete("query");
+    }
+
+    if (type === 'ai') {
+      setBasicSearch("");
+      params.set("ai", "true");
+    } else {
+      setAiSearch("");
+      params.delete("ai");
+    }
+
+    const queryString = params.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    });
+  }
+
+  const handleBasicSearch = (value: string) => {
+    setBasicSearch(value);
+    debouncedBasicSearch(value);
+  };
+
+  const handlePropertyType = (value: string) => {
+    const isCurrentlySelected = filters.propertyType === value;
+    const newValue = isCurrentlySelected ? "" : value;
+
+    setFilters((prev) => ({
+      ...prev,
+      propertyType: newValue,
+    }));
+
+    if (newValue.trim()) {
+      params.set("propertyType", newValue);
+    } else {
+      params.delete("propertyType");
+    }
+
+    const queryString = params.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    });
+  };
 
   const handleInputChange = (key: keyof typeof inputValues) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -287,21 +337,6 @@ export default function PropertySearch() {
     return sortedGroups;
   };
 
-  // const handleNaturalSearch = () => {
-  //   if (!naturalSearchQuery || naturalSearchQuery.trim().length === 0) {
-  //     toast.error("Ange en sökfras eller plats");
-  //     return;
-  //   }
-
-  //   setFilters((prev) => ({
-  //     ...prev,
-  //     query: naturalSearchQuery,
-  //     ai: true,
-  //   }));
-  //   // Sync to basic search input
-  //   setInputValues((prev) => ({ ...prev, query: naturalSearchQuery }));
-  // };
-
   const onChangeSearchTab = (value: string) => {
     setActiveSearchTab(value);
     setActiveTab(
@@ -329,35 +364,6 @@ export default function PropertySearch() {
       </div>
     );
   }
-
-  const handleSearch = (value: string, type: 'basic' | 'ai') => {
-    setFilters((prev) => ({
-      ...prev,
-      query: value,
-    }));
-
-    if (value.trim()) {
-      params.set("query", value);
-    } else {
-      params.delete("query");
-    }
-
-    if (type === 'ai') {
-      params.set("ai", "true");
-    } else {
-      params.delete("ai");
-    }
-
-    const queryString = params.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-      scroll: false,
-    });
-  }
-
-  const handleBasicSearch = (value: string) => {
-    setBasicSearch(value);
-    debouncedBasicSearch(value);
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -474,14 +480,8 @@ export default function PropertySearch() {
                     <div key={type} className="flex items-center space-x-2">
                       <Checkbox
                         id={type}
-                        checked={filters.propertyType === type}
-                        onCheckedChange={() =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            propertyType:
-                              prev.propertyType === type ? "" : type,
-                          }))
-                        }
+                        checked={filters.propertyType === type.toLowerCase()}
+                        onCheckedChange={() => handlePropertyType(type.toLowerCase())}
                       />
                       <Label htmlFor={type} className="text-sm cursor-pointer">
                         {propertyTypeLabels[type]}
