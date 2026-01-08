@@ -1,12 +1,15 @@
 import { Suspense } from "react";
 import { getServerSession } from "@/auth/server-session";
-import AITools from "@/components/ai-tools";
+import { getUserSubscriptionTier } from "@/lib/subscription";
+import { AIVerktygContent } from "./content";
 
 export default async function AIVerktygPage() {
   const session = await getServerSession();
   if (!session?.user) {
     return null; // Layout handles redirect
   }
+
+  const subscriptionTier = await getUserSubscriptionTier(session.user.id);
 
   return (
     <Suspense
@@ -19,11 +22,7 @@ export default async function AIVerktygPage() {
         </div>
       }
     >
-      <AIVerktygContent />
+      <AIVerktygContent subscriptionTier={subscriptionTier} />
     </Suspense>
   );
 }
-
-const AIVerktygContent = () => {
-  return <AITools />;
-};

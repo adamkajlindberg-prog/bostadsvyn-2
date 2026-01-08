@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -92,6 +93,15 @@ export const userPreferences = pgTable("user_preferences", {
   preferredCurrency: text("preferred_currency").default("SEK").notNull(),
   preferredLanguage: text("preferred_language").default("sv").notNull(),
   theme: text("theme").default("system").notNull(),
+  aiInterestedAreas: jsonb("ai_interested_areas").$type<string[]>(),
+  aiBudgetRange: jsonb("ai_budget_range").$type<{ min: number | null; max: number | null }>(),
+  aiPreferredPropertyTypes: jsonb("ai_preferred_property_types").$type<string[]>(),
+  aiInvestmentGoals: jsonb("ai_investment_goals").$type<string[]>(),
+  aiNotifications: jsonb("ai_notifications").$type<{
+    priceAlerts: boolean;
+    marketUpdates: boolean;
+    newListings: boolean;
+  }>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

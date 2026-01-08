@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getServerSession } from "@/auth/server-session";
-import { Card, CardContent } from "@/components/ui/card";
+import AIImageGallery from "@/components/ai-image-gallery";
 
 export default async function AIBildgalleriPage() {
   const session = await getServerSession();
@@ -19,17 +19,7 @@ export default async function AIBildgalleriPage() {
         </div>
       }
     >
-      <AIBildgalleriContent />
+      <AIImageGallery />
     </Suspense>
   );
 }
-
-const AIBildgalleriContent = () => {
-  return (
-    <Card>
-      <CardContent className="text-center py-12">
-        <p className="text-muted-foreground">AI-bildgalleri kommer snart</p>
-      </CardContent>
-    </Card>
-  );
-};
