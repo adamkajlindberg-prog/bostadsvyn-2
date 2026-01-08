@@ -70,7 +70,7 @@ const getFiltersFromParams = (
       ? Number(params.get("maxRooms"))
       : undefined,
     features: params.getAll("features"),
-    energyClass: params.getAll("energyClass"),
+    energyClass: params.get("energyClass")?.split(",").filter(Boolean) || [],
     sortBy: params.get("sortBy") || "",
     minRent: params.get("minRent") ? Number(params.get("minRent")) : undefined,
     maxRent: params.get("maxRent") ? Number(params.get("maxRent")) : undefined,
@@ -124,8 +124,6 @@ export default function PropertySearch() {
     | undefined
   >(undefined);
   const [activeSearchTab, setActiveSearchTab] = useState("");
-  const [basicSearch, setBasicSearch] = useState<string>(!filters.ai ? filters.query || "" : "");
-  const [aiSearch, setAiSearch] = useState<string>(filters.ai ? filters.query || "" : "");
 
   // Hide filter checkboxes
   const [hideRental, setHideRental] = useState(false);
@@ -134,25 +132,69 @@ export default function PropertySearch() {
 
   // Separated filter states
   const [inputValues, setInputValues] = useState({
+    basicSearch: !filters.ai ? filters.query || "" : "",
+    aiSearch: filters.ai ? filters.query || "" : "",
     location: filters.location || "",
+    propertyType: filters.propertyType || "",
     minPrice: filters.minPrice?.toString() || "",
     maxPrice: filters.maxPrice?.toString() || "",
+    minArea: filters.minArea || 0,
+    maxArea: filters.maxArea || 1000,
+    minRooms: filters.minRooms || 0,
+    maxRooms: filters.maxRooms || 10,
+    energyClass: filters.energyClass || []
   });
 
-  const debouncedFilterUpdate = useDebounce((key: string, value: string) => {
+  const updateUrlParams = () => {
+    const queryString = params.toString();
+    router.replace(
+      queryString ? `${pathname}?${queryString}` : pathname,
+      {
+        scroll: false,
+      },
+    );
+  };
+
+  const debounceBasicSearch = useDebounce((value: string) => {
+    handleSearch(value, "basic");
+  }, 1000);
+
+  const debounceLocationSearch = useDebounce((value: string) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: key === "location"
-        ? value
-        : value ? Number(value) : undefined,
+      location: value,
     }));
+
+    if (value.trim()) {
+      params.set("location", value);
+    } else {
+      params.delete("location");
+    }
+
+    updateUrlParams();
   }, 1000);
 
-  const debouncedBasicSearch = useDebounce((value: string) => {
-    handleSearch(value, 'basic');
-  }, 1000);
+  const debouncePriceRangeSearch = useDebounce(
+    (value: string, type: "min" | "max") => {
+      setFilters((prev) => ({
+        ...prev,
+        [type === "min" ? "minPrice" : "maxPrice"]: value
+          ? Number(value)
+          : undefined,
+      }));
 
-  const handleSearch = (value: string, type: 'basic' | 'ai') => {
+      if (value.trim()) {
+        params.set(type === "min" ? "minPrice" : "maxPrice", value);
+      } else {
+        params.delete(type === "min" ? "minPrice" : "maxPrice");
+      }
+
+      updateUrlParams();
+    },
+    1000,
+  );
+
+  const handleSearch = (value: string, type: "basic" | "ai") => {
     setFilters((prev) => ({
       ...prev,
       query: value,
@@ -164,23 +206,25 @@ export default function PropertySearch() {
       params.delete("query");
     }
 
-    if (type === 'ai') {
-      setBasicSearch("");
+    if (type === "ai") {
+      setInputValues((prev) => ({ ...prev, basicSearch: "" }));
       params.set("ai", "true");
     } else {
-      setAiSearch("");
+      setInputValues((prev) => ({ ...prev, aiSearch: "" }));
       params.delete("ai");
     }
 
-    const queryString = params.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-      scroll: false,
-    });
-  }
+    updateUrlParams();
+  };
 
   const handleBasicSearch = (value: string) => {
-    setBasicSearch(value);
-    debouncedBasicSearch(value);
+    setInputValues((prev) => ({ ...prev, basicSearch: value }));
+    debounceBasicSearch(value);
+  };
+
+  const handleLocationSearch = (value: string) => {
+    setInputValues((prev) => ({ ...prev, location: value }));
+    debounceLocationSearch(value);
   };
 
   const handlePropertyType = (value: string) => {
@@ -198,30 +242,111 @@ export default function PropertySearch() {
       params.delete("propertyType");
     }
 
-    const queryString = params.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-      scroll: false,
-    });
+    updateUrlParams();
   };
 
-  const handleInputChange = (key: keyof typeof inputValues) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setInputValues((prev) => ({ ...prev, [key]: value }));
-    debouncedFilterUpdate(key, value);
+  const handlePriceRange = (value: string, type: "min" | "max") => {
+    setInputValues((prev) => ({
+      ...prev,
+      [type === "min" ? "minPrice" : "maxPrice"]: value,
+    }));
+    debouncePriceRangeSearch(value, type);
+  };
+
+  const handleAreaRange = (min: number, max: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      minArea: min,
+      maxArea: max,
+    }));
+
+    if (min > 0) {
+      params.set("minArea", min.toString());
+    } else {
+      params.delete("minArea");
+    }
+    if (max < 1000) {
+      params.set("maxArea", max.toString());
+    } else {
+      params.delete("maxArea");
+    }
+
+    updateUrlParams();
+  }
+
+  const handleRoomsRange = (min: number, max: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      minRooms: min,
+      maxRooms: max,
+    }));
+
+    if (min > 0) {
+      params.set("minRooms", min.toString());
+    } else {
+      params.delete("minRooms");
+    }
+    if (max < 10) {
+      params.set("maxRooms", max.toString());
+    } else {
+      params.delete("maxRooms");
+    }
+
+    updateUrlParams();
+  }
+
+  const handleEnergyClass = (energyClass: string) => {
+    setInputValues((prev) => {
+      const currentSelection = prev.energyClass || [];
+      const newSelection = currentSelection.includes(energyClass)
+        ? currentSelection.filter((e) => e !== energyClass)
+        : [...currentSelection, energyClass];
+
+      setFilters((prevFilters) => {
+        if (newSelection.length > 0) {
+          params.set("energyClass", newSelection.join(","));
+        } else {
+          params.delete("energyClass");
+        }
+
+        updateUrlParams();
+
+        return {
+          ...prevFilters,
+          energyClass: newSelection,
+        };
+      });
+
+      return {
+        ...prev,
+        energyClass: newSelection,
+      };
+    });
   };
 
   const clearInputValues = () => {
     setInputValues({
+      basicSearch: "",
+      aiSearch: "",
       location: "",
+      propertyType: "",
       minPrice: "",
       maxPrice: "",
+      minArea: 0,
+      maxArea: 1000,
+      minRooms: 0,
+      maxRooms: 10,
+      energyClass: []
     });
-  }
+
+    router.replace(pathname, {
+      scroll: false,
+    });
+  };
 
   const clearFilters = () => {
-    setFilters(getFiltersFromParams(new URLSearchParams()));
+    const clearedFilters = getFiltersFromParams(new URLSearchParams());
+    setFilters(clearedFilters);
     clearInputValues();
     setSelectedLocation(undefined);
     setHideRental(false);
@@ -422,16 +547,24 @@ export default function PropertySearch() {
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Beskriv din drömbostad i naturligt språk. Vår AI tolkar automatiskt dina önskemål.
+                  Beskriv din drömbostad i naturligt språk. Vår AI tolkar
+                  automatiskt dina önskemål.
                 </p>
                 <div className="flex gap-2">
                   <Input
                     placeholder="T.ex. '3 rum lägenhet i Stockholm'"
-                    value={aiSearch}
-                    onChange={(e) => setAiSearch(e.target.value)}
+                    value={inputValues.aiSearch}
+                    onChange={(e) =>
+                      setInputValues((prev) => ({
+                        ...prev,
+                        aiSearch: e.target.value,
+                      }))
+                    }
                     className="text-sm py-[19px] bg-background shadow-none"
                   />
-                  <Button onClick={() => handleSearch(aiSearch, 'ai')}>
+                  <Button
+                    onClick={() => handleSearch(inputValues.aiSearch, "ai")}
+                  >
                     <Sparkles className="h-4 w-4" />
                   </Button>
                 </div>
@@ -443,7 +576,7 @@ export default function PropertySearch() {
               <div>
                 <Label>Söka</Label>
                 <Input
-                  value={basicSearch}
+                  value={inputValues.basicSearch}
                   onChange={(e) => handleBasicSearch(e.target.value)}
                   placeholder="T.ex. Villa i Stockholm"
                   className="mt-3 py-[19px]"
@@ -458,7 +591,7 @@ export default function PropertySearch() {
                 <Input
                   placeholder="T.ex. Stockholm"
                   value={inputValues.location}
-                  onChange={handleInputChange("location")}
+                  onChange={(e) => handleLocationSearch(e.target.value)}
                   className="mt-3 py-[19px]"
                 />
               </div>
@@ -481,7 +614,9 @@ export default function PropertySearch() {
                       <Checkbox
                         id={type}
                         checked={filters.propertyType === type.toLowerCase()}
-                        onCheckedChange={() => handlePropertyType(type.toLowerCase())}
+                        onCheckedChange={() =>
+                          handlePropertyType(type.toLowerCase())
+                        }
                       />
                       <Label htmlFor={type} className="text-sm cursor-pointer">
                         {propertyTypeLabels[type]}
@@ -500,13 +635,17 @@ export default function PropertySearch() {
                       type="number"
                       placeholder="Från"
                       value={inputValues.minPrice}
-                      onChange={handleInputChange("minPrice")}
+                      onChange={(e) =>
+                        handlePriceRange(e.target.value, "min")
+                      }
                     />
                     <Input
                       type="number"
                       placeholder="Till"
                       value={inputValues.maxPrice}
-                      onChange={handleInputChange("maxPrice")}
+                      onChange={(e) =>
+                        handlePriceRange(e.target.value, "max")
+                      }
                     />
                   </div>
                 </div>
@@ -517,21 +656,24 @@ export default function PropertySearch() {
                 <Label>Boarea (m²)</Label>
                 <div className="mt-4 space-y-4">
                   <Slider
-                    value={[filters.minArea || 0, filters.maxArea || 1000]}
+                    value={[inputValues.minArea, inputValues.maxArea]}
                     onValueChange={([min, max]) => {
-                      setFilters((prev) => ({
+                      setInputValues((prev) => ({
                         ...prev,
                         minArea: min,
-                        maxArea: max,
-                      }));
+                        maxArea: max
+                      }))
                     }}
+                    onValueCommit={([min, max]) =>
+                      handleAreaRange(min, max)
+                    }
                     max={1000}
                     step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{filters.minArea} m²</span>
-                    <span>{filters.maxArea} m²</span>
+                    <span>{inputValues.minArea} m²</span>
+                    <span>{inputValues.maxArea} m²</span>
                   </div>
                 </div>
               </div>
@@ -541,21 +683,24 @@ export default function PropertySearch() {
                 <Label>Antal rum</Label>
                 <div className="mt-4 space-y-4">
                   <Slider
-                    value={[filters.minRooms || 0, filters.maxRooms || 10]}
+                    value={[inputValues.minRooms, inputValues.maxRooms]}
                     onValueChange={([min, max]) => {
-                      setFilters((prev) => ({
+                      setInputValues((prev) => ({
                         ...prev,
                         minRooms: min,
-                        maxRooms: max,
-                      }));
+                        maxRooms: max
+                      }))
+                    }}
+                    onValueCommit={([min, max]) => {
+                      handleRoomsRange(min, max);
                     }}
                     max={10}
                     step={1}
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{filters.minRooms} rum</span>
-                    <span>{filters.maxRooms}+ rum</span>
+                    <span>{inputValues.minRooms} rum</span>
+                    <span>{inputValues.maxRooms}+ rum</span>
                   </div>
                 </div>
               </div>
@@ -613,23 +758,12 @@ export default function PropertySearch() {
                         <Button
                           key={energyClass}
                           variant={
-                            filters.energyClass?.includes(energyClass)
+                            inputValues.energyClass?.includes(energyClass)
                               ? "default"
                               : "outline"
                           }
                           size="sm"
-                          onClick={() =>
-                            setFilters((prev) => ({
-                              ...prev,
-                              energyClass: prev.energyClass?.includes(
-                                energyClass,
-                              )
-                                ? prev.energyClass.filter(
-                                  (e) => e !== energyClass,
-                                )
-                                : [...(prev.energyClass || []), energyClass],
-                            }))
-                          }
+                          onClick={() => handleEnergyClass(energyClass)}
                         >
                           {energyClass}
                         </Button>
@@ -771,9 +905,14 @@ export default function PropertySearch() {
                   <Checkbox
                     id="hideRental"
                     checked={hideRental}
-                    onCheckedChange={(checked) => setHideRental(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setHideRental(checked === true)
+                    }
                   />
-                  <Label htmlFor="hideRental" className="text-sm cursor-pointer">
+                  <Label
+                    htmlFor="hideRental"
+                    className="text-sm cursor-pointer"
+                  >
                     Visa ej hyresbostäder
                   </Label>
                 </div>
@@ -781,9 +920,14 @@ export default function PropertySearch() {
                   <Checkbox
                     id="hideCommercial"
                     checked={hideCommercial}
-                    onCheckedChange={(checked) => setHideCommercial(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setHideCommercial(checked === true)
+                    }
                   />
-                  <Label htmlFor="hideCommercial" className="text-sm cursor-pointer">
+                  <Label
+                    htmlFor="hideCommercial"
+                    className="text-sm cursor-pointer"
+                  >
                     Visa ej kommersiellt
                   </Label>
                 </div>
@@ -791,9 +935,14 @@ export default function PropertySearch() {
                   <Checkbox
                     id="hideNyproduktion"
                     checked={hideNyproduktion}
-                    onCheckedChange={(checked) => setHideNyproduktion(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setHideNyproduktion(checked === true)
+                    }
                   />
-                  <Label htmlFor="hideNyproduktion" className="text-sm cursor-pointer">
+                  <Label
+                    htmlFor="hideNyproduktion"
+                    className="text-sm cursor-pointer"
+                  >
                     Visa ej nyproduktion
                   </Label>
                 </div>
